@@ -1,0 +1,43 @@
+/* Container with fixed width and height */
+.toggle-container {
+  display: flex;
+  border: 2px solid #1e88e5;
+  overflow: hidden;
+  width: 248px;
+  height: 32px;
+}
+
+/* Toggle button styling */
+.toggle-button {
+  flex: 1;
+  padding: 5px 10px;
+  background-color: white;
+  color: #1e88e5;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font: normal normal 600 14px/19px Open Sans;
+  letter-spacing: 0px;
+  opacity: 1;
+}
+
+/* Active button */
+.toggle-button.active {
+  background-color: #1e88e5;
+  color: white;
+}
+
+/* Responsive Styles */
+@media (max-width: 400px) {
+  .toggle-container {
+    width: 100%;
+    max-width: 248px;
+  }
+  
+  .toggle-button {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}

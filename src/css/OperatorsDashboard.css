@@ -1,0 +1,22 @@
+.dashboard-container {
+  padding: 16px;
+}
+
+.summary-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 16px 0;
+}
+
+.floor-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}

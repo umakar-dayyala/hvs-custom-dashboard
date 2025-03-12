@@ -1,0 +1,85 @@
+General Header Styles
+.header-banner {
+    display: flex;
+    flex-direction: column;
+    background-color: #2f4284; /* Banner background color */
+    color: white;
+    
+}
+
+/* Logo and Site Name */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 8%; /* Adjust logo size */
+    height: 4%; /* Adjust logo size */
+}
+
+.site-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 30%;
+}
+
+/* Navigation Links */
+nav {
+    width: 100%;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: right;
+    padding: 10;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.nav-links a:hover {
+    background-color: #a5b1a6;
+}
+
+select option, select optgroup {
+    background: white !important;
+    color: #676a6c !important;
+}
+
+AccordionButton{
+    background: #f4f5f5 !important;
+    color: #676a6c !important;
+}
+
+select {
+    background: white !important;
+    color: #676a6c !important;
+}
+
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .header-banner {
+        text-align: center;
+    }
+
+    .nav-links {
+        flex-direction: column;
+    }
+
+    .nav-links li {
+        margin: 10px 0;
+    }
+}
