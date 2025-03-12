@@ -20,7 +20,7 @@ const floorData = [
 
 const OperatorDashboard = () => {
     return (
-        <Box p={2} >
+        <Box>
             <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
             <div>
                 <SensorStatusCards />

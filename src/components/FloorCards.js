@@ -43,7 +43,7 @@ const FloorCards = ({ floorData }) => {
                       </Box>
 
                       {/* Vertical Divider */}
-                      <Divider orientation="vertical" flexItem style={{  backgroundColor: "#D1D5DB", height: "20px", margin: "0 8px" }} />
+                      <Divider orientation="vertical" flexItem style={{ backgroundColor: "#D1D5DB", height: "20px", margin: "0 8px" }} />
 
                       {/* Biological */}
                       <Box display="flex" alignItems="center" mr={1}>
@@ -54,7 +54,7 @@ const FloorCards = ({ floorData }) => {
                       </Box>
 
                       {/* Vertical Divider */}
-                      <Divider orientation="vertical" flexItem style={{  backgroundColor: "#D1D5DB", height: "20px", margin: "0 8px" }} />
+                      <Divider orientation="vertical" flexItem style={{ backgroundColor: "#D1D5DB", height: "20px", margin: "0 8px" }} />
 
                       {/* Chemical */}
                       <Box display="flex" alignItems="center">
@@ -100,18 +100,28 @@ const FloorCards = ({ floorData }) => {
                     <Grid container spacing={2} mb={1}>
                       {/* Active */}
                       <Grid item xs={6}>
-                        <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
-                          Active <strong style={{ fontWeight: "bold" }}>{floor.activeSensors || "00"}</strong>
-                        </HvTypography>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
+                            Active
+                          </HvTypography>
+                          <HvTypography variant="body" style={{ fontWeight: "bold", color: "#2F2F2F" }}>
+                            {floor.activeSensors || "00"}
+                          </HvTypography>
+                        </Box>
                         <HvTypography variant="caption1" style={{ color: "#9E9E9E" }}>Sensor</HvTypography>
                         <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
                       </Grid>
 
                       {/* Inactive */}
                       <Grid item xs={6}>
-                        <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
-                          Inactive <strong style={{ fontWeight: "bold" }}>{floor.inactiveSensors || "00"}</strong>
-                        </HvTypography>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
+                            Inactive
+                          </HvTypography>
+                          <HvTypography variant="body" style={{ fontWeight: "bold", color: "#2F2F2F" }}>
+                            {floor.inactiveSensors || "00"}
+                          </HvTypography>
+                        </Box>
                         <HvTypography variant="caption1" style={{ color: "#9E9E9E" }}>Sensor</HvTypography>
                         <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
                       </Grid>
@@ -121,17 +131,27 @@ const FloorCards = ({ floorData }) => {
                     <Grid container spacing={2} mb={1}>
                       {/* Unhealthy */}
                       <Grid item xs={6}>
-                        <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
-                          Unhealthy <strong style={{ fontWeight: "bold", color: "#E30613" }}>{floor.unhealthySensors || "00"}</strong>
-                        </HvTypography>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
+                            Unhealthy
+                          </HvTypography>
+                          <HvTypography variant="body" style={{ fontWeight: "bold", color: "#2F2F2F" }}>
+                            {floor.unhealthySensors || "00"}
+                          </HvTypography>
+                        </Box>
                         <HvTypography variant="caption1" style={{ color: "#9E9E9E" }}>Sensor</HvTypography>
                       </Grid>
 
                       {/* Total */}
                       <Grid item xs={6}>
-                        <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
-                          Total <strong style={{ fontWeight: "bold" }}>{floor.totalSensors || "00"}</strong>
-                        </HvTypography>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
+                            Total
+                          </HvTypography>
+                          <HvTypography variant="body" style={{ fontWeight: "bold", color: "#2F2F2F" }}>
+                            {floor.totalSensors || "00"}
+                          </HvTypography>
+                        </Box>
                         <HvTypography variant="caption1" style={{ color: "#9E9E9E" }}>Sensor</HvTypography>
                       </Grid>
                     </Grid>
@@ -139,10 +159,16 @@ const FloorCards = ({ floorData }) => {
                     <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
 
                     {/* Total Detected Alarms */}
-                    <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
-                      Total Detected Alarms <strong style={{ fontWeight: "bold" }}>{floor.detectedAlarms || "00"}</strong>
-                    </HvTypography>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
+                        Total Detected Alarms
+                      </HvTypography>
+                      <HvTypography variant="body" style={{ fontWeight: "bold", color: "#2F2F2F" }}>
+                        {floor.detectedAlarms || "00"}
+                      </HvTypography>
+                    </Box>
                   </Box>
+
 
 
                   {/* Button */}
