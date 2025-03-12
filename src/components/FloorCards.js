@@ -43,7 +43,7 @@ const FloorCards = ({ floorData }) => {
                       </Box>
 
                       {/* Vertical Divider */}
-                      <Divider orientation="vertical" flexItem style={{ backgroundColor: "#28A745", height: "20px", margin: "0 8px" }} />
+                      <Divider orientation="vertical" flexItem style={{  backgroundColor: "#D1D5DB", height: "20px", margin: "0 8px" }} />
 
                       {/* Biological */}
                       <Box display="flex" alignItems="center" mr={1}>
@@ -54,7 +54,7 @@ const FloorCards = ({ floorData }) => {
                       </Box>
 
                       {/* Vertical Divider */}
-                      <Divider orientation="vertical" flexItem style={{ backgroundColor: "#28A745", height: "20px", margin: "0 8px" }} />
+                      <Divider orientation="vertical" flexItem style={{  backgroundColor: "#D1D5DB", height: "20px", margin: "0 8px" }} />
 
                       {/* Chemical */}
                       <Box display="flex" alignItems="center">
@@ -104,6 +104,7 @@ const FloorCards = ({ floorData }) => {
                           Active <strong style={{ fontWeight: "bold" }}>{floor.activeSensors || "00"}</strong>
                         </HvTypography>
                         <HvTypography variant="caption1" style={{ color: "#9E9E9E" }}>Sensor</HvTypography>
+                        <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
                       </Grid>
 
                       {/* Inactive */}
@@ -112,10 +113,9 @@ const FloorCards = ({ floorData }) => {
                           Inactive <strong style={{ fontWeight: "bold" }}>{floor.inactiveSensors || "00"}</strong>
                         </HvTypography>
                         <HvTypography variant="caption1" style={{ color: "#9E9E9E" }}>Sensor</HvTypography>
+                        <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
                       </Grid>
                     </Grid>
-
-                    <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
 
                     {/* Row 2 - Unhealthy and Total Sensors */}
                     <Grid container spacing={2} mb={1}>
