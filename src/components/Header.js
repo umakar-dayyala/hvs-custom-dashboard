@@ -7,7 +7,7 @@ import {
   HStack,
   IconButton,
 } from '@chakra-ui/react';
-import { HamburgerIcon } from '@chakra-ui/icons';
+// import { HamburgerIcon } from '@chakra-ui/icons';
 
 const Header = ({ onMenuToggle }) => {
   //const currentTime = new Date().toLocaleString();
@@ -26,7 +26,7 @@ const Header = ({ onMenuToggle }) => {
     <Flex justifyContent="space-between" alignItems="center" bg="#fbfcfc" color="#414141" p={1}>
       <Box display="flex" alignItems="center">
         <IconButton
-          icon={<HamburgerIcon />}
+          // icon={<HamburgerIcon />}
           aria-label="Toggle Menu"
           variant="ghost"
           onClick={onMenuToggle}

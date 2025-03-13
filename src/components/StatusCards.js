@@ -1,6 +1,6 @@
 import React from "react";
 import { SimpleGrid, Box, Text, Flex, HStack } from "@chakra-ui/react";
-import { BellIcon } from "@chakra-ui/icons";
+// import { BellIcon } from "@chakra-ui/icons";
 
 // Define image mappings based on type and notification status
 const imageMap = {
@@ -53,10 +53,10 @@ const StatusCards = ({ data }) => {
               <Text fontSize="lg" fontWeight="bold" flex="1" textAlign="center">
                 {card.label}
               </Text>
-              <BellIcon
+              {/* <BellIcon
                 boxSize={8}
                 color={card.hasNotification ? "red" : "green"}
-              />
+              /> */}
             </Flex>
             <Text fontSize="2xl" fontWeight="bold">{card.value}</Text>
           </Box>
