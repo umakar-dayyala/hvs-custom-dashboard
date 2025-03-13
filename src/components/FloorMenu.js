@@ -13,7 +13,6 @@ import {
   MenuList,
   MenuItem,
 } from '@chakra-ui/react';
-import { ChevronDownIcon } from '@chakra-ui/icons';
 
 const FloorMenu = ({ isOpen, onClose }) => {
 const floors = ['Ground Floor', 'First Floor', 'Second Floor', 'All Floors'];

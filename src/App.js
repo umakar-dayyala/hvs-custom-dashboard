@@ -38,12 +38,12 @@ const App = () => {
           </div> */}
           <AlertBanner />
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<OperatorsDashboard />} />
               <Route path="/ibacSensor" element={<IBACSensor />} />
               <Route path="/AGMSensor" element={<AGMSensorDashboard />} />
               <Route path="/ibacparamSettings" element={<IBACparameterSettings />} />
               <Route path="/ap4c-fsensor" element={<AP4CSensorDashboard />} />
-              <Route path="/operatorsdashboard" element={<OperatorsDashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </HvContainer>
         </Router>
