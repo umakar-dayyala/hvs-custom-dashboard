@@ -29,7 +29,7 @@ export const getSensorData = async () => {
 
 export const getSensorsummaryData = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/summary/sensor-summary?param_floor=ALL`); // Replace with your actual API URL
+    const response = await axios.get(`${API_BASE_URL}/summary/sensor-summary?param_floor=ALL`); // Replace with your actual API URL
     const data = response.data;
 
     // Transform API response to match expected format

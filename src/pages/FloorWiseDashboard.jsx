@@ -1,24 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Divider } from "@mui/material";
 import FloorTabs from "../components/FloorTabs";
 import SensorStatusCards from '../components/SensorStatusCards';
 import FilterBar from "../components/FintersInFloorWise";
 import DataTable from "../components/FloorWiseDataTable";
 import FloorSummary from "../components/FloorSummary";
+import { getSensorsummaryData } from "../service/summaryServices";
 
 // Example floor and sensor data
-const floorName = [
-  { "id": "lower-ground", "name": "Lower Ground" },
-  { "id": "upper-ground", "name": "Upper Ground" },
-  { "id": "first-floor", "name": "First Floor" },
-  { "id": "terrace", "name": "Terrace" },
-  { "id": "north-utility", "name": "North Utility" },
-  { "id": "south-utility", "name": "South Utility" },
-  { "id": "iron-gate", "name": "Iron Gate" },
-  { "id": "qrt-01", "name": "QRT 01" },
-  { "id": "qrt-02", "name": "QRT 02" },
-  { "id": "lab", "name": "LAB" }
-];
+// const floorName = [
+//   { "id": "lower-ground", "name": "Lower Ground" },
+//   { "id": "upper-ground", "name": "Upper Ground" },
+//   { "id": "first-floor", "name": "First Floor" },
+//   { "id": "terrace", "name": "Terrace" },
+//   { "id": "north-utility", "name": "North Utility" },
+//   { "id": "south-utility", "name": "South Utility" },
+//   { "id": "iron-gate", "name": "Iron Gate" },
+//   { "id": "qrt-01", "name": "QRT 01" },
+//   { "id": "qrt-02", "name": "QRT 02" },
+//   { "id": "lab", "name": "LAB" }
+// ];
+
+
 
 const floorSummaryData = {
   "floor": "First Floor",
@@ -50,6 +53,25 @@ const sensorData = [
   
 
 const FloorWiseDashboard = () => {
+  const [floorData, setFloorData] = useState([]);
+
+    useEffect(() => {
+        const fetchData = () => {
+            getSensorsummaryData()
+                .then((response) => {
+                    setFloorData(response);
+                })
+                .catch((error) => {
+                    console.error("Error fetching floor data:", error);
+                });
+        };
+    
+        fetchData(); // Initial fetch
+        const interval = setInterval(fetchData, 500000000000); // Fetch every 500ms need to change later
+    
+        return () => clearInterval(interval); // Cleanup on unmount
+    }, []);
+
   const [filters, setFilters] = useState({
     viewBy: "Location",
     sensorType: [],
@@ -74,7 +96,7 @@ const FloorWiseDashboard = () => {
         <FloorSummary data={floorSummaryData} />
 
         <Box width="100%">
-          <FloorTabs floorData={floorName} />
+          <FloorTabs floorData={floorData} />
         </Box>
 
         {/* Filters */}
