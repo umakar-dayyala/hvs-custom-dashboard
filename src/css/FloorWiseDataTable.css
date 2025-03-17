@@ -1,0 +1,36 @@
+/* FloorWiseDataTable.css */
+
+/* Container */
+.table-container {
+    margin-top: 16px;
+}
+
+
+/* Table Header */
+.header-row {
+    background-color: #ffffff;
+}
+
+/* Table Row */
+.body-row {
+    background-color: #f0f1f6;
+}
+
+/* Table Cell */
+.table-cell {
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+/* Table Cell */
+.table-cell1 {
+    text-align: center;
+}
+
+/* Icons */
+.status-icon {
+    display: block;
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+}

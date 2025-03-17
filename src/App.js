@@ -11,10 +11,12 @@ import IBACparameterSettings from "./pages/IBACparamSettings";
 import FloorMenu from "./components/FloorMenu";
 import AlertBanner from "./components/AlertBanner";
 import OperatorsDashboard from "./pages/OperatorsDashboard";
+import FloorWiseDashboard from "./pages/FloorWiseDashboard";
 import Breadcrumbs from "./components/Breadcrumbs";
 import SensorLegend from "./components/SensorLegend";
 import ToggleButtons from "./components/ToggleButtons";
 import SensorStatusCards from "./components/SensorStatusCards";
+
 
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,6 +46,7 @@ const App = () => {
               <Route path="/ibacparamSettings" element={<IBACparameterSettings />} />
               <Route path="/ap4c-fsensor" element={<AP4CSensorDashboard />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/floorwise" element={<FloorWiseDashboard />} />
             </Routes>
           </HvContainer>
         </Router>
