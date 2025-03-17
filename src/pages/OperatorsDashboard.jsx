@@ -1,24 +1,36 @@
-import React from "react";
+import React, { useEffect, useState,useRef } from "react";
 import { Box, Typography,Divider } from "@mui/material";
 import { HvTypography } from "@hitachivantara/uikit-react-core";
 import FloorTabs from "../components/FloorTabs";
 import FloorCards from "../components/FloorCards";
 import SensorStatusCards from '../components/SensorStatusCards';
+import {getSensorsummaryData } from "../service/summaryServices";
 
-const floorData = [
-    { "name": "Lower Ground Floor", "totalZones": 6, "totalSensors": 24, "noOfIncidents": "NA", "detectedAlarms": "NA", "typeOfAlarms": "NA" },
-    { "name": "Under Ground Floor", "totalZones": 6, "totalSensors": 24, "noOfIncidents": 2, "detectedAlarms": "NA", "typeOfAlarms": "NA" },
-    { "name": "First Floor", "totalZones": 6, "totalSensors": 24, "noOfIncidents": 3, "detectedAlarms": "NA", "typeOfAlarms": "NA" },
-    { "name": "Terrace", "totalZones": 6, "totalSensors": 24, "noOfIncidents": 4, "detectedAlarms": "NA", "typeOfAlarms": "NA" },
-    { "name": "North Utility", "totalZones": 6, "totalSensors": 24, "noOfIncidents": 5, "detectedAlarms": "NA", "typeOfAlarms": "NA" },
-    { "name": "South Utility", "totalZones": 6, "totalSensors": 24, "noOfIncidents": "06", "detectedAlarms": "NA", "typeOfAlarms": "NA" },
-    { "name": "Iron Gate", "totalZones": 6, "totalSensors": 24, "noOfIncidents": "07", "detectedAlarms": "NA", "typeOfAlarms": "NA" },
-    { "name": "QRT 01", "totalZones": 6, "totalSensors": 24, "noOfIncidents": "NA", "detectedAlarms": "NA", "typeOfAlarms": "NA", "status": "Active" },
-    { "name": "QRT 02", "totalZones": 6, "totalSensors": 24, "noOfIncidents": "NA", "detectedAlarms": "NA", "typeOfAlarms": "NA", "status": "Active" },
-    { "name": "LAB", "totalZones": 6, "totalSensors": 24, "noOfIncidents": "NA", "detectedAlarms": "NA", "typeOfAlarms": "NA", "status": "Active" }
-];
+
+
 
 const OperatorDashboard = () => {
+    const [floorData, setFloorData] = useState([]);
+
+    useEffect(() => {
+        const fetchData = () => {
+            getSensorsummaryData()
+                .then((response) => {
+                    setFloorData(response);
+                })
+                .catch((error) => {
+                    console.error("Error fetching floor data:", error);
+                });
+        };
+    
+        fetchData(); // Initial fetch
+        const interval = setInterval(fetchData, 500000000000); // Fetch every 500ms need to change later
+    
+        return () => clearInterval(interval); // Cleanup on unmount
+    }, []);
+    
+
+    // console.log(floorData);
     return (
         <Box>
             <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />

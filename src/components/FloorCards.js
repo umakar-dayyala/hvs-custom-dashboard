@@ -1,44 +1,97 @@
-import React from "react";
+import React, {  use, useContext, useEffect } from "react";
 import { Box, Grid, Button, Divider } from "@mui/material";
 import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 
 // Import SVG icons
-import totalZonesIcon from "../assets/greyDirection.svg";
+import rtotalZonesIcon from "../assets/rJumpToFloor.svg";
 import totalSensorsIcon from "../assets/greyLocation.svg";
 import radiologicalIcon from "../assets/gRadiological.svg";
 import biologicalIcon from "../assets/gBiological.svg";
 import chemicalIcon from "../assets/gChemical.svg";
+
+import alertradiologicalIcon from "../assets/rRadiological.svg";
+import alertbiologicalIcon from "../assets/rBiological.svg";
+import alertchemicalIcon from "../assets/rChemical.svg";
+
 import jumpToFloor from "../assets/greyJumpToFloor.svg";
 
+import { MyContext } from "../context/MyContext";
+
+
+
 const FloorCards = ({ floorData }) => {
+  const { value, setValue } = useContext(MyContext);
+
+  // Update global state whenever floorData changes
+  useEffect(() => {
+    const updatedColors = floorData.map((floor) => {
+      const hasAlert =
+        (floor.unhealthySensors && floor.unhealthySensors > 0) ||
+        (floor.totalAlarms && floor.totalAlarms > 0) ||
+        (floor.biologicalAlerts && floor.biologicalAlerts > 0) ||
+        (floor.chemicalAlerts && floor.chemicalAlerts > 0) ||
+        (floor.radiologicalAlerts && floor.radiologicalAlerts > 0);
+
+      return hasAlert ? "#E30613" : "#28A745";
+    });
+
+    // Set the global state with the updated colors
+    setValue(updatedColors);
+  }, [floorData, setValue]);
+
   return (
     <Box mt={2}>
       <Grid container spacing={8} justifyContent="center">
         {floorData.map((floor, index) => {
           // Determine the border color based on alerts
+          const sensorTypeAlertBio = floor.biologicalAlerts && floor.biologicalAlerts > 0;
+          const bioicon = sensorTypeAlertBio ? alertbiologicalIcon : biologicalIcon;
+          const sensorTypeAlertChem = floor.chemicalAlerts && floor.chemicalAlerts > 0;
+          const chemicon = sensorTypeAlertChem ? alertchemicalIcon : chemicalIcon;
+          const sensorTypeAlertRad = floor.radiologicalAlerts && floor.radiologicalAlerts > 0;
+          const radicon = sensorTypeAlertRad ? alertradiologicalIcon : radiologicalIcon;
+
           const hasAlert =
-            (floor.noOfIncidents && floor.noOfIncidents > 0) ||
-            (floor.detectedAlarms && floor.detectedAlarms > 0) ||
-            (floor.typeOfAlarms && floor.typeOfAlarms > 0);
+            (floor.unhealthySensors && floor.unhealthySensors > 0) ||
+            (floor.totalAlarms && floor.totalAlarms > 0);
           const borderColor = hasAlert ? "#E30613" : "#28A745"; // Red if alert, Green otherwise
+
+          const totalAlarms = floor.totalAlarms;
+          const fontColor = totalAlarms ? "#E30613" : "#2F2F2F";
+
+          const unhealthySensors = floor.unhealthySensors && floor.unhealthySensors > 0;
+          const fontColorUS = unhealthySensors ? "#E30613" : "#2F2F2F";
+
+          const jumpToFloorIcon =
+            hasAlert || sensorTypeAlertBio || sensorTypeAlertChem || sensorTypeAlertRad
+              ? rtotalZonesIcon
+              : jumpToFloor;
+
+          const titleFontColor =
+            hasAlert || sensorTypeAlertBio || sensorTypeAlertChem || sensorTypeAlertRad
+              ? "#E30613"
+              : "#2F2F2F";
 
           return (
             <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={index}>
-              <HvCard
-                style={{
-                  borderTop: `4px solid ${borderColor}`, // Dynamic top border
-                }}
-              >
-                <Box p={2} display="flex" backgroundColor="white" flexDirection="column" justifyContent="space-between" height="100%">
+              <HvCard statusColor={borderColor}>
+                <Box
+                  p={2}
+                  display="flex"
+                  backgroundColor="white"
+                  flexDirection="column"
+                  justifyContent="space-between"
+                  height="100%"
+                >
                   {/* Top Icons */}
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     {/* Icons with Counts */}
                     <Box display="flex" alignItems="center">
                       {/* Radiological */}
                       <Box display="flex" alignItems="center" mr={1}>
-                        <img src={radiologicalIcon} alt="Radiological" width={20} height={20} style={{ marginRight: "4px" }} />
+                        <img src={radicon} alt="Radiological" width={20} height={20} style={{ marginRight: "4px" }} />
                         <HvTypography variant="body" ml={0.5} style={{ fontWeight: "bold", color: "#414249" }}>
-                          {floor.radiologicalCount || "00"}
+                          {floor.radiologicalAlerts || "00"}
                         </HvTypography>
                       </Box>
 
@@ -47,9 +100,9 @@ const FloorCards = ({ floorData }) => {
 
                       {/* Biological */}
                       <Box display="flex" alignItems="center" mr={1}>
-                        <img src={biologicalIcon} alt="Biological" width={20} height={20} style={{ marginRight: "4px" }} />
+                        <img src={bioicon} alt="Biological" width={20} height={20} style={{ marginRight: "4px" }} />
                         <HvTypography variant="body" ml={0.5} style={{ fontWeight: "bold", color: "#414249" }}>
-                          {floor.biologicalCount || "00"}
+                          {floor.biologicalAlerts || "00"}
                         </HvTypography>
                       </Box>
 
@@ -58,27 +111,25 @@ const FloorCards = ({ floorData }) => {
 
                       {/* Chemical */}
                       <Box display="flex" alignItems="center">
-                        <img src={chemicalIcon} alt="Chemical" width={20} height={20} style={{ marginRight: "4px" }} />
+                        <img src={chemicon} alt="Chemical" width={20} height={20} style={{ marginRight: "4px" }} />
                         <HvTypography variant="body" ml={0.5} style={{ fontWeight: "bold", color: "#414249" }}>
-                          {floor.chemicalCount || "00"}
+                          {floor.chemicalAlerts || "00"}
                         </HvTypography>
                       </Box>
                     </Box>
 
                     {/* Jump to Floor */}
-                    <img src={jumpToFloor} alt="Jump to Floor" width={24} height={24} />
+                    <img src={jumpToFloorIcon} alt="Jump to Floor" width={24} height={24} />
                   </Box>
 
-
                   {/* Floor Name */}
-                  <HvTypography variant="title3" style={{ fontWeight: "bold", marginTop: 8, color: "#2f2f2f" }}>
-                    {floor.name.toUpperCase()}
+                  <HvTypography variant="title3" style={{ fontWeight: "bold", marginTop: 8, color: titleFontColor }}>
+                    {floor.floor.toUpperCase()}
                   </HvTypography>
 
                   {/* Total Zones and Total Sensors Row */}
                   <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
                     <Box display="flex" alignItems="center">
-                      <img src={totalZonesIcon} alt="Total Zones" width={16} height={16} />
                       <HvTypography variant="body" ml={1}>
                         Total Zones: <strong>{floor.totalZones}</strong>
                       </HvTypography>
@@ -135,7 +186,7 @@ const FloorCards = ({ floorData }) => {
                           <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
                             Unhealthy
                           </HvTypography>
-                          <HvTypography variant="body" style={{ fontWeight: "bold", color: "#2F2F2F" }}>
+                          <HvTypography variant="body" style={{ fontWeight: "bold", color: fontColorUS }}>
                             {floor.unhealthySensors || "00"}
                           </HvTypography>
                         </Box>
@@ -163,13 +214,11 @@ const FloorCards = ({ floorData }) => {
                       <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
                         Total Detected Alarms
                       </HvTypography>
-                      <HvTypography variant="body" style={{ fontWeight: "bold", color: "#2F2F2F" }}>
-                        {floor.detectedAlarms || "00"}
+                      <HvTypography variant="body" style={{ fontWeight: "bold", color: fontColor }}>
+                        {floor.totalAlarms || "00"}
                       </HvTypography>
                     </Box>
                   </Box>
-
-
 
                   {/* Button */}
                   <Button

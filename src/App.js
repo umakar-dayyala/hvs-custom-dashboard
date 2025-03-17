@@ -16,12 +16,14 @@ import Breadcrumbs from "./components/Breadcrumbs";
 import SensorLegend from "./components/SensorLegend";
 import ToggleButtons from "./components/ToggleButtons";
 import SensorStatusCards from "./components/SensorStatusCards";
+import { MyProvider } from "./context/MyContext";
 
 
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
+    <MyProvider>
     <HvProvider >
       <AlertProvider>
         <Router>
@@ -52,6 +54,7 @@ const App = () => {
         </Router>
       </AlertProvider>
     </HvProvider>
+    </MyProvider>
   );
 };
 

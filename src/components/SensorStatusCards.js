@@ -72,7 +72,7 @@ const SensorStatusCards = (props) => {
             className={`sensor-card ${alertBorder ? "alert-border" : ""}`}
             {...props}
           >
-            <HvCardHeader title={card.title} />
+            <HvCardHeader  title={<HvTypography variant="title">{card.title}</HvTypography>}/>
 
             {currentImage && (
               <img
@@ -100,7 +100,7 @@ const SensorStatusCards = (props) => {
 
               <div className="sensor-card-content">
                 <HvTypography variant="title1">{sensorValue}</HvTypography>
-                <FaEye />
+                <FaEye color="#2064B4"/>
               </div>
             </HvCardContent>
           </HvCard>

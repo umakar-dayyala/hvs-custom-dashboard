@@ -25,3 +25,25 @@ export const getSensorData = async () => {
     return []; // Return an empty array in case of error
   }
 };
+
+
+export const getSensorsummaryData = async () => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/summary/sensor-summary?param_floor=ALL`); // Replace with your actual API URL
+    const data = response.data;
+
+    // Transform API response to match expected format
+    return data;
+  } catch (error) {
+    console.error("Error fetching sensor data:", error);
+    return []; // Return an empty array in case of error
+  }
+};
+
+
+
+
+
+
+
+

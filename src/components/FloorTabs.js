@@ -1,63 +1,45 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Button } from "@mui/material";
+import { MyContext } from "../context/MyContext";
 
 const FloorTabs = ({ floorData }) => {
-  // Check for any alerts across all floors to set the border color for "View All Alarms"
-  const hasGlobalAlert = floorData.some(
-    (floor) =>
-      (floor.noOfIncidents && floor.noOfIncidents > 0) ||
-      (floor.detectedAlarms && floor.detectedAlarms > 0) ||
-      (floor.typeOfAlarms && floor.typeOfAlarms > 0)
-  );
-
-  const globalBorderColor = hasGlobalAlert ? "#E30613" : "#28A745";
+  const { value } = useContext(MyContext);
 
   return (
     <Box width="100%" display="flex" justifyContent="space-between" flexWrap="nowrap">
-      {floorData.map((floor, index) => {
-        const hasAlert =
-          (floor.noOfIncidents && floor.noOfIncidents > 0) ||
-          (floor.detectedAlarms && floor.detectedAlarms > 0) ||
-          (floor.typeOfAlarms && floor.typeOfAlarms > 0);
+      {floorData.map((floor, index) => (
+        <Button
+          key={index}
+          variant="outlined"
+          sx={{
+            flex: 1,
+            color: value[index], // Ensure index does not go out of bounds
+            borderColor: value[index],
+            textTransform: "none",
+            margin: "2px",
+            fontWeight: "bold",
+            "&:hover": {
+              backgroundColor: value[index],
+              color: "#FFFFFF",
+            },
+          }}
+        >
+          {floor.floor === "First Floor" ? floor.floor : floor.floor.replace(" Floor", "")}
+        </Button>
+      ))}
 
-        const borderColor = hasAlert ? "#E30613" : "#28A745";
-
-        return (
-          <Button
-            key={index}
-            variant="outlined"
-            sx={{
-              flex: 1,
-              color: borderColor,
-              borderColor: borderColor,
-              backgroundColor: "#ffffff",
-              textTransform: "none",
-              margin: "2px",
-              fontWeight: "bold",
-              "&:hover": {
-                backgroundColor: borderColor,
-                color: "#FFFFFF",
-              },
-            }}
-          >
-            {floor.name === "First Floor" ? floor.name : floor.name.replace(" Floor", "")}
-          </Button>
-        );
-      })}
-
-      {/* View All Alarms Button with Global Alert Color */}
+      {/* View All Alarms Button */}
       <Button
         variant="outlined"
         sx={{
           flex: 1,
-          color: globalBorderColor,
-          borderColor: globalBorderColor,
-          backgroundColor: "#ffffff",
+          color: value[1], // Use an appropriate value for this button
+          borderColor: value[1],
           textTransform: "none",
           margin: "2px",
           fontWeight: "bold",
           "&:hover": {
-            backgroundColor: globalBorderColor,
+            backgroundColor: value[1],
             color: "#FFFFFF",
           },
         }}
@@ -69,5 +51,3 @@ const FloorTabs = ({ floorData }) => {
 };
 
 export default FloorTabs;
-
-
