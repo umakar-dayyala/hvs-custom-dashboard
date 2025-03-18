@@ -12,6 +12,7 @@ import FloorMenu from "./components/FloorMenu";
 import AlertBanner from "./components/AlertBanner";
 import OperatorsDashboard from "./pages/OperatorsDashboard";
 import FloorWiseDashboard from "./pages/FloorWiseDashboard";
+import AllAlertsDashboard from "./pages/AllAlertsDashboard";
 import Breadcrumbs from "./components/Breadcrumbs";
 import SensorLegend from "./components/SensorLegend";
 import ToggleButtons from "./components/ToggleButtons";
@@ -49,6 +50,7 @@ const App = () => {
               <Route path="/ap4c-fsensor" element={<AP4CSensorDashboard />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/floorwise" element={<FloorWiseDashboard />} />
+              <Route path="/allalerts" element={<AllAlertsDashboard />} />
             </Routes>
           </HvContainer>
         </Router>
