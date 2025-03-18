@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://10.131.19.205:5000/api";
-//const API_BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api`
+//const API_BASE_URL = "http://10.131.19.205:5000/api";
+const API_BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api`
 
 export const getSensorData = async () => {
   try {
@@ -14,10 +14,10 @@ export const getSensorData = async () => {
       { title: "Chemical Alert", value: data.chemical_alerts.toString() },
       { title: "Biological Alert", value: data.biological_alerts.toString() },
       { title: "Radiological Alert", value: data.radiological_alerts.toString() },
-      { title: "Unhealthy Sensors", value: data.sensor_health },
       { title: "Total Sensor", value: data.total_sensors.toString() },
       { title: "Active Sensor", value: data.active_sensors.toString() },
       { title: "Inactive Sensor", value: data.inactive_sensors.toString() },
+      { title: "Unhealthy Sensors", value: data.sensor_health },
       { title: "Open Incident", value: data.incident_tracked.toString() },
     ];
   } catch (error) {
