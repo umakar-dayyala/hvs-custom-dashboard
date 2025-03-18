@@ -254,6 +254,7 @@ const FloorCards = ({ floorData }) => {
           );
         })}
       </Grid>
+      <Box mt={5} />
     </Box>
   );
 };
