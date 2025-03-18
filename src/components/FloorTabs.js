@@ -1,9 +1,23 @@
 import React, { useContext } from "react";
 import { Box, Button } from "@mui/material";
 import { MyContext } from "../context/MyContext";
+import { useNavigate } from "react-router-dom";
 
 const FloorTabs = ({ floorData }) => {
   const { value } = useContext(MyContext);
+  const navigate = useNavigate();
+
+  const goToFloor = (floor) => {
+    window.location.href = `floorwise?floor=${floor}`;
+  };
+
+  const goToAllAlarms = () => {
+    window.location.href = `floorwise`;
+  }
+
+  
+
+  
 
   return (
     <Box width="100%" display="flex" justifyContent="space-between" flexWrap="nowrap">
@@ -13,16 +27,17 @@ const FloorTabs = ({ floorData }) => {
           variant="outlined"
           sx={{
             flex: 1,
-            color: value[index], // Ensure index does not go out of bounds
-            borderColor: value[index],
+            color: value[index] || "black", // Avoid out-of-bounds errors
+            borderColor: value[index] || "black",
             textTransform: "none",
             margin: "2px",
             fontWeight: "bold",
             "&:hover": {
-              backgroundColor: value[index],
+              backgroundColor: value[index] || "black",
               color: "#FFFFFF",
             },
           }}
+          onClick={() => goToFloor(floor.floor)}
         >
           {floor.floor === "First Floor" ? floor.floor : floor.floor.replace(" Floor", "")}
         </Button>
@@ -33,16 +48,17 @@ const FloorTabs = ({ floorData }) => {
         variant="outlined"
         sx={{
           flex: 1,
-          color: value[1], // Use an appropriate value for this button
-          borderColor: value[1],
+          color: value[1] || "black",
+          borderColor: value[1] || "black",
           textTransform: "none",
           margin: "2px",
           fontWeight: "bold",
           "&:hover": {
-            backgroundColor: value[1],
+            backgroundColor: value[1] || "black",
             color: "#FFFFFF",
           },
         }}
+        onClick={() => goToAllAlarms()}
       >
         View All Alarms
       </Button>

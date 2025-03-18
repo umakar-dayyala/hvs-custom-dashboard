@@ -4,7 +4,7 @@ import { HvTypography } from "@hitachivantara/uikit-react-core";
 import FloorTabs from "../components/FloorTabs";
 import FloorCards from "../components/FloorCards";
 import SensorStatusCards from '../components/SensorStatusCards';
-import {getSensorsummaryData } from "../service/summaryServices";
+import {floorList } from "../service/summaryServices";
 
 
 
@@ -14,7 +14,7 @@ const OperatorDashboard = () => {
 
     useEffect(() => {
         const fetchData = () => {
-            getSensorsummaryData()
+            floorList()
                 .then((response) => {
                     setFloorData(response);
                 })

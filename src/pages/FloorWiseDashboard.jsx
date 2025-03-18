@@ -1,63 +1,73 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Divider } from "@mui/material";
 import FloorTabs from "../components/FloorTabs";
 import SensorStatusCards from '../components/SensorStatusCards';
 import FilterBar from "../components/FintersInFloorWise";
 import DataTable from "../components/FloorWiseDataTable";
 import FloorSummary from "../components/FloorSummary";
-import { getSensorsummaryData } from "../service/summaryServices";
+import { floorList, getFloorSummary, GetSensorSummary } from "../service/summaryServices";
 
-// Example floor and sensor data
-// const floorName = [
-//   { "id": "lower-ground", "name": "Lower Ground" },
-//   { "id": "upper-ground", "name": "Upper Ground" },
-//   { "id": "first-floor", "name": "First Floor" },
-//   { "id": "terrace", "name": "Terrace" },
-//   { "id": "north-utility", "name": "North Utility" },
-//   { "id": "south-utility", "name": "South Utility" },
-//   { "id": "iron-gate", "name": "Iron Gate" },
-//   { "id": "qrt-01", "name": "QRT 01" },
-//   { "id": "qrt-02", "name": "QRT 02" },
-//   { "id": "lab", "name": "LAB" }
-// ];
-
-
-
-const floorSummaryData = {
-  "floor": "First Floor",
-  "sensors": [
-    { "sensorType": "Chemical", "count": 2 },
-    { "sensorType": "Radiological", "count": 1 },
-    { "sensorType": "Biological", "count": 10 }
-  ],
-  "totalZones": 7,
-  "totalLocations": 14,
-  "activeSensors": 14,
-  "inactiveSensors": 0
-};
 
 // Example sensor data
-const sensorData = [
-    { zone: "01", location: "Zone - 1 Corridor", detector: "FC1 (IMS based Chemical Detector)", isOnline: false, alarm: "Yes", alarmCount: "01 Alarm", description: "Example Description" },
-    { zone: "01", location: "Lok Sabha PG Zone-1 Entry", detector: "FC1 (IMS based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "PMO 02", location: "Zone-2 Corridor", detector: "FC1 (IMS based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "PMO 02", location: "Zone-2 Corridor", detector: "AGM (Area Gamma Monitor)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "03", location: "Zone-3 Corridor", detector: "FC1 (IMS based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "04", location: "Zone-4 Corridor", detector: "FC1 (IMS based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "06", location: "Zone-6 Corridor", detector: "FC1 (IMS based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "LS Chamber", location: "Lok Sabha PG Zone-2 Entry", detector: "FC1 (IMS based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "LS Chamber", location: "Lok Sabha PG Corridor", detector: "FC2 (FPD based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "LS Chamber", location: "Lok Sabha PG Corridor", detector: "PRM (Pedestrian Radiation Monitor)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-    { zone: "RS Chamber", location: "Rajya Sabha PG Zone-5 Entry", detector: "FC1 (IMS based Chemical Detector)", isOnline: true, alarm: "No", alarmCount: "00", description: "" },
-  ];
+const FloorWiseDashboard = () => {
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [floorData, setFloorData] = useState([]);
+  const [sensorSummary, setSensorSummary] = useState([]);
+  const [floorSummaryData, setFloorSummaryData] = useState([]);
+
+  const queryParams = new URLSearchParams(window.location.search);
+  const floor = queryParams.get("floor")||"ALL";
+
   
 
-const FloorWiseDashboard = () => {
-  const [floorData, setFloorData] = useState([]);
+  useEffect(() => {
+    const fetchData = async() => {
+      await getFloorSummary(`param_floor=${floor}&param_zone=ALL&param_location=ALL&param_sensor_type=ALL&param_sensor_name=ALL&param_sensor_status=ALL`)
+        .then((response) => {
+          setFloorSummaryData(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching floor data:", error);
+        });
+    };
+
+    fetchData(); // Initial fetch
+
+  }, []);
+
+  
+  useEffect(() => {
+    const fetchData = async() => {
+      await GetSensorSummary(`param_floor=${floor}`)
+        .then((response) => {
+          const jsonData = response;
+          const summedData = jsonData.data.reduce((acc, curr) => {
+            for (const key in curr) {
+                if (key !== "floor") {
+                    acc[key] = (acc[key] || 0) + curr[key];
+                }
+            }
+            return acc;
+        }, {});
+
+          setSensorSummary(summedData);
+        })
+        .catch((error) => {
+          console.error("Error fetching floor data:", error);
+        });
+    };
+
+    fetchData(); // Initial fetch
+
+  }, []);
 
     useEffect(() => {
         const fetchData = () => {
-            getSensorsummaryData()
+          floorList()
                 .then((response) => {
                     setFloorData(response);
                 })
@@ -72,12 +82,15 @@ const FloorWiseDashboard = () => {
         return () => clearInterval(interval); // Cleanup on unmount
     }, []);
 
+    console.log('sensorSummary', sensorSummary);
+
   const [filters, setFilters] = useState({
     viewBy: "Location",
     sensorType: [],
     sensor: [],
     sensorStatus: []
   });
+
 
   const handleFilterChange = (filterName, value) => {
     setFilters({ ...filters, [filterName]: value });
@@ -93,7 +106,7 @@ const FloorWiseDashboard = () => {
 
       <Box width="100%">
         {/* Pass floorSummaryData to FloorSummary */}
-        <FloorSummary data={floorSummaryData} />
+        <FloorSummary data={sensorSummary} />
 
         <Box width="100%">
           <FloorTabs floorData={floorData} />
@@ -103,7 +116,7 @@ const FloorWiseDashboard = () => {
         <FilterBar filters={filters} onFilterChange={handleFilterChange} />
 
         {/* Data Table */}
-        <DataTable data={sensorData} />
+        <DataTable data={floorSummaryData} />
       </Box>
     </Box>
   );

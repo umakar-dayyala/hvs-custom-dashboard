@@ -27,10 +27,39 @@ export const getSensorData = async () => {
 };
 
 
-export const getSensorsummaryData = async () => {
+export const floorList = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/summary/sensor-summary?param_floor=ALL`); // Replace with your actual API URL
     const data = response.data;
+
+    // Transform API response to match expected format
+    return data;
+  } catch (error) {
+    console.error("Error fetching sensor data:", error);
+    return []; // Return an empty array in case of error
+  }
+};
+
+
+export const getFloorSummary = async (filterData) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/floor/getFloorSummary?${filterData}`); // Replace with your actual API URL
+    const data = response.data;
+
+    // Transform API response to match expected format
+    return data;
+  } catch (error) {
+    console.error("Error fetching sensor data:", error);
+    return []; // Return an empty array in case of error
+  }
+};
+
+
+export const GetSensorSummary = async (floorName) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/floor/getSensorSummary?${floorName}`);
+    const data = response.data;
+    //console.log('data', data);
 
     // Transform API response to match expected format
     return data;

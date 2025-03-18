@@ -2,6 +2,7 @@ import React, {  use, useContext, useEffect } from "react";
 import { Box, Grid, Button, Divider } from "@mui/material";
 import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 
+
 // Import SVG icons
 import rtotalZonesIcon from "../assets/rJumpToFloor.svg";
 import totalSensorsIcon from "../assets/greyLocation.svg";
@@ -16,6 +17,7 @@ import alertchemicalIcon from "../assets/rChemical.svg";
 import jumpToFloor from "../assets/greyJumpToFloor.svg";
 
 import { MyContext } from "../context/MyContext";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -38,6 +40,13 @@ const FloorCards = ({ floorData }) => {
     // Set the global state with the updated colors
     setValue(updatedColors);
   }, [floorData, setValue]);
+
+  const navigate = useNavigate();
+
+  const goToFloor = (floor) => {
+    navigate("floorwise?floor="+floor);
+  }
+
 
   return (
     <Box mt={2}>
@@ -233,6 +242,7 @@ const FloorCards = ({ floorData }) => {
                       height: "32px",
                       alignSelf: "flex-end",
                     }}
+                    onClick={() => goToFloor(floor.floor)}
                   >
                     Go to Floor
                   </Button>

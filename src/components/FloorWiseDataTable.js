@@ -26,7 +26,6 @@ const FloorWiseDataTable = ({ data }) => (
             "Detector",
             "Offline/Online",
             "Alarm & Alerts",
-            "Description",
             "",
           ].map((header) => (
             <TableCell key={header} className="table-cell1">
@@ -65,23 +64,23 @@ const FloorWiseDataTable = ({ data }) => (
             {/* Offline/Online */}
             <TableCell className="table-cell">
               <img
-                src={row.isOnline ? CheckCircleIcon : CancelIcon}
-                alt={row.isOnline ? "Online" : "Offline"}
+                src={row.status=="Online" ? CheckCircleIcon : CancelIcon}
+                alt={row.status ? "Online" : "Offline"}
                 className="status-icon"
               />
             </TableCell>
 
             {/* Alarm & Alerts */}
             <TableCell className="table-cell">
-              <HvTypography>{row.alarmCount}</HvTypography>
+              <HvTypography>0{row.alarms_and_alerts}</HvTypography>
             </TableCell>
 
             {/* Description */}
-            <TableCell className="table-cell">
+            {/* <TableCell className="table-cell">
               <HvTypography color={row.description ? "negative" : "neutral"}>
                 {row.description || "-"}
               </HvTypography>
-            </TableCell>
+            </TableCell> */}
 
             {/* Stop Button */}
             <TableCell className="table-cell">
