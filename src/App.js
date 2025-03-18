@@ -31,13 +31,13 @@ const App = () => {
           <Header onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} />
           <FloorMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
           <HvContainer>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {/* <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Breadcrumbs />
             <div style={{ display: "flex", gap: "10px" }}>
               <SensorLegend />
               <ToggleButtons />
             </div>
-          </div>
+          </div> */}
           {/* <div style={{ marginTop: "16px" }}>
             <SensorStatusCards />
           </div> */}

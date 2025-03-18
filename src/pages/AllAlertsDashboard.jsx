@@ -3,6 +3,8 @@ import { Box, Divider } from "@mui/material";
 import FloorTabs from "../components/FloorTabs";
 import SensorStatusCards from "../components/SensorStatusCards";
 import AllAlertsFloorWiseTable from "../components/AllAlertsFloorWiseTable";
+import Breadcrumbs from "../components/Breadcrumbs";
+import SensorLegend from "../components/SensorLegend";
 
 const AllAlertsDashboard = () => {
   const [floorData] = useState([
@@ -62,13 +64,21 @@ const AllAlertsDashboard = () => {
 
   return (
     <Box>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Breadcrumbs />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <SensorLegend />
+          {/* <ToggleButtons /> */}
+        </div>
+      </div>
       {/* Sensor Status Cards */}
       <SensorStatusCards />
       <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
 
       {/* Floor Tabs */}
       <Box width="100%">
-        <FloorTabs floorData={floorData} />
+        {/* Need Uncomment it  */}
+        {/* <FloorTabs floorData={floorData} /> */}
       </Box>
 
       <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} />
