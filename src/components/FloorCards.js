@@ -9,6 +9,7 @@ import totalSensorsIcon from "../assets/greyLocation.svg";
 import radiologicalIcon from "../assets/gRadiological.svg";
 import biologicalIcon from "../assets/gBiological.svg";
 import chemicalIcon from "../assets/gChemical.svg";
+import totalZoneIcon from "../assets/greyDirection.svg";
 
 import alertradiologicalIcon from "../assets/rRadiological.svg";
 import alertbiologicalIcon from "../assets/rBiological.svg";
@@ -139,6 +140,7 @@ const FloorCards = ({ floorData }) => {
                   {/* Total Zones and Total Sensors Row */}
                   <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
                     <Box display="flex" alignItems="center">
+                    <img src={totalZoneIcon} alt="Total Zone" width={16} height={16} />
                       <HvTypography variant="body" ml={1}>
                         Total Zones: <strong>{floor.totalZones}</strong>
                       </HvTypography>
