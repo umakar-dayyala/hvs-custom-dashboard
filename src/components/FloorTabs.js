@@ -4,6 +4,7 @@ import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
 
 const FloorTabs = ({ floorData }) => {
+  alert("FloorTabs "+JSON.stringify(floorData));
   const { value } = useContext(MyContext);
   const navigate = useNavigate();
 
@@ -12,12 +13,8 @@ const FloorTabs = ({ floorData }) => {
   };
 
   const goToAllAlarms = () => {
-    window.location.href = `floorwise`;
+    window.location.href = `allalerts`;
   }
-
-  
-
-  
 
   return (
     <Box width="100%" display="flex" justifyContent="space-between" flexWrap="nowrap">
