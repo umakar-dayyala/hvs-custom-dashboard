@@ -4,7 +4,6 @@ import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
 
 const FloorTabs = ({ floorData }) => {
-  alert("FloorTabs "+JSON.stringify(floorData));
   const { value } = useContext(MyContext);
   const navigate = useNavigate();
 
