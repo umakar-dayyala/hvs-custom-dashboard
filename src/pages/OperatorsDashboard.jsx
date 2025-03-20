@@ -32,6 +32,11 @@ const OperatorDashboard = () => {
         return () => clearInterval(interval); // Cleanup on unmount
     }, []);
 
+    // Function to handle tab click
+  const handleTabClick = (floorName) => {
+    window.location.href = `floorwise?floor=${floorName}`;
+  };
+
 
     // console.log(floorData);
     return (
@@ -55,7 +60,7 @@ const OperatorDashboard = () => {
             <Box display="flex" mt={2} flexDirection="column" alignItems="center">
                 {/* Pass floorData to FloorTabs */}
                 <Box width="100%">
-                    <FloorTabs floorData={floorData} />
+                    <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
                 </Box>
 
                 {/* Pass floorData to FloorCards */}

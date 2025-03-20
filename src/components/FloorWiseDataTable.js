@@ -37,60 +37,62 @@ const FloorWiseDataTable = ({ data }) => (
 
       {/* Table Body */}
       <TableBody>
-        {data.map((row, index) => (
-          <TableRow key={index} className="body-row">
-            {/* Sl No */}
-            <TableCell className="table-cell">
-              <HvTypography>{String(index + 1).padStart(2, "0")}</HvTypography>
-            </TableCell>
+  {data?.length > 0 ? (
+    data.map((row, index) => (
+      <TableRow key={index} className="body-row">
+        {/* Sl No */}
+        <TableCell className="table-cell">
+          <HvTypography>{String(index + 1).padStart(2, "0")}</HvTypography>
+        </TableCell>
 
-            {/* Zone */}
-            <TableCell className="table-cell">
-              <HvTypography>{row.zone}</HvTypography>
-            </TableCell>
+        {/* Zone */}
+        <TableCell className="table-cell">
+          <HvTypography>{row?.s_no?.zone || "-"}</HvTypography>
+        </TableCell>
 
-            {/* Location */}
-            <TableCell className="table-cell">
-              <HvTypography>{row.location}</HvTypography>
-            </TableCell>
+        {/* Location */}
+        <TableCell className="table-cell">
+          <HvTypography>{row?.s_no?.location || "-"}</HvTypography>
+        </TableCell>
 
-            {/* Detector */}
-            <TableCell className="table-cell">
-              <HvTypography color={row.alarm === "Yes" ? "negative" : "positive"}>
-                {row.detector}
-              </HvTypography>
-            </TableCell>
+        {/* Detector */}
+        <TableCell className="table-cell">
+          <HvTypography color={row?.alarm === "Yes" ? "negative" : "positive"}>
+            {row?.s_no?.detector || "-"}
+          </HvTypography>
+        </TableCell>
 
-            {/* Offline/Online */}
-            <TableCell className="table-cell">
-              <img
-                src={row.status=="Online" ? CheckCircleIcon : CancelIcon}
-                alt={row.status ? "Online" : "Offline"}
-                className="status-icon"
-              />
-            </TableCell>
+        {/* Offline/Online */}
+        <TableCell className="table-cell">
+          <img
+            src={row?.s_no?.status === "Online" ? CheckCircleIcon : CancelIcon}
+            alt={row?.s_no?.status ? "Online" : "Offline"}
+            className="status-icon"
+          />
+        </TableCell>
 
-            {/* Alarm & Alerts */}
-            <TableCell className="table-cell">
-              <HvTypography>0{row.alarms_and_alerts}</HvTypography>
-            </TableCell>
+        {/* Alarm & Alerts */}
+        <TableCell className="table-cell">
+          <HvTypography>0{row?.s_no?.alarms_and_alerts || "0"}</HvTypography>
+        </TableCell>
 
-            {/* Description */}
-            {/* <TableCell className="table-cell">
-              <HvTypography color={row.description ? "negative" : "neutral"}>
-                {row.description || "-"}
-              </HvTypography>
-            </TableCell> */}
+        {/* Stop Button */}
+        <TableCell className="table-cell">
+          <HvButton category="primary" disabled={!row?.s_no?.alarms_and_alerts}>
+            Stop LED / Buzzer
+          </HvButton>
+        </TableCell>
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={7} className="table-cell">
+        <HvTypography>No data available</HvTypography>
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
 
-            {/* Stop Button */}
-            <TableCell className="table-cell">
-              <HvButton category="primary" disabled={!row.alarm}>
-                Stop LED / Buzzer
-              </HvButton>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
     </Table>
   </TableContainer>
 );
