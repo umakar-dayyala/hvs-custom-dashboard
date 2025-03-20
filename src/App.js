@@ -13,6 +13,7 @@ import AlertBanner from "./components/AlertBanner";
 import OperatorsDashboard from "./pages/OperatorsDashboard";
 import FloorWiseDashboard from "./pages/FloorWiseDashboard";
 import AllAlertsDashboard from "./pages/AllAlertsDashboard";
+import { IbacIndividual } from "./pages/IbacIndividual";
 import Breadcrumbs from "./components/Breadcrumbs";
 import SensorLegend from "./components/SensorLegend";
 import ToggleButtons from "./components/ToggleButtons";
@@ -51,6 +52,7 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/floorwise" element={<FloorWiseDashboard />} />
               <Route path="/allalerts" element={<AllAlertsDashboard />} />
+              <Route path="/ibacIndividual" element={<IbacIndividual/>} />
             </Routes>
           </HvContainer>
         </Router>
