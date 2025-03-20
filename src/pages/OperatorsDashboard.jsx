@@ -61,39 +61,43 @@ const OperatorDashboard = () => {
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
-  return (
-    <Box css={scrollContainer}>
-      {/* Sticky Header Section */}
-      <Box position="sticky" top={0} zIndex={1000} bgcolor={"#f0f1f6"}>
-        {/* Breadcrumbs and Toggle Section */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" p={1}>
-          <Breadcrumbs />
-          <Box display="flex">
-            <SensorLegend />
-          </Box>
-        </Box>
+    // Function to handle tab click
+  const handleTabClick = (floorName) => {
+    window.location.href = `floorwise?floor=${floorName}`;
+  };
 
-        <HorizontalDivider />
 
-        {/* Sensor Status Cards */}
-        <Box p={1}>
-          <SensorStatusCards />
-        </Box>
+    // console.log(floorData);
+    return (
+        <Box css={scrollContainer}>
+            {/* Sticky Header Section */}
+            <Box position="sticky" top={0} zIndex={1000} bgcolor={"#f0f1f6"}>
+                {/* Breadcrumbs and Toggle Section */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" p={1}>
+                <Breadcrumbs />
+                <Box display="flex">
+                    <SensorLegend />
+                </Box>
+                </Box>
 
-        <HorizontalDivider />
+                <HorizontalDivider />
 
-        {/* Page Title */}
-        <HvTypography variant="title3" style={{ padding: "0 16px", marginBottom: "1rem" }}>
-          Operators Dashboard - Main Page
-        </HvTypography>
-      </Box>
+                {/* Sensor Status Cards */}
+                <Box p={1}>
+                <SensorStatusCards />
+                </Box>
 
-      {/* Scrollable Content Section */}
-      <Box flexGrow={1} display="flex" flexDirection="column">
-        {/* Pass floorData to FloorTabs */}
-        <Box width="100%">
-          <FloorTabs floorData={floorData} />
-        </Box>
+                <HorizontalDivider />
+            <HvTypography variant="title3" >
+                Operators Dashboard - Main Page
+            </HvTypography>
+            </Box>
+
+            <Box display="flex" mt={2} flexDirection="column" alignItems="center">
+                {/* Pass floorData to FloorTabs */}
+                <Box width="100%">
+                    <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
+                </Box>
 
         {/* Pass floorData to FloorCards */}
         <Box width="100%" mt={2}>

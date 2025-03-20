@@ -59,8 +59,18 @@ export const GetSensorSummary = async (floorName) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/floor/getSensorSummary?${floorName}`);
     const data = response.data;
-    //console.log('data', data);
+    // Transform API response to match expected format
+    return data;
+  } catch (error) {
+    console.error("Error fetching sensor data:", error);
+    return []; // Return an empty array in case of error
+  }
+};
 
+export const getLocationSelector = async (params) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/floor/getLocationSelector?${params}`);
+    const data = response.data;
     // Transform API response to match expected format
     return data;
   } catch (error) {
@@ -70,6 +80,38 @@ export const GetSensorSummary = async (floorName) => {
 };
 
 
+// Fetch Sensor Type Selector
+export const getSensorTypeSelector = async (params) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/floor/getSensorTypeSelector?${params}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sensor type selector:", error);
+    return [];
+  }
+};
+
+// Fetch Sensor Name Selector
+export const getSensorNameSelector = async (params) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/floor/getSensorNameSelector?${params}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sensor name selector:", error);
+    return [];
+  }
+};
+
+// Fetch Sensor Status Selector
+export const getSensorStatusSelector = async (params) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/floor/getSensorStatusSelector?${params}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sensor status selector:", error);
+    return [];
+  }
+};
 
 
 

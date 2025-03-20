@@ -3,7 +3,7 @@ import { Box, Button } from "@mui/material";
 import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
 
-const FloorTabs = ({ floorData }) => {
+const FloorTabs = ({ floorData, onTabChange  }) => {
   const { value } = useContext(MyContext);
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const FloorTabs = ({ floorData }) => {
               color: "#FFFFFF",
             },
           }}
-          onClick={() => goToFloor(floor.floor)}
+          onClick={() => onTabChange(floor.floor)}
         >
           {floor.floor === "First Floor" ? floor.floor : floor.floor.replace(" Floor", "")}
         </Button>
