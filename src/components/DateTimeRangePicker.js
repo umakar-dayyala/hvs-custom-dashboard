@@ -74,7 +74,7 @@ const DateTimeRangePicker = ({ onChange }) => {
             style={{ height: "2rem" }}s
           >
             <MenuItem value="" disabled>
-              Select Time Range
+              Select Time 
             </MenuItem>
             <MenuItem value="5min">Last 5 mins</MenuItem>
             <MenuItem value="7min">Last 7 mins</MenuItem>

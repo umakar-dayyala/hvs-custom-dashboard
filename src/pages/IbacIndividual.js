@@ -4,10 +4,12 @@ import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
 import OutlierChart from '../components/OutlierChart';
 import AnomalyChart from '../components/AnomalyChart';
-import { Box } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import bioicon from "../assets/rBiological.svg";
 import gbioicon from "../assets/gBiological.svg";
 import PlotlyDataChart from '../components/PlotlyDataChart';
+import rbell from "../assets/rbell.svg";
+import Alertbar from '../components/Alertbar';
 
 const dummyData = [
   { alarmCount: 1, alarmType: "Bio Alarm", location: "Lab A", timeRange: "10:00 AM - 10:20 AM" },
@@ -86,24 +88,32 @@ const responseData = {
 
 export const IbacIndividual = () => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} bioicon={bioicon} gbioicon={gbioicon} />
+          <IndividualKPI kpiData={kpiData} bioicon={bioicon} gbioicon={gbioicon}  rbell={rbell}/>
           {/* <Alertbar alerts={dummyData} /> */}
-          <IndividualParameters sampleData={sampleData} />
+          <Alertbar/>
+          
         </HvStack>
+        <IndividualParameters sampleData={sampleData} />
         {/* <ChartComponent /> */}
-        <PlotlyDataChart data={chartData} title="Particle & Bio Count Over Time" />
-      </div>
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%", gap: "10px" }}>
-        <div style={{ flex: 1, minWidth: "48%" }}>
-          <AnomalyChart responseData={responseData} />
-        </div>
-        <div style={{ flex: 1, minWidth: "48%" }}>
-          <OutlierChart responseData={responseData} />
-        </div>
+        <Box mt={2}>
+        <PlotlyDataChart data={chartData} />
+        </Box>
       </Box>
-    </div>
+      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2}>
+        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
+          <Box width={"49.5%"} > 
+          <AnomalyChart responseData={responseData} />
+          </Box>
+        {/* </div> */}
+        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
+          <Box width={"49.5%"}>
+            <OutlierChart responseData={responseData} />
+          </Box>
+        {/* </div> */}
+      </Box>
+    </Box>
   );
 };

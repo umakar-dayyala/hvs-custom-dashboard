@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import Plot from "react-plotly.js";
 import { HvCard } from "@hitachivantara/uikit-react-core";
 import DateTimeRangePicker from "./DateTimeRangePicker";
+import { Paper } from "@mui/material";
+import { background, border } from "@chakra-ui/react";
+import { legendClasses } from "@mui/x-charts";
 
 
-const PlotlyDataChart = ({ data, title }) => {
+const PlotlyDataChart = ({ data }) => {
  
   const keys = Object.keys(data).filter((key) => key !== "Time");
   const [selectedRange, setSelectedRange] = useState([
@@ -42,25 +45,27 @@ const PlotlyDataChart = ({ data, title }) => {
   }));
 
   const layout = {
-    title: { 
-      text: title || "Data Visualization", 
-      font: { size: 20 } 
-    },
+   
     xaxis: { title: "Time", tickangle: 45 },
     yaxis: { title: "Count" },
     legend: { 
-      orientation: "h", 
-      x: 0.5, 
-      xanchor: "center", 
-      y: 1.1, 
-      font: { size: 18 } 
+      orientation: "h", // Vertical stacking
+      x: 0.3, // Position it next to the chart
+      y: -0.5, // Center vertically
+      
+      font: { size: 15 }, // Increase font size
+      traceorder: "normal", // Keep order intact
+      
     },
-    margin: { t: 100, b: 80 }, // Increase top margin for title visibility
+    margin: { t: 50, b: 80, l: 50, r: 50 }, // Increase right margin for legend space
+    plot_bgcolor: "#F5F6F6",  // Set the chart background to gray
+   
+    
+  
   };
   
-
   return (
-    <HvCard bgcolor="white" height="auto" statusColor="red">
+    <HvCard bgcolor="white" height="auto" statusColor="red" style={{borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem",paddingLeft:"1rem" }}>
       <DateTimeRangePicker onChange={handleRangeChange} />
       {/* <QuickTimeSelector/> */}

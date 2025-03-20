@@ -61,7 +61,7 @@ const AnomalyChart = ({ responseData }) => {
   }
 
   return (
-    <HvCard style={{ height: "100%", width: "100%", backgroundColor: "white" ,minHeight:"500px"}} statusColor="red">
+    <HvCard style={{ height: "100%", width: "100%", backgroundColor: "white" ,minHeight:"500px",borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}} statusColor="red">
       <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingBottom: "1rem", paddingLeft: "1rem",width:"100%" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingBottom: "1rem", paddingLeft: "1rem", width: "100%",marginRight:"1rem" }}>
   <Select
@@ -106,11 +106,12 @@ const AnomalyChart = ({ responseData }) => {
             },
           ]}
           layout={{
-            title: { text: currentDataset.label, font: { size: 18 } },
+            
             xaxis: { title: "Time", tickangle: 45 },
             yaxis: { title: "Values", automargin: true }, // Ensure Y-axis labels have enough space
             margin: { t: 60, b: 80, l: 80, r: 50 }, // Increased left margin from 50 to 80
             dragmode: "zoom",
+            plot_bgcolor: "#F5F6F6", 
           }}
           style={{ height: "100%", width: "100%" }}
           useResizeHandler={true}

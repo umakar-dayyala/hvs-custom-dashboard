@@ -10,36 +10,12 @@
     flex: 1;
     width: 27.19rem;
     height: auto;
+    background-color: white;
+  }
+
+  .section-title{
+    
+    margin-top: 1rem;
   }
   
-  .parameter-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.625rem; 
-  }
-  
-  .parameter-row {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .parameter-key {
-    font-size: 1.2rem; /* 20px */
-  }
-  
-  .parameter-value {
-    font-size: 1.2rem; /* 20px */
-  }
-  
-  .parameter-status {
-    font-size: 1.2rem; /* 20px */
-  }
-  
-  .no-fault {
-    color: green;
-  }
-  
-  .fault {
-    color: red;
-  }
   
