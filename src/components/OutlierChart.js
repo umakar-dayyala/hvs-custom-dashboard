@@ -51,7 +51,7 @@ const OutlierChart = ({ responseData }) => {
     }, [selectedRange]);
 
   return (
-    <HvCard style={{ height: "auto", width: "100%", backgroundColor: "white" }} statusColor="red">
+    <HvCard style={{ height: "auto", width: "100%", backgroundColor: "white" ,borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}} statusColor="red" >
       <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem", paddingLeft: "1rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingBottom: "1rem", paddingLeft: "1rem", width: "100%",marginRight:"1rem" }}>
   <Select
@@ -96,11 +96,12 @@ const OutlierChart = ({ responseData }) => {
             },
           ]}
           layout={{
-            title: { text: currentDataset.label, font: { size: 18 } },
+            
             xaxis: { title: "Time", tickangle: 45 },
             yaxis: { title: "Values", automargin: true }, // Ensure Y-axis labels have enough space
-           
+            margin: { t: 60, b: 80, l: 80, r: 50 }, // Increased left margin from 50 to 80
             dragmode: "zoom",
+            plot_bgcolor: "#F5F6F6", 
           }}
           style={{ height: "100%", width: "100%" }}
           useResizeHandler={true}

@@ -6,7 +6,7 @@ import {
   HvTypography,
 } from "@hitachivantara/uikit-react-core";
 
-const IndividualKPI = ({ kpiData }) => {
+const IndividualKPI = ({ kpiData, rbell }) => {
   const isAlarmActive = parseInt(kpiData.value) > 0;
 
   return (
@@ -16,14 +16,31 @@ const IndividualKPI = ({ kpiData }) => {
         minWidth: "200px",
         marginTop: "2rem",
         backgroundColor: "white",
+        position: "relative", // Needed for absolute positioning of the bell
+         borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"
       }}
       statusColor={isAlarmActive ? "red" : "green"}
     >
+      {/* Bell Icon in Top-Right */}
+      <img
+        src={rbell}
+        alt="bell"
+        style={{
+          position: "absolute",
+          bottom: "0.5rem",
+          right: "0.5rem",
+          height: "70%", // Adjusts dynamically with the card
+        }}
+      />
+
       <HvCardHeader
         title={
           <HvTypography
             variant="title2"
-            style={{ color: isAlarmActive ? "red" : "black" }}
+            style={{
+              color: isAlarmActive ? "red" : "black",
+              fontWeight: "bold",
+            }}
           >
             {kpiData.title}
           </HvTypography>
@@ -32,7 +49,11 @@ const IndividualKPI = ({ kpiData }) => {
       <HvCardContent>
         <HvTypography
           variant="title1"
-          style={{ color: isAlarmActive ? "red" : "black" }}
+          style={{
+            color: isAlarmActive ? "red" : "black",
+            fontWeight: "bold",
+            fontSize: "1.5rem",
+          }}
         >
           {kpiData.value}
         </HvTypography>
@@ -41,8 +62,7 @@ const IndividualKPI = ({ kpiData }) => {
   );
 };
 
-const KPIContainer = ({ bioicon, gbioicon, kpiData }) => {
-  // Check if any KPI value is greater than 0
+const KPIContainer = ({ bioicon, gbioicon, kpiData, rbell }) => {
   const isAlarmActive = kpiData.some((kpi) => parseInt(kpi.value) > 0);
 
   return (
@@ -55,7 +75,7 @@ const KPIContainer = ({ bioicon, gbioicon, kpiData }) => {
       }}
     >
       <img
-        src={isAlarmActive ? bioicon : gbioicon} // Conditionally render the image
+        src={isAlarmActive ? bioicon : gbioicon}
         alt="Icon"
         style={{
           height: "8rem",
@@ -63,7 +83,7 @@ const KPIContainer = ({ bioicon, gbioicon, kpiData }) => {
         }}
       />
       {kpiData.map((kpi, index) => (
-        <IndividualKPI key={index} kpiData={kpi} />
+        <IndividualKPI key={index} kpiData={kpi} rbell={rbell} />
       ))}
     </div>
   );
