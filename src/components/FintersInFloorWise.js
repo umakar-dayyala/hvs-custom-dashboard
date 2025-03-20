@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Box, MenuItem, Select, Button } from "@mui/material";
-import { HvTypography } from "@hitachivantara/uikit-react-core";
+import { HvTypography, HvButton } from "@hitachivantara/uikit-react-core";
 
 const FintersInFloorWise = ({
   filters,
   onFilterApply,
+  zoneData,
   locationData,
   sensorTypeData,
   sensorNameData,
@@ -37,24 +38,36 @@ const FintersInFloorWise = ({
       <HvTypography variant="label">View by</HvTypography>
 
       <Select
+        multiple
         value={selectedFilters.zone}
         onChange={(e) => handleFilterChange("zone", e.target.value)}
         size="small"
         displayEmpty
         sx={dropdownStyle}
+        renderValue={(selected) =>
+          selected.length ? selected.join(", ") : "Zone"
+        }
       >
         <MenuItem value="ALL">All Zones</MenuItem>
-        <MenuItem value="Zone1">Zone1</MenuItem>
-        <MenuItem value="Zone2">Zone 2</MenuItem>
+        {Array.isArray(zoneData.zone) && zoneData.zone.map((option) => (
+          <MenuItem key={option.zone} value={option.zone}>
+            {option.zone}
+          </MenuItem>
+        ))}
       </Select>
+
 
       {/* Location Dropdown */}
       <Select
+        multiple
         value={selectedFilters.location}
         onChange={(e) => handleFilterChange("location", e.target.value)}
         size="small"
         displayEmpty
         sx={dropdownStyle}
+        renderValue={(selected) =>
+          selected.length ? selected.join(", ") : "Location"
+        }
       >
         <MenuItem value="ALL">All Locations</MenuItem>
         {locationData?.map((option) => (
@@ -125,7 +138,7 @@ const FintersInFloorWise = ({
       </Select>
 
       {/* Apply Button */}
-      <Button onClick={() => onFilterApply(selectedFilters)}>Apply</Button>
+      <HvButton onClick={() => onFilterApply(selectedFilters)}>Apply</HvButton>
     </Box>
   );
 };

@@ -1,3 +1,4 @@
+import { filter } from "@chakra-ui/react";
 import axios from "axios";
 
 //const API_BASE_URL = "http://10.131.19.205:5000/api";
@@ -43,14 +44,24 @@ export const floorList = async () => {
 
 export const getFloorSummary = async (filterData) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/floor/getFloorSummary?${filterData}`); // Replace with your actual API URL
-    const data = response.data;
+    // Convert query string to object
+    const params = new URLSearchParams(filterData);
+    const body = Object.fromEntries(params.entries());
+    
+    console.log("Request Body: ", body);
+    
+    const response = await axios.post(`${API_BASE_URL}/floor/getFloorSummary`, body, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    // Transform API response to match expected format
+    const data = response.data;
+    console.log(data);
     return data;
   } catch (error) {
-    console.error("Error fetching sensor data:", error);
-    return []; // Return an empty array in case of error
+    console.error("Error fetching sensor data: " + JSON.stringify(error));
+    return [];
   }
 };
 
@@ -64,6 +75,17 @@ export const GetSensorSummary = async (floorName) => {
   } catch (error) {
     console.error("Error fetching sensor data:", error);
     return []; // Return an empty array in case of error
+  }
+};
+
+export const getFloorZoneSelector = async (params) => {
+  try {
+    console.log((`${API_BASE_URL}/floor/getZoneList?${params}`));
+    const response = await axios.get(`${API_BASE_URL}/floor/getZoneList?${params}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data from API:", error);
+    throw error;
   }
 };
 
@@ -106,6 +128,17 @@ export const getSensorNameSelector = async (params) => {
 export const getSensorStatusSelector = async (params) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/floor/getSensorStatusSelector?${params}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sensor status selector:", error);
+    return [];
+  }
+};
+
+export const getFloorAlartList = async () => {
+  try {
+    console.log("getFloor "+`${API_BASE_URL}/floor/getFloorAlerts`);
+    const response = await axios.get(`${API_BASE_URL}/floor/getFloorAlerts`);
     return response.data;
   } catch (error) {
     console.error("Error fetching sensor status selector:", error);

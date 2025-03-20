@@ -1,66 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Divider } from "@mui/material";
 import FloorTabs from "../components/FloorTabs";
 import SensorStatusCards from "../components/SensorStatusCards";
 import AllAlertsFloorWiseTable from "../components/AllAlertsFloorWiseTable";
 import Breadcrumbs from "../components/Breadcrumbs";
 import SensorLegend from "../components/SensorLegend";
+import { floorList, 
+getFloorAlartList} from "../service/summaryServices";
 
 const AllAlertsDashboard = () => {
-  const [floorData] = useState([
-    { id: 1, name: "Lower Ground" },
-    { id: 2, name: "Upper Ground" },
-    { id: 3, name: "First Floor" },
-  ]);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const [floorWiseAlertsData] = useState([
-    {
-      floorName: "Under Ground Floor Detected Alarm | Zone 04",
-      alerts: [
-        {
-          slNo: "01",
-          zone: "04",
-          location: "Upper Ground Floor At Garuda Dwar (Left side)",
-          noOfAlarm: "01",
-          timeStamp: "01",
-          alarmType: "Radiation (Ibac) Raman based Radiological warfare",
-          correlatedAlarm: "X",
-          incidentStatus: "Open",
-          isOnline: false,
-          sensorType: "Radiation",
-        },
-      ],
-    },
-    {
-      floorName: "Lower Ground Floor Detected Alarm | Zone 02",
-      alerts: [
-        {
-          slNo: "02",
-          zone: "02",
-          location: "Lower Ground Floor Inside AHU room no. L-49",
-          noOfAlarm: "02",
-          timeStamp: "01",
-          alarmType: "Large Bio Count",
-          correlatedAlarm: "X",
-          incidentStatus: "Open",
-          isOnline: true,
-          sensorType: "Radiation",
-        },
-        {
-          slNo: "03",
-          zone: "02",
-          location: "Lower Ground Floor At Hans Dwar (Right side)",
-          noOfAlarm: "01",
-          timeStamp: "01",
-          alarmType: "Phosphorus Concentration (CP) (ug/m3)",
-          correlatedAlarm: "X",
-          incidentStatus: "Open",
-          isOnline: true,
-          sensorType: "Radiation",
-        },
-      ],
-    },
-  ]);
+  const queryParams = new URLSearchParams(location.search);
+  const initialFloor = queryParams.get("floor") || "ALL";
+
+  // State
+  const [floor, setFloor] = useState(initialFloor);
+  const [floorData, setFloorData] = useState([]);
+  const [floorWiseAlertsData, setFloorWiseAlertsData] = useState([]);
+
+  const fetchFloorList = async () => {
+    try {
+      const response = await floorList();
+      setFloorData(response);
+    } catch (error) {
+      console.error("Error fetching floor list:", error);
+    }
+  };
+
+  const fetchFloorAlertList = async () => {
+    try {
+      const response = await getFloorAlartList();
+      setFloorWiseAlertsData(response.data);
+    } catch (error) {
+      console.error("Error fetching floor alerts:", error);
+    }
+  }; 
+
+  const handleTabClick = (floorName) => {
+    setFloor(floorName);
+    // Navigate to the "floorwise" route with the floor parameter
+    navigate(`/floorwise?floor=${encodeURIComponent(floorName)}`, { replace: true });
+  };
+  
+  useEffect(() => {
+    fetchFloorList();
+    fetchFloorAlertList();
+  }, [floor]);
 
   return (
     <Box>
@@ -77,8 +65,7 @@ const AllAlertsDashboard = () => {
 
       {/* Floor Tabs */}
       <Box width="100%">
-        {/* Need Uncomment it  */}
-        {/* <FloorTabs floorData={floorData} /> */}
+        <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
       </Box>
 
       <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} />

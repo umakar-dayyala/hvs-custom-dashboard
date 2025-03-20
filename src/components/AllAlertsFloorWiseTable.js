@@ -60,7 +60,7 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                   <TableRow key={alertIndex} className="body-row">
                     {/* Sl No */}
                     <TableCell className="table-cell">
-                      <HvTypography>{alert.slNo}</HvTypography>
+                      <HvTypography>{alertIndex + 1}</HvTypography>
                     </TableCell>
 
                     {/* Zone */}
@@ -75,47 +75,45 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
 
                     {/* No of Alarm */}
                     <TableCell className="table-cell">
-                      <HvTypography>{alert.noOfAlarm}</HvTypography>
+                      <HvTypography>{alert.no_of_alarms}</HvTypography>
                     </TableCell>
 
                     {/* Time Stamp of Alarm */}
                     <TableCell className="table-cell">
-                      <HvTypography>{alert.timeStamp}</HvTypography>
+                      <HvTypography>{alert.timestamp}</HvTypography>
                     </TableCell>
 
                     {/* Alarm Type with Icon */}
                     <TableCell className="table-cell">
-                      <Box display="flex" alignItems="center">
-                        {sensorTypeIcons[alert.sensorType] && (
+                      <Box display="flex" >
+                        {sensorTypeIcons[alert.sensor_type] && (
                           <img
-                            src={sensorTypeIcons[alert.sensorType]}
-                            alt={alert.sensorType}
+                            src={sensorTypeIcons[alert.sensor_type]}
+                            alt={alert.sensor_type}
                             className="status-icon"
                           />
                         )}
-                        <HvTypography color="negative">{alert.alarmType}</HvTypography>
+                        <HvTypography color="negative">{alert.alarm_type}</HvTypography>
                       </Box>
                     </TableCell>
 
                     {/* Correlated Alarm */}
                     <TableCell className="table-cell">
                       <img
-                        src={alert.correlatedAlarm === "X" ? CancelIcon : CheckCircleIcon}
-                        alt={alert.correlatedAlarm === "X" ? "No" : "Yes"}
+                        src={alert.correlated_alarms === "No" ? CancelIcon : CheckCircleIcon}
+                        alt={alert.correlated_alarms === "No" ? "No" : "Yes"}
                         className="status-icon"
                       />
                     </TableCell>
 
                     {/* Incident Status */}
                     <TableCell className="table-cell">
-                      <HvTypography>{alert.incidentStatus}</HvTypography>
+                      <HvTypography>{alert.incident_status}</HvTypography>
                     </TableCell>
 
                     {/* Action */}
                     <TableCell className="table-cell">
-                      <HvButton category="primary" 
-                    //   disabled={!alert.isOnline}
-                      >
+                      <HvButton category="primary">
                         Stop LED / Buzzer
                       </HvButton>
                     </TableCell>

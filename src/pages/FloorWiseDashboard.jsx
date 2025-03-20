@@ -10,6 +10,7 @@ import {
   floorList,
   getFloorSummary,
   GetSensorSummary,
+  getFloorZoneSelector,
   getLocationSelector,
   getSensorTypeSelector,
   getSensorNameSelector,
@@ -30,14 +31,15 @@ const FloorWiseDashboard = () => {
   const [floorData, setFloorData] = useState([]);
   const [sensorSummary, setSensorSummary] = useState([]);
   const [floorSummaryData, setFloorSummaryData] = useState([]);
+  const [zoneData, setZoneData] = useState([]);
   const [locationData, setLocationData] = useState([]);
   const [sensorTypeData, setSensorTypeData] = useState([]);
   const [sensorNameData, setSensorNameData] = useState([]);
   const [sensorStatusData, setSensorStatusData] = useState([]);
 
   const defaultFilters = {
-    zone: "ALL",
-    location: "ALL",
+    zone: [],
+    location: [],
     sensorType: [],
     sensor: [],
     sensorStatus: [],
@@ -51,7 +53,7 @@ const FloorWiseDashboard = () => {
   const fetchFloorSummary = async (floorParam, appliedFilters) => {
     try {
       const response = await getFloorSummary(
-        `param_floor=${floorParam}&param_zone=${appliedFilters.zone || "ALL"}&param_location=${appliedFilters.location || "ALL"}&param_sensor_type=${formatFilter(appliedFilters.sensorType)}&param_sensor_name=${formatFilter(appliedFilters.sensor)}&param_sensor_status=${formatFilter(appliedFilters.sensorStatus)}`
+        `param_floor=${floorParam}&param_zone=${formatFilter(appliedFilters.zone)}&param_location=${formatFilter(appliedFilters.location)}&param_sensor_type=${formatFilter(appliedFilters.sensorType)}&param_sensor_name=${formatFilter(appliedFilters.sensor)}&param_sensor_status=${formatFilter(appliedFilters.sensorStatus)}`
       );
       setFloorSummaryData(response);
     } catch (error) {
@@ -76,6 +78,16 @@ const FloorWiseDashboard = () => {
       console.error("Error fetching floor list:", error);
     }
   };
+
+  const fetchZoneData = async (floorParam) => {
+
+    try {
+      const response = await getFloorZoneSelector(`param_floor=${floorParam}`);
+      setZoneData(response.data);
+    } catch (error) {
+      console.error("Error fetching zone data:", error);
+    }
+  }
 
   const fetchLocationData = async (zoneParam = "ALL", floorParam = "ALL") => {
     try {
@@ -129,6 +141,7 @@ const FloorWiseDashboard = () => {
     fetchFloorSummary(floorName, defaultFilters);
     fetchSensorSummary(floorName);
     fetchFloorList();
+    fetchZoneData(floorName);
     fetchLocationData("ALL", floorName);
     fetchSensorTypeData(floorName, "ALL", "ALL");
   };
@@ -144,6 +157,7 @@ const FloorWiseDashboard = () => {
 
     setFilters(updatedFilters);
     fetchFloorSummary(floor, updatedFilters);
+    fetchZoneData(floor);
     fetchLocationData(updatedFilters.zone, floor);
     fetchSensorTypeData(floor, updatedFilters.zone, updatedFilters.location);
     fetchSensorNameData(floor, updatedFilters.zone, updatedFilters.location, updatedFilters.sensorType);
@@ -154,8 +168,11 @@ const FloorWiseDashboard = () => {
     fetchFloorSummary(floor, filters);
     fetchSensorSummary(floor);
     fetchFloorList();
+    fetchZoneData(floor);
     fetchLocationData("ALL", floor);
     fetchSensorTypeData(floor, "ALL", "ALL");
+    fetchSensorNameData(floor, "ALL", "ALL", []);
+    fetchSensorStatusData(floor, "ALL", "ALL", [], []);
   }, [floor]);
 
   return (
@@ -185,6 +202,7 @@ const FloorWiseDashboard = () => {
             <FilterBar 
               filters={filters} 
               onFilterApply={handleApplyFilters} 
+              zoneData={zoneData}
               locationData={locationData}
               sensorTypeData={sensorTypeData}
               sensorNameData={sensorNameData}
