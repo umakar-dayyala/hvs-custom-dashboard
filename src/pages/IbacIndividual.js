@@ -102,14 +102,14 @@ export const IbacIndividual = () => {
         <PlotlyDataChart data={chartData} />
         </Box>
       </Box>
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2}>
+      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
         {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"49.5%"} > 
+          <Box width={"50%"} > 
           <AnomalyChart responseData={responseData} />
           </Box>
         {/* </div> */}
         {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"49.5%"}>
+          <Box width={"50%"}>
             <OutlierChart responseData={responseData} />
           </Box>
         {/* </div> */}
