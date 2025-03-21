@@ -18,8 +18,10 @@ const FloorWiseDataTable = ({ data }) => {
   const navigate = useNavigate();
 
   const handleDetectorClick = (device_id, detector) => {
-    alert(`Clicked on detector: ${device_id}`);
+    //alert(`Clicked on detector: ${device_id}`);
     if (device_id) {
+      
+      
       navigate(`/${detector}/${device_id}`);
     }
   };

@@ -23,7 +23,7 @@ import Alertbar from '../components/Alertbar';
 
 import Breadcrumbs from '../components/Breadcrumbs';
 import ToggleButtons from '../components/ToggleButtons';
-import {  Button, Modal, Typography } from "@mui/material";
+import { Button, Modal, Typography } from "@mui/material";
 import ConfirmationModal from '../components/ConfirmationModal';
 
 export const IbacIndividual = () => {
@@ -33,8 +33,8 @@ export const IbacIndividual = () => {
   const [anomalyChartData, setAnomalyChartData] = useState({});
   const [outlierChartData, setOutlierChartData] = useState({});
   const [toggleState, setToggleState] = useState("Operator");
-const [showModal, setShowModal] = useState(false);
-const [newState, setNewState] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [newState, setNewState] = useState(null);
 
 
   // New States for Time Range
@@ -124,7 +124,7 @@ const [newState, setNewState] = useState(null);
       setToggleState(state); // Directly update state if no confirmation needed
     }
   };
-  
+
   const handleConfirmChange = () => {
     if (newState) {
       setToggleState(newState); // Apply only confirmed changes
@@ -142,11 +142,11 @@ const [newState, setNewState] = useState(null);
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Breadcrumbs />
         <div style={{ display: "flex", gap: "10px" }}>
-        <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
-  
+          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+
         </div>
       </div>
-  
+
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
           <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
@@ -156,19 +156,22 @@ const [newState, setNewState] = useState(null);
         <Box mt={2}>
           <PlotlyDataChart bioParamChartData={bioParamChartData} />
         </Box>
-  
+
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={"50%"}>
-          <AnomalyChart 
-          anomalyChartData={anomalyChartData} 
-          onRangeChange={handleRangeChange}
-          />
+            <AnomalyChart
+              anomalyChartData={anomalyChartData}
+              onRangeChange={handleRangeChange}
+            />
           </Box>
           <Box width={"50%"}>
-          <OutlierChart outlierChartData={outlierChartData} />
+            <OutlierChart
+              outlierChartData={outlierChartData}
+              onRangeChange={handleRangeChange}
+            />
           </Box>
         </Box>
-  
+
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={toggleState === "Operator" ? "100%" : "50%"}>
             <IntensityChart />
@@ -180,18 +183,18 @@ const [newState, setNewState] = useState(null);
           )}
         </Box>
       </Box>
-  
+
       {showModal && (
-        <ConfirmationModal 
-          open={showModal} 
-          onClose={handleCancelChange} 
-          onConfirm={handleConfirmChange} 
+        <ConfirmationModal
+          open={showModal}
+          onClose={handleCancelChange}
+          onConfirm={handleConfirmChange}
           title="Confirm Role Change"
           message="Are you sure you want to switch to Supervisor mode?"
         />
       )}
     </Box>
   );
-  };
+};
 
 
