@@ -47,8 +47,9 @@ export const IbacIndividual = () => {
   useEffect(() => {
     // Real-time data updates (WebSocket)
     const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id") || "1149";
+    //const deviceId = queryParams.get("device_id") || "1149";
 
+    const deviceId = "1149";
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
         console.error("Error receiving data:", err);
@@ -75,12 +76,12 @@ export const IbacIndividual = () => {
 
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
-    // const formattedFromTime = "2024/11/15 17:15:30.543";
-    // const formattedToTime = "2026/03/20 12:10:38.140";
+    // const formattedFromTime = "'2024/11/15 17:15:30.543'";
+    // const formattedToTime = "'2026/03/20 12:10:38.140'";
 
     const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
-    // const deviceId = "1148";
+    //const deviceId = queryParams.get("device_id");
+    const deviceId = "1148";
     try {
       // Fetch Charts with Time Range
       const chart = await fetchBioParamChartData(deviceId, formattedFromTime, formattedToTime);
@@ -91,7 +92,7 @@ export const IbacIndividual = () => {
 
     try {
       const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-      setAnomalyChartData(anomaly.data.data);
+      setAnomalyChartData(anomaly.data);
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -99,7 +100,7 @@ export const IbacIndividual = () => {
 
     try {
       const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-      setOutlierChartData(outlier);
+      setOutlierChartData(outlier.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -112,6 +113,7 @@ export const IbacIndividual = () => {
 
   // Handle Range Change from PlotlyDataChart
   const handleRangeChange = (range) => {
+    alert("handleRangeChange");
     setFromTime(range[0].toISOString());
     setToTime(range[1].toISOString());
   };
@@ -154,7 +156,10 @@ export const IbacIndividual = () => {
         </HvStack>
         <IndividualParameters paramsData={paramsData} />
         <Box mt={2}>
-          <PlotlyDataChart bioParamChartData={bioParamChartData} />
+          <PlotlyDataChart
+           bioParamChartData={bioParamChartData} 
+           onRangeChange={handleRangeChange} 
+          />
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>

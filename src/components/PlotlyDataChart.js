@@ -3,35 +3,38 @@ import Plot from "react-plotly.js";
 import { HvCard } from "@hitachivantara/uikit-react-core";
 import DateTimeRangePicker from "./DateTimeRangePicker";
 
-const PlotlyDataChart = ({ data }) => {
+const PlotlyDataChart = ({ bioParamChartData ,onRangeChange }) => {
   const [selectedRange, setSelectedRange] = useState([null, null]);
   const [rate, setRate] = useState(1);
 
   // Initialize selectedRange when data changes
   useEffect(() => {
-    if (data && data.Time && data.Time.length > 0) {
-      setSelectedRange([data.Time[0], data.Time[data.Time.length - 1]]);
+    if (bioParamChartData && bioParamChartData.Time && bioParamChartData.Time.length > 0) {
+      setSelectedRange([bioParamChartData.Time[0], bioParamChartData.Time[bioParamChartData.Time.length - 1]]);
     }
-  }, [data]);
+  }, [bioParamChartData]);
 
   const handleRangeChange = (range, selectedRate) => {
     setSelectedRange(range);
     setRate(selectedRate);
+    if (onRangeChange) {
+      onRangeChange(range);  
+    }
   };
 
-  const keys = data ? Object.keys(data).filter((key) => key !== "Time") : [];
+  const keys = bioParamChartData ? Object.keys(bioParamChartData).filter((key) => key !== "Time") : [];
 
   // Handle no data gracefully
   let traces = [];
-  if (data && data.Time && data.Time.length > 0) {
-    const filteredIndices = data.Time
+  if (bioParamChartData && bioParamChartData.Time && bioParamChartData.Time.length > 0) {
+    const filteredIndices = bioParamChartData.Time
       .map((time, index) => ({ index, time: new Date(time) }))
       .filter(({ time }) => time >= new Date(selectedRange[0]) && time <= new Date(selectedRange[1]));
 
     const filteredData = {
-      Time: filteredIndices.map(({ index }) => data.Time[index]),
+      Time: filteredIndices.map(({ index }) => bioParamChartData.Time[index]),
       ...keys.reduce((acc, key) => {
-        acc[key] = filteredIndices.map(({ index }) => data[key][index]);
+        acc[key] = filteredIndices.map(({ index }) => bioParamChartData[key][index]);
         return acc;
       }, {}),
     };
