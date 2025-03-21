@@ -17,12 +17,25 @@ import "../css/FloorWiseDataTable.css";
 const FloorWiseDataTable = ({ data }) => {
   const navigate = useNavigate();
 
+  const routeName = (detector) => {
+    const routes = {
+      AGM: "agmindividual",
+      "AP4C-F": "AP4CIndividual",
+      FCAD: "FCADIndividual", 
+      PRM: "PRMIndividual",
+      VRM: "vrmIndividual",
+      IBAC: "ibacIndividual",
+      MAB: "MABIndividual",
+    };
+  
+    return routes[detector] || null; // Return null if detector not found
+  };
+  
+  // Handle detector click and navigate accordingly
   const handleDetectorClick = (device_id, detector) => {
-    //alert(`Clicked on detector: ${device_id}`);
-    if (device_id) {
-      
-      
-      navigate(`/${detector}/${device_id}`);
+    const route = routeName(detector);
+    if (device_id && route) {
+      navigate(`/${route}?device_id=${device_id}`);
     }
   };
 
