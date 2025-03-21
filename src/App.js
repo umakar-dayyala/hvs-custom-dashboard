@@ -14,11 +14,13 @@ import OperatorsDashboard from "./pages/OperatorsDashboard";
 import FloorWiseDashboard from "./pages/FloorWiseDashboard";
 import AllAlertsDashboard from "./pages/AllAlertsDashboard";
 import { IbacIndividual } from "./pages/IbacIndividual";
+import {AgmIndividual} from "./pages/agmIndividual"; // for agm sensor
 import Breadcrumbs from "./components/Breadcrumbs";
 import SensorLegend from "./components/SensorLegend";
 import ToggleButtons from "./components/ToggleButtons";
 import SensorStatusCards from "./components/SensorStatusCards";
 import { MyProvider } from "./context/MyContext";
+import Loader from "./components/Loader";
 
 
 const App = () => {
@@ -53,6 +55,8 @@ const App = () => {
               <Route path="/floorwise" element={<FloorWiseDashboard />} />
               <Route path="/allalerts" element={<AllAlertsDashboard />} />
               <Route path="/ibacIndividual" element={<IbacIndividual/>} />
+              <Route path="/agmIndividual" element = {<AgmIndividual/>}/>
+              <Route path="/loader" element={<Loader/>}/>
             </Routes>
           </HvContainer>
         </Router>
