@@ -52,6 +52,7 @@ const FloorWiseDataTable = ({ data }) => {
               "Detector",
               "Offline/Online",
               "Alarm & Alerts",
+              "Description",
               "",
             ].map((header) => (
               <TableCell key={header} className="table-cell1">
@@ -107,7 +108,11 @@ const FloorWiseDataTable = ({ data }) => {
 
                 {/* Alarm & Alerts */}
                 <TableCell className="table-cell">
-                  <HvTypography>0{row?.s_no?.alarms_and_alerts || "0"}</HvTypography>
+                  <HvTypography>0{row?.s_no?.alarms_and_alerts || "-"}</HvTypography>
+                </TableCell>
+                
+                <TableCell className="table-cell">
+                  <HvTypography>{row?.s_no?.alarm_fault_columns || "0"}</HvTypography>
                 </TableCell>
 
                 {/* Stop Button */}
