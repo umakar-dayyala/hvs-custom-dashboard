@@ -14,6 +14,7 @@ import OperatorsDashboard from "./pages/OperatorsDashboard";
 import FloorWiseDashboard from "./pages/FloorWiseDashboard";
 import AllAlertsDashboard from "./pages/AllAlertsDashboard";
 import { IbacIndividual } from "./pages/IbacIndividual";
+import {AgmIndividual} from "./pages/agmIndividual"; // for agm sensor
 import Breadcrumbs from "./components/Breadcrumbs";
 import SensorLegend from "./components/SensorLegend";
 import ToggleButtons from "./components/ToggleButtons";
@@ -23,6 +24,8 @@ import { VRMIndividual } from "./pages/VRMIndividual";
 import { PRMIndividual } from "./pages/PRMIndividual";
 import { AP4CIndividual } from "./pages/AP4CIndividual";
 import { MABIndividual } from "./pages/MABIndividual";
+
+
 
 
 const App = () => {
@@ -61,6 +64,7 @@ const App = () => {
               <Route path="/PRMIndividual" element={<PRMIndividual/>}/>
               <Route path="/AP4CIndividual" element={<AP4CIndividual/>}/>
               <Route path="/MABIndividual" element={<MABIndividual/>}/>
+              <Route path="/agmindividual" element={<AgmIndividual/>}/>
             </Routes>
           </HvContainer>
         </Router>
