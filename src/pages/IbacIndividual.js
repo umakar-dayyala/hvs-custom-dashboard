@@ -47,9 +47,8 @@ export const IbacIndividual = () => {
   useEffect(() => {
     // Real-time data updates (WebSocket)
     const queryParams = new URLSearchParams(window.location.search);
-    //const deviceId = queryParams.get("device_id") || "1149";
+    const deviceId = queryParams.get("device_id") || "1149";
 
-    const deviceId = "1149";
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
         console.error("Error receiving data:", err);
@@ -80,8 +79,8 @@ export const IbacIndividual = () => {
     // const formattedToTime = "'2026/03/20 12:10:38.140'";
 
     const queryParams = new URLSearchParams(window.location.search);
-    //const deviceId = queryParams.get("device_id");
-    const deviceId = "1148";
+    const deviceId = queryParams.get("device_id");
+    // const deviceId = "1148";
     try {
       // Fetch Charts with Time Range
       const chart = await fetchBioParamChartData(deviceId, formattedFromTime, formattedToTime);
@@ -113,7 +112,6 @@ export const IbacIndividual = () => {
 
   // Handle Range Change from PlotlyDataChart
   const handleRangeChange = (range) => {
-    alert("handleRangeChange");
     setFromTime(range[0].toISOString());
     setToTime(range[1].toISOString());
   };
