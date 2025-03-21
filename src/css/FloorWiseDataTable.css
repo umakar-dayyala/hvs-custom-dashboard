@@ -34,3 +34,25 @@
     width: 24px;
     height: 24px;
 }
+
+
+/* Zone Column - Fixed Width */
+.zone-cell {
+    width: 8rem; /* Fixed width */
+    min-width: 8rem;
+    max-width: 8rem;
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds "..." if content is too long */
+}
+
+/* Location Column - Fixed Width */
+.location-cell {
+    width: 20rem; /* adjust accroding to teh requirement */
+    min-width: 20rem;
+    max-width: 20rem;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds "..." if content is too long */
+}
+
+

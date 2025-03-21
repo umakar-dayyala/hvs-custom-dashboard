@@ -55,9 +55,11 @@ const SensorStatusCards = (props) => {
           progressPercentage = (unhealthy / total) * 100;
           sensorValue = `${unhealthy}/${total}`;
           alertBorder = unhealthy > 0;
-        } else {
+        } else if (!["Total Sensor", "Inactive Sensor", "Active Sensor"].includes(card.title)) {
           sensorValue = Number(sensorValue);
           alertBorder = sensorValue > 0;
+        } else {
+          alertBorder = false; // Ensures these specific cards don't get an alert
         }
 
         const currentImage =

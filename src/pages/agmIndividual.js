@@ -10,12 +10,16 @@ import gbioicon from "../assets/gRadiological.svg";
 import PlotlyDataChart from '../components/PlotlyDataChart';
 import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
+import IntensityChart from '../components/IntensityChart';
+import PredictionChart from '../components/PredictionChart';
+import AGMadditionalParameters from '../components/AGMadditionalParameters';
+
 
 const sampleData = [{
   "Radiation Readings": {
     "radiation_parameters": "Values",
     "dose_rate": "999999",
-   
+
   },
   "Device Faults": {
     "fault_parameters": "Status",
@@ -30,7 +34,7 @@ const sampleData = [{
     "health_parameters": "Values",
     "HV (High Voltage)": "00"
   },
- 
+
 }];
 
 const chartData = {
@@ -45,13 +49,13 @@ const chartData = {
   "dose rate": [2, 3, 1, 5, 4, 6],
   "Over Range ": [5, 8, 6, 9, 7, 10],
   "Over load": [10, 12, 14, 15, 16, 18],
- 
+
 };
 
 const kpiData = [
   { "title": "Dose Rate Alarm", "value": "01" },
   { "title": "Over Range", "value": "00" },
-  { "title": "Over Load", "value": "01" },
+  { "title": "Over Load", "value": "11" },
 ];
 
 const responseData = {
@@ -84,33 +88,46 @@ const responseData = {
 };
 
 export const AgmIndividual = () => {
-    return (
-        <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon}  rbell={rbell}/>
-              {/* <Alertbar alerts={dummyData} /> */}
-              <Alertbar/>
-              
-            </HvStack>
-            <IndividualParameters sampleData={sampleData} />
-            {/* <ChartComponent /> */}
-            <Box mt={2}>
-            <PlotlyDataChart data={chartData} />
-            </Box>
-          </Box>
-          <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-            {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-              <Box width={"50%"} > 
-              <AnomalyChart responseData={responseData} />
-              </Box>
-            {/* </div> */}
-            {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-              <Box width={"50%"}>
-                <OutlierChart responseData={responseData} />
-              </Box>
-            {/* </div> */}
-          </Box>
+  return (
+    <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <HvStack direction="column" divider spacing="sm">
+          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+          {/* <Alertbar alerts={dummyData} /> */}
+          <Alertbar />
+
+        </HvStack>
+        <IndividualParameters sampleData={sampleData} />
+        {/* <ChartComponent /> */}
+        <Box mt={2}>
+          <PlotlyDataChart data={chartData} />
         </Box>
-      );
-    };
+      </Box>
+      <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
+        <Box width={"50%"} >
+          <AnomalyChart responseData={responseData} />
+        </Box>
+        {/* </div> */}
+        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
+        <Box width={"50%"}>
+          <OutlierChart responseData={responseData} />
+        </Box>
+        {/* </div> */}
+      </Box>
+
+      <Box
+        style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }}
+      mt={2} mb={2}
+        gap={2}
+      >
+        <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <IntensityChart />
+        </Box>
+        <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "80%" }}>
+          <AGMadditionalParameters />
+        </Box>
+      </Box>
+    </Box>
+  );
+};

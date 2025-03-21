@@ -64,12 +64,12 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                     </TableCell>
 
                     {/* Zone */}
-                    <TableCell className="table-cell">
+                    <TableCell className="table-cell zone-cell">
                       <HvTypography>{alert.zone}</HvTypography>
                     </TableCell>
 
                     {/* Location */}
-                    <TableCell className="table-cell">
+                    <TableCell className="table-cell location-cell">
                       <HvTypography>{alert.location}</HvTypography>
                     </TableCell>
 
@@ -85,13 +85,13 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
 
                     {/* Alarm Type with Icon */}
                     <TableCell className="table-cell">
-                      <Box display="flex" >
+                      <Box style={{ display: "flex", alignItems: "center", justifyContent: "flexstart", gap: "0.25rem", padding: "0.5rem" }}>
                         {sensorTypeIcons[alert.sensor_type] && (
                           <img
                             src={sensorTypeIcons[alert.sensor_type]}
                             alt={alert.sensor_type}
-                            className="status-icon"
                           />
+
                         )}
                         <HvTypography color="negative">{alert.alarm_type}</HvTypography>
                       </Box>
