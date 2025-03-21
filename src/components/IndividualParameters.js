@@ -41,16 +41,16 @@ const capitalize = (str) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-const IndividualParameters = ({ sampleData = [] }) => {
+const IndividualParameters = ({ paramsData = [] }) => {
   const [notifications, setNotifications] = useState([
     { message: "Sensor threshold exceeded", timestamp: "2025-03-20 10:15:00" },
     { message: "System reboot required", timestamp: "2025-03-20 09:45:00" },
     { message: "New firmware update available", timestamp: "2025-03-20 08:30:00" }
   ]);
 
-  if (!sampleData.length) return <p>No data available</p>;
+  if (!paramsData.length) return <p>No data available</p>;
 
-  const dataObject = sampleData[0];
+  const dataObject = paramsData[0];
 
   return (
     <div className="parameter-container">
