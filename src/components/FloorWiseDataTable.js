@@ -21,16 +21,16 @@ const FloorWiseDataTable = ({ data }) => {
     const routes = {
       AGM: "agmindividual",
       "AP4C-F": "AP4CIndividual",
-      FCAD: "FCADIndividual", 
+      FCAD: "FCADIndividual",
       PRM: "PRMIndividual",
       VRM: "vrmIndividual",
       IBAC: "ibacIndividual",
       MAB: "MABIndividual",
     };
-  
+
     return routes[detector] || null; // Return null if detector not found
   };
-  
+
   // Handle detector click and navigate accordingly
   const handleDetectorClick = (device_id, detector) => {
     const route = routeName(detector);
@@ -84,8 +84,12 @@ const FloorWiseDataTable = ({ data }) => {
                 {/* Detector with Link */}
                 <TableCell className="table-cell">
                   <HvTypography
-                    color={row?.alarm === "Yes" ? "negative" : "positive"}
-                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    color="atmo2" // Blue text color from HVS Kit
+                    style={{
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      color: "#0073E6", // Ensures blue color, adjust if needed
+                    }}
                     onClick={() => handleDetectorClick(row?.s_no?.device_id, row?.s_no?.detector)}
                   >
                     {row?.s_no?.detector || "-"}
