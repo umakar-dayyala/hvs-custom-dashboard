@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.389b9bab.css",
-    "main.js": "/static/js/main.a85d844c.js",
+    "main.js": "/static/js/main.22884751.js",
     "static/media/gBiological.svg": "/static/media/gBiological.c079b517e9835ba2c7a11b151116d78e.svg",
     "static/media/rBiological.svg": "/static/media/rBiological.40fa73ad37621d894a6b95e31967d614.svg",
     "static/media/gChemical.svg": "/static/media/gChemical.9da90d5da11f49f98acfa84567a507d6.svg",
@@ -19,10 +19,10 @@
     "static/media/greyLocation.svg": "/static/media/greyLocation.1397e51f8e7cd05eb7249813f079c60f.svg",
     "static/media/rbell.svg": "/static/media/rbell.23b182fc116b2c399063a975bdae2bb4.svg",
     "main.389b9bab.css.map": "/static/css/main.389b9bab.css.map",
-    "main.a85d844c.js.map": "/static/js/main.a85d844c.js.map"
+    "main.22884751.js.map": "/static/js/main.22884751.js.map"
   },
   "entrypoints": [
     "static/css/main.389b9bab.css",
-    "static/js/main.a85d844c.js"
+    "static/js/main.22884751.js"
   ]
 }
