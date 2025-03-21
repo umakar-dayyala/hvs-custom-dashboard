@@ -24,6 +24,7 @@ import { VRMIndividual } from "./pages/VRMIndividual";
 import { PRMIndividual } from "./pages/PRMIndividual";
 import { AP4CIndividual } from "./pages/AP4CIndividual";
 import { MABIndividual } from "./pages/MABIndividual";
+import Loader from "./components/Loader";
 
 
 
@@ -66,6 +67,8 @@ const App = () => {
               <Route path="/AP4CIndividual" element={<AP4CIndividual/>}/>
               <Route path="/MABIndividual" element={<MABIndividual/>}/>
               <Route path="/agmindividual" element={<AgmIndividual/>}/>
+              <Route path="/loader" element={<Loader/>}/>
+
              
             </Routes>
           </HvContainer>

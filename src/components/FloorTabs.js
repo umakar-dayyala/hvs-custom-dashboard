@@ -23,13 +23,13 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
           variant="outlined"
           sx={{
             flex: 1,
-            color: value[index] || "black", // Avoid out-of-bounds errors
-            borderColor: value[index] || "black",
+            color: value[index] || "green", // Avoid out-of-bounds errors
+            borderColor: value[index] || "green",
             textTransform: "none",
             margin: "2px",
             fontWeight: "bold",
             "&:hover": {
-              backgroundColor: value[index] || "black",
+              backgroundColor: value[index] || "green",
               color: "#FFFFFF",
             },
           }}
@@ -44,13 +44,13 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
         variant="outlined"
         sx={{
           flex: 1,
-          color: value[1] || "black",
-          borderColor: value[1] || "black",
+          color: value[1] || "green",
+          borderColor: value[1] || "green",
           textTransform: "none",
           margin: "2px",
           fontWeight: "bold",
           "&:hover": {
-            backgroundColor: value[1] || "black",
+            backgroundColor: value[1] || "green",
             color: "#FFFFFF",
           },
         }}

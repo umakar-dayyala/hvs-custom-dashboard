@@ -48,15 +48,15 @@ const OperatorDashboard = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      // setLoading(true); // shows the loader before fetching the data
+      setLoading(true); // shows the loader before fetching the data
       floorList()
         .then((response) => {
           setFloorData(response);
-          // setLoading(false); // hidding the loader after the data fetch
+          setLoading(false); // hidding the loader after the data fetch
         })
         .catch((error) => {
           console.error("Error fetching floor data:", error);
-          // setLoading(false); //Hidding the loader even there is error 
+          setLoading(false); //Hidding the loader even there is error 
         });
     };
 
@@ -75,7 +75,7 @@ const OperatorDashboard = () => {
     // console.log(floorData);
     return (
       <>
-      {/* {loading && <Loader />}   */}
+      {loading && <Loader />}  
         <Box css={scrollContainer}>
             {/* Sticky Header Section */}
             <Box position="sticky" top={0} zIndex={1000} bgcolor={"#f0f1f6"}>
