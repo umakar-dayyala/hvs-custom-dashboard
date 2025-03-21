@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -12,6 +12,8 @@ import PredictionChart from '../components/PredictionChart';
 import IntensityChart from '../components/IntensityChart';
 import bioicon from "../assets/rBiological.svg";
 import gbioicon from "../assets/gBiological.svg";
+import Breadcrumbs from '../components/Breadcrumbs';
+import ToggleButtons from '../components/ToggleButtons';
 
 
 const dummyData = [
@@ -82,46 +84,50 @@ const responseData = {
 };
 
 export const MABIndividual = () => {
-  return (
-    <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon}  rbell={rbell}/>
-          {/* <Alertbar alerts={dummyData} /> */}
-          <Alertbar/>
-          
-        </HvStack>
-        <IndividualParameters sampleData={sampleData} />
-        {/* <ChartComponent /> */}
-        <Box mt={2}>
-        <PlotlyDataChart data={chartData} />
+    const [toggleState, setToggleState] = useState("Operator");
+  
+    return (
+      <Box>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Breadcrumbs />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <ToggleButtons onToggleChange={setToggleState} />
+          </div>
+        </div>
+  
+        <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <HvStack direction="column" divider spacing="sm">
+              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+              <Alertbar />
+            </HvStack>
+            <IndividualParameters sampleData={sampleData} />
+            <Box mt={2}>
+              <PlotlyDataChart data={chartData} />
+            </Box>
+          </Box>
+  
+          <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+            <Box width={"50%"}>
+              <AnomalyChart responseData={responseData} />
+            </Box>
+            <Box width={"50%"}>
+              <OutlierChart responseData={responseData} />
+            </Box>
+          </Box>
+  
+          {/* Conditional Rendering for PredictionChart */}
+          <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+            <Box width={toggleState === "Operator" ? "100%" : "50%"}> 
+              <IntensityChart />
+            </Box>
+            {toggleState !== "Operator" && (
+              <Box width={"50%"}>
+                <PredictionChart />
+              </Box>
+            )}
+          </Box>
         </Box>
       </Box>
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"} > 
-          <AnomalyChart responseData={responseData} />
-          </Box>
-        {/* </div> */}
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"}>
-            <OutlierChart responseData={responseData} />
-          </Box>
-        {/* </div> */}
-      </Box>
-
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"} > 
-          <IntensityChart/>
-          </Box>
-        {/* </div> */}
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"}>
-            <PredictionChart/>
-          </Box>
-        {/* </div> */}
-      </Box>
-    </Box>
-  );
-};
+    );
+  };

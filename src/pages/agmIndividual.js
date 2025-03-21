@@ -84,6 +84,7 @@ const responseData = {
 };
 
 export const AgmIndividual = () => {
+  
     return (
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>

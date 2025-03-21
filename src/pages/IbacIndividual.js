@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -12,6 +12,10 @@ import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
 import IntensityChart from '../components/IntensityChart';
 import PredictionChart from '../components/PredictionChart';
+import Breadcrumbs from '../components/Breadcrumbs';
+import ToggleButtons from '../components/ToggleButtons';
+import {  Button, Modal, Typography } from "@mui/material";
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const dummyData = [
   { alarmCount: 1, alarmType: "Bio Alarm", location: "Lab A", timeRange: "10:00 AM - 10:20 AM" },
@@ -89,45 +93,82 @@ const responseData = {
 };
 
 export const IbacIndividual = () => {
-  return (
+  const [toggleState, setToggleState] = useState("Operator");
+const [showModal, setShowModal] = useState(false);
+const [newState, setNewState] = useState(null);
+
+const handleToggleClick = (state) => {
+  if (toggleState === "Operator" && state === "Supervisor") {
+    setNewState(state); // Store new state temporarily
+    setShowModal(true); // Show confirmation modal
+  } else {
+    setToggleState(state); // Directly update state if no confirmation needed
+  }
+};
+
+const handleConfirmChange = () => {
+  if (newState) {
+    setToggleState(newState); // Apply only confirmed changes
+  }
+  setShowModal(false); // Close modal
+};
+
+const handleCancelChange = () => {
+  setNewState(null); // Reset temporary state
+  setShowModal(false); // Close modal without changing state
+};
+
+
+return (
+  <Box>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Breadcrumbs />
+      <div style={{ display: "flex", gap: "10px" }}>
+      <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+
+      </div>
+    </div>
+
     <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon}  rbell={rbell}/>
-          {/* <Alertbar alerts={dummyData} /> */}
-          <Alertbar/>
-          
-        </HvStack>
-        <IndividualParameters sampleData={sampleData} />
-        {/* <ChartComponent /> */}
-        <Box mt={2}>
+      <HvStack direction="column" divider spacing="sm">
+        <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+        <Alertbar />
+      </HvStack>
+      <IndividualParameters sampleData={sampleData} />
+      <Box mt={2}>
         <PlotlyDataChart data={chartData} />
+      </Box>
+
+      <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+        <Box width={"50%"}>
+          <AnomalyChart responseData={responseData} />
+        </Box>
+        <Box width={"50%"}>
+          <OutlierChart responseData={responseData} />
         </Box>
       </Box>
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"} > 
-          <AnomalyChart responseData={responseData} />
-          </Box>
-        {/* </div> */}
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
+
+      <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+        <Box width={toggleState === "Operator" ? "100%" : "50%"}>
+          <IntensityChart />
+        </Box>
+        {toggleState !== "Operator" && (
           <Box width={"50%"}>
-            <OutlierChart responseData={responseData} />
+            <PredictionChart />
           </Box>
-        {/* </div> */}
-      </Box>
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"} > 
-          <IntensityChart/>
-          </Box>
-        {/* </div> */}
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"}>
-            <PredictionChart/>
-          </Box>
-        {/* </div> */}
+        )}
       </Box>
     </Box>
-  );
+
+    {showModal && (
+      <ConfirmationModal 
+        open={showModal} 
+        onClose={handleCancelChange} 
+        onConfirm={handleConfirmChange} 
+        title="Confirm Role Change"
+        message="Are you sure you want to switch to Supervisor mode?"
+      />
+    )}
+  </Box>
+);
 };
