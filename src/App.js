@@ -19,6 +19,10 @@ import SensorLegend from "./components/SensorLegend";
 import ToggleButtons from "./components/ToggleButtons";
 import SensorStatusCards from "./components/SensorStatusCards";
 import { MyProvider } from "./context/MyContext";
+import { VRMIndividual } from "./pages/VRMIndividual";
+import { PRMIndividual } from "./pages/PRMIndividual";
+import { AP4CIndividual } from "./pages/AP4CIndividual";
+import { MABIndividual } from "./pages/MABIndividual";
 
 
 const App = () => {
@@ -53,6 +57,10 @@ const App = () => {
               <Route path="/floorwise" element={<FloorWiseDashboard />} />
               <Route path="/allalerts" element={<AllAlertsDashboard />} />
               <Route path="/ibacIndividual" element={<IbacIndividual/>} />
+              <Route path="/vrmIndividual" element={<VRMIndividual/>}/>
+              <Route path="/PRMIndividual" element={<PRMIndividual/>}/>
+              <Route path="/AP4CIndividual" element={<AP4CIndividual/>}/>
+              <Route path="/MABIndividual" element={<MABIndividual/>}/>
             </Routes>
           </HvContainer>
         </Router>

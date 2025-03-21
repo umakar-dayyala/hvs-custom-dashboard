@@ -62,7 +62,7 @@ const IndividualKPI = ({ kpiData, rbell }) => {
   );
 };
 
-const KPIContainer = ({ bioicon, gbioicon, kpiData, rbell }) => {
+const KPIContainer = ({ ricon, gicon, kpiData, rbell }) => {
   const isAlarmActive = kpiData.some((kpi) => parseInt(kpi.value) > 0);
 
   return (
@@ -75,7 +75,7 @@ const KPIContainer = ({ bioicon, gbioicon, kpiData, rbell }) => {
       }}
     >
       <img
-        src={isAlarmActive ? bioicon : gbioicon}
+        src={isAlarmActive ? ricon : gicon}
         alt="Icon"
         style={{
           height: "8rem",

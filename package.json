@@ -13,7 +13,7 @@
     "@mui/x-charts": "^7.28.0",
     "@mui/x-date-pickers": "^7.28.0",
     "@mui/x-date-pickers-pro": "^7.28.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.4",
     "chart.js": "^4.4.7",
     "cra-template": "1.2.0",
     "date-fns": "^4.1.0",

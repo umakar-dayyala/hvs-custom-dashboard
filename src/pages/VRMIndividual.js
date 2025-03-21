@@ -10,36 +10,32 @@ import gbioicon from "../assets/gBiological.svg";
 import PlotlyDataChart from '../components/PlotlyDataChart';
 import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
+
+import radioicon from "../assets/rRadiological.svg";
+import gradioicon from "../assets/gRadiological.svg";
 import IntensityChart from '../components/IntensityChart';
 import PredictionChart from '../components/PredictionChart';
+import VRMadditionalParameters from '../components/VRMadditionalParameters';
 
 const dummyData = [
   { alarmCount: 1, alarmType: "Bio Alarm", location: "Lab A", timeRange: "10:00 AM - 10:20 AM" },
 ];
 
 const sampleData = [{
-  "Biological_Parameters": {
-    "small_bio_count": "82",
-    "small_particle_count": "12441000",
-    "large_bio_count": "304",
-    "large_particle_count": "6959",
-    "particle_size": "16"
+  "Radiation Readings": {
+    "DET 01 Count": "82",
+    "DET 02 Count": "09",
   },
-  "Health_Parameters": {
-    "exhaust_pressure": "3.34",
-    "laser_pd": "370",
-    "laser_current": "40.28",
-    "background_monitor": "1.4",
-    "power_supply_3_3v": "3.33",
-    "internal_temperature": "45.25",
-    "input_voltage": "23.93"
+  "Device Health Faults": {
+    "DET 01 Status ": "BG Low",
+    "DET 02 Status": "BG High",
+    "System Error": "Fault",
   },
-  "Health_Status": {
-    "fault_background_light_monitor": "No Fault",
-    "low_battery": "No Fault",
-    "laser_power": "No Fault",
-    "laser_current2": "No Fault",
-    "pressure": "No Fault"
+  "System Settings  ": {
+    "Vehicle In": "No Fault",
+    "Simulation Mode": "No Fault",
+    "555 Mode": "No Fault",
+   
   },
  
 }];
@@ -53,16 +49,14 @@ const chartData = {
     "2025-02-17T15:32:20.694Z",
     "2025-02-17T15:32:21.954Z",
   ],
-  "Small Particle Count": [2, 3, 1, 5, 4, 6],
-  "Large Particle Count": [5, 8, 6, 9, 7, 10],
-  "Large Bio Count": [10, 12, 14, 15, 16, 18],
-  "Small Bio Count": [22, 25, 27, 26, 28, 30],
+  "DET 01 Count": [2, 3, 1, 5, 4, 6],
+  "DET 02 Count": [5, 8, 6, 9, 7, 10],
 };
 
 const kpiData = [
-  { "title": "Biological Alarm", "value": "01" },
-  { "title": "Algorithm Alarm", "value": "00" },
-  { "title": "Diagnostic Fault Alarm", "value": "00" },
+  { "title": "DET 1 Status", "value": "01" },
+  { "title": "DET 2 Status", "value": "00" },
+  { "title": "System Error", "value": "00" },
 ];
 
 const responseData = {
@@ -76,24 +70,24 @@ const responseData = {
   ],
   "datasets": [
     {
-      "label": "Small Particle Count",
+      "label": "DET 01 Count",
       "data": [208636, 208636, 208636, 208636, 208636, 208636],
       "anomalyValues": [0, 0, 0, 0, 0, 1],
     },
     {
-      "label": "Large Particle Count",
+      "label": "DET 02 Count",
       "data": [208636, 208636, 208636, 208636, 208636, 2086360],
       "anomalyValues": [0, 0, 0, 0, 1, 1],
     },
   ],
 };
 
-export const IbacIndividual = () => {
+export const VRMIndividual = () => {
   return (
     <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon}  rbell={rbell}/>
+          <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon}  rbell={rbell}/>
           {/* <Alertbar alerts={dummyData} /> */}
           <Alertbar/>
           
@@ -116,18 +110,25 @@ export const IbacIndividual = () => {
           </Box>
         {/* </div> */}
       </Box>
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"} > 
-          <IntensityChart/>
-          </Box>
-        {/* </div> */}
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"}>
-            <PredictionChart/>
-          </Box>
-        {/* </div> */}
-      </Box>
+
+      <Box 
+  style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} 
+  mt={2} 
+  gap={2}
+>
+  <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <IntensityChart />
+  </Box>
+  <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <VRMadditionalParameters />
+  </Box>
+  <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <PredictionChart />
+  </Box>
+</Box>
+
+
+
     </Box>
   );
 };
