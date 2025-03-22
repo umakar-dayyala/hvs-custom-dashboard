@@ -20,9 +20,9 @@ import alertBiological from "../assets/rBiological.svg";
 import alertRadiation from "../assets/rRadiological.svg";
 
 const sensorImages = {
-  "Chemical Alert": { normal: gChemical, alert: alertChemical },
-  "Biological Alert": { normal: gBiological, alert: alertBiological },
-  "Radiological Alert": { normal: gRadiation, alert: alertRadiation },
+  "Chemical Alarms": { normal: gChemical, alert: alertChemical },
+  "Biological Alarms": { normal: gBiological, alert: alertBiological },
+  "Radiological Alarms": { normal: gRadiation, alert: alertRadiation },
 };
 
 const SensorStatusCards = (props) => {
@@ -104,7 +104,7 @@ const SensorStatusCards = (props) => {
                 <HvTypography variant="title1">
                   {sensorValue === 0 ? "00" : sensorValue.toString().padStart(2, "0")}
                 </HvTypography>
-                <FaEye color="#2064B4" />
+                {/* <FaEye color="#2064B4" /> */}
               </div>
             </HvCardContent>
           </HvCard>
