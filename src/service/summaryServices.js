@@ -18,7 +18,7 @@ export const getSensorData = async () => {
       { title: "Total Sensor", value: data.total_sensors.toString() },
       { title: "Active Sensor", value: data.active_sensors.toString() },
       { title: "Inactive Sensor", value: data.inactive_sensors.toString() },
-      { title: "Unhealthy Sensors", value: data.sensor_health },
+      { title: "Faulty Sensors", value: data.sensor_health },
       { title: "Open Incident", value: data.incident_tracked.toString() },
     ];
   } catch (error) {

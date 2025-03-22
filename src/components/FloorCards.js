@@ -8,10 +8,9 @@ import { useNavigate } from "react-router-dom";
 // Import SVG icons
 import totalSensorsIcon from "../assets/greyLocation.svg";
 import totalZoneIcon from "../assets/greyDirection.svg";
-import jumpToFloor from "../assets/greyJumpToFloor.svg";
 
-// Chart Colors
-const chartColors = ["#28A745", "#ff9933", "#E30613"]; // Active, Inactive, Unhealthy
+// Fixed Chart Colors
+const chartColors = ["#29991d", "#E30613", "#ff1f1f"]; // Green, Red, Amber
 
 const FloorCards = ({ floorData }) => {
   const { value, setValue } = useContext(MyContext);
@@ -36,13 +35,17 @@ const FloorCards = ({ floorData }) => {
     <Box mt={2}>
       <Grid container spacing={8} justifyContent="center">
         {floorData.map((floor, index) => {
-          const borderColor = floor.unhealthySensors > 0 || floor.totalAlarms > 0 ? "#E30613" : "#28A745";
+          const borderColor =
+            floor.unhealthySensors > 0 || floor.totalAlarms > 0
+              ? "#E30613"
+              : "#28A745";
 
+          // Chart options with fixed colors
           const chartOptions = {
             chart: { type: "donut" },
-            labels: ["Active", "Inactive", "Unhealthy"],
+            labels: ["Active", "Inactive", "Faulty Sensors"],
             legend: { show: true, position: "bottom" },
-            colors: chartColors,
+            colors: chartColors, // Fixed Colors
             dataLabels: { enabled: false },
           };
 
@@ -64,25 +67,53 @@ const FloorCards = ({ floorData }) => {
                   height="100%"
                 >
                   {/* Floor Name */}
-                  <HvTypography variant="title3" style={{ fontWeight: "bold", marginTop: 8, color: borderColor }}>
+                  <HvTypography
+                    variant="title3"
+                    style={{
+                      fontWeight: "bold",
+                      marginTop: 8,
+                      color: borderColor,
+                    }}
+                  >
                     {floor.floor.toUpperCase()}
                   </HvTypography>
 
                   {/* Donut Chart */}
                   <Box display="flex" justifyContent="center" mt={2} mb={2}>
-                    <ReactApexChart options={chartOptions} series={chartSeries} type="donut" width="100%" height={200} />
+                    <ReactApexChart
+                      options={chartOptions}
+                      series={chartSeries}
+                      type="donut"
+                      width="100%"
+                      height={200}
+                    />
                   </Box>
 
                   {/* Total Zones and Sensors */}
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={1}
+                  >
                     <Box display="flex" alignItems="center">
-                      <img src={totalZoneIcon} alt="Total Zone" width={16} height={16} />
+                      <img
+                        src={totalZoneIcon}
+                        alt="Total Zone"
+                        width={16}
+                        height={16}
+                      />
                       <HvTypography variant="body" ml={1}>
                         Total Zones: <strong>{floor.totalZones}</strong>
                       </HvTypography>
                     </Box>
                     <Box display="flex" alignItems="center">
-                      <img src={totalSensorsIcon} alt="Total Sensors" width={16} height={16} />
+                      <img
+                        src={totalSensorsIcon}
+                        alt="Total Sensors"
+                        width={16}
+                        height={16}
+                      />
                       <HvTypography variant="body" ml={1}>
                         Total Sensors: <strong>{floor.totalSensors}</strong>
                       </HvTypography>
@@ -90,14 +121,23 @@ const FloorCards = ({ floorData }) => {
                   </Box>
 
                   {/* Divider */}
-                  <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
+                  <Divider
+                    style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }}
+                  />
 
                   {/* Total Detected Alarms */}
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
                       Total Detected Alarms
                     </HvTypography>
-                    <HvTypography variant="body" style={{ fontWeight: "bold", color: borderColor }}>
+                    <HvTypography
+                      variant="body"
+                      style={{ fontWeight: "bold", color: borderColor }}
+                    >
                       {floor.totalAlarms || "00"}
                     </HvTypography>
                   </Box>
