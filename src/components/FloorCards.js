@@ -43,8 +43,7 @@ const FloorCards = ({ floorData }) => {
           // Calculate total sensors (sum of Active, Inactive, Faulty)
           const totalSensors =
             (floor.activeSensors || 0) +
-            (floor.inactiveSensors || 0) +
-            (floor.unhealthySensors || 0);
+            (floor.inactiveSensors || 0);
 
           // Chart options with fixed colors and sum in the center
           const chartOptions = {
