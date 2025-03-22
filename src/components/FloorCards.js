@@ -40,13 +40,39 @@ const FloorCards = ({ floorData }) => {
               ? "#E30613"
               : "#28A745";
 
-          // Chart options with fixed colors
+          // Calculate total sensors (sum of Active, Inactive, Faulty)
+          const totalSensors =
+            (floor.activeSensors || 0) +
+            (floor.inactiveSensors || 0) +
+            (floor.unhealthySensors || 0);
+
+          // Chart options with fixed colors and sum in the center
           const chartOptions = {
             chart: { type: "donut" },
             labels: ["Active", "Inactive", "Faulty Sensors"],
             legend: { show: true, position: "bottom" },
             colors: chartColors, // Fixed Colors
-            dataLabels: { enabled: false },
+            dataLabels: {
+              enabled: true,
+              formatter: (val) => Math.round(val) + "%",
+            },
+            plotOptions: {
+              pie: {
+                donut: {
+                  size: "60%", // Controls the donut ring size
+                  labels: {
+                    show: true,
+                    total: {
+                      show: true,
+                      label: "Total",
+                      fontSize: "16px",
+                      color: "#000",
+                      formatter: () => `${totalSensors}`,
+                    },
+                  },
+                },
+              },
+            },
           };
 
           const chartSeries = [
