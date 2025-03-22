@@ -80,7 +80,8 @@ export const IbacIndividual = () => {
 
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-    // const deviceId = "1148";
+    console.log("Device ID: ", deviceId);
+    //const deviceId = "1148";
     try {
       // Fetch Charts with Time Range
       const chart = await fetchBioParamChartData(deviceId, formattedFromTime, formattedToTime);
