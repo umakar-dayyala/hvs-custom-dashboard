@@ -8,11 +8,15 @@ export const fetchBioParamChartData = async (deviceId, fromTime, toTime) => {
     const url = `${API_BASE_URL}/getIbacChart`;
     const params = {
       param_device_id: deviceId,
-      param_start_date: `'${fromTime}'`,  // Add single quotes around the dates
-      param_end_date: `'${toTime}'`,
+      param_start_date: `${fromTime}`,  // Add single quotes around the dates
+      param_end_date: `${toTime}`,
     };
+    // console.log("Request URL:", url);
+    // console.log("Request Params:", params);
 
     const response = await axios.get(url, { params });
+
+    // console.log("Fetched bio param chart data:"+JSON.stringify(response.data));
 
     return response.data;
   } catch (error) {
@@ -27,16 +31,16 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
       const url = `${API_BASE_URL}/getIbacChartAnomaly`;
       const params = {
         param_device_id: deviceId,
-        param_start_date: `'${fromTime}'`,  // Add single quotes around the dates
-        param_end_date: `'${toTime}'`,
+        param_start_date: `${fromTime}`,  // Add single quotes around the dates
+        param_end_date: `${toTime}`,
       };
   
-      console.log("Request URL:", url);
-      console.log("Request Params:", params);
+      // console.log("Request URL:", url);
+      // console.log("Request Params:", params);
   
       const response = await axios.get(url, { params });
   
-      console.log("Fetched anomaly chart data:"+JSON.stringify(response.data));
+      //console.log("Fetched anomaly chart data:"+JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       console.error("Error fetching anomaly chart data:", error);
@@ -49,16 +53,16 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
       const url = `${API_BASE_URL}/getIbacChartOutlier`;
       const params = {
         param_device_id: deviceId,
-        param_start_date: `'${fromTime}'`,  // Add single quotes around the dates
-        param_end_date: `'${toTime}'`,
+        param_start_date: `${fromTime}`,  // Add single quotes around the dates
+        param_end_date: `${toTime}`,
       };
   
-      console.log("Request URL:", url);
-      console.log("Request Params:", params);
+      // console.log("Request URL:", url);
+      // console.log("Request Params:", params);
   
       const response = await axios.get(url, { params });
   
-      console.log("Fetched bio param chart data:"+JSON.stringify(response.data));
+      // console.log("Fetched bio param chart data:"+JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       console.error("Error fetching outlier chart data:", error);

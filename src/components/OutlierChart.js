@@ -6,64 +6,96 @@ import DateTimeRangePicker from "./DateTimeRangePicker";
 import dayjs from "dayjs";
 import "../css/Anomaly.css";
 
-const OutlierChart = ({ responseData }) => {
+const OutlierChart = ({ outlierChartData }) => {
   const [selectedDataset, setSelectedDataset] = useState("");
   const [filteredData, setFilteredData] = useState(null);
-  const [selectedRange, setSelectedRange] = useState([dayjs().subtract(5, "minute"), dayjs()]);
+  const [selectedRange, setSelectedRange] = useState([
+    dayjs().subtract(5, "minute"),
+    dayjs(),
+  ]);
 
   const isValidData =
-    responseData &&
-    Array.isArray(responseData.datasets) &&
-    responseData.datasets.length > 0;
+    outlierChartData &&
+    Array.isArray(outlierChartData.datasets) &&
+    outlierChartData.datasets.length > 0;
 
   useEffect(() => {
     if (isValidData) {
-      setSelectedDataset(responseData.datasets[0].label);
-      setFilteredData(responseData);
+      setSelectedDataset(outlierChartData.datasets[0].label);
+      setFilteredData(outlierChartData);
     }
-  }, [responseData]);
+  }, [outlierChartData]);
 
   useEffect(() => {
     if (selectedRange && isValidData) {
       handleDateRangeChange(selectedRange);
     }
-  }, [selectedRange, responseData]);
+  }, [selectedRange, outlierChartData]);
 
   const handleDatasetChange = (event) => {
     setSelectedDataset(event.target.value);
   };
 
   const handleDateRangeChange = ([start, end]) => {
-    const filteredLabels = responseData.labels.filter((label) => {
+    if (
+      !outlierChartData ||
+      !outlierChartData.labels ||
+      !Array.isArray(outlierChartData.labels)
+    ) {
+      console.warn("No outlierChartData or labels found!");
+      return;
+    }
+
+    const filteredLabels = outlierChartData.labels.filter((label) => {
       const timestamp = dayjs(label);
       return timestamp.isAfter(start) && timestamp.isBefore(end);
     });
 
-    const filteredDatasets = responseData.datasets.map((dataset) => ({
-      ...dataset,
-      data: dataset.data.filter((_, index) => filteredLabels.includes(responseData.labels[index])),
-      anomalyValues: dataset.anomalyValues.filter((_, index) => filteredLabels.includes(responseData.labels[index])),
-    }));
+    const filteredDatasets =
+      Array.isArray(outlierChartData.datasets) &&
+      outlierChartData.datasets.map((dataset) => ({
+        ...dataset,
+        data: Array.isArray(dataset.data)
+          ? dataset.data.filter((_, index) =>
+              filteredLabels.includes(outlierChartData.labels[index])
+            )
+          : [],
+        anomalyValues: Array.isArray(dataset.anomalyValues)
+          ? dataset.anomalyValues.filter((_, index) =>
+              filteredLabels.includes(outlierChartData.labels[index])
+            )
+          : [],
+      }));
 
-    setFilteredData({ labels: filteredLabels, datasets: filteredDatasets });
+    setFilteredData({
+      labels: filteredLabels,
+      datasets: filteredDatasets || [],
+    });
   };
 
   const currentDataset =
-    filteredData?.datasets.find((d) => d.label === selectedDataset) || filteredData?.datasets[0];
+    filteredData?.datasets.find((d) => d.label === selectedDataset) ||
+    filteredData?.datasets[0];
 
   const normalData = [];
   const anomalyData = [];
 
-  currentDataset?.data.forEach((value, index) => {
-    if (currentDataset.anomalyValues[index] === 0) {
-      normalData.push({ x: filteredData.labels[index], y: value });
-    } else {
-      anomalyData.push({ x: filteredData.labels[index], y: value });
-    }
-  });
+  if (currentDataset?.data) {
+    currentDataset.data.forEach((value, index) => {
+      if (currentDataset.anomalyValues[index] === 0) {
+        normalData.push({ x: filteredData.labels[index], y: value });
+      } else {
+        anomalyData.push({ x: filteredData.labels[index], y: value });
+      }
+    });
+  }
 
   // 🛡️ Check if there's valid data after filtering
-  const hasData = filteredData && filteredData.datasets.some((dataset) => dataset.data.length > 0);
+  const hasData =
+    filteredData &&
+    filteredData.datasets.some(
+      (dataset) => Array.isArray(dataset.data) && dataset.data.length > 0
+    );
 
   return (
     <HvCard
@@ -73,7 +105,8 @@ const OutlierChart = ({ responseData }) => {
         backgroundColor: "white",
         minHeight: "500px",
         borderRadius: "0px",
-        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+        boxShadow:
+          "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
       }}
       statusColor="red"
     >
@@ -96,13 +129,13 @@ const OutlierChart = ({ responseData }) => {
           style={{ marginTop: "1rem", height: "2rem" }}
         >
           {isValidData &&
-            responseData.datasets.map((dataset) => (
+            outlierChartData.datasets.map((dataset) => (
               <MenuItem key={dataset.label} value={dataset.label}>
                 {dataset.label}
               </MenuItem>
             ))}
         </Select>
-        <DateTimeRangePicker onChange={handleDateRangeChange} />
+        <DateTimeRangePicker onChange={setSelectedRange} />
       </div>
 
       {/* Data Handling */}

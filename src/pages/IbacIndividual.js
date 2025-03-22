@@ -75,12 +75,13 @@ export const IbacIndividual = () => {
 
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
-    // const formattedFromTime = "2024/11/15 17:15:30.543";
-    // const formattedToTime = "2026/03/20 12:10:38.140";
+    // const formattedFromTime = "'2024/11/15 17:15:30.543'";
+    // const formattedToTime = "'2026/03/20 12:10:38.140'";
 
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-    // const deviceId = "1148";
+    console.log("Device ID: ", deviceId);
+    //const deviceId = "1148";
     try {
       // Fetch Charts with Time Range
       const chart = await fetchBioParamChartData(deviceId, formattedFromTime, formattedToTime);
@@ -91,7 +92,7 @@ export const IbacIndividual = () => {
 
     try {
       const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-      setAnomalyChartData(anomaly.data.data);
+      setAnomalyChartData(anomaly.data);
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -99,7 +100,7 @@ export const IbacIndividual = () => {
 
     try {
       const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-      setOutlierChartData(outlier);
+      setOutlierChartData(outlier.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -154,7 +155,10 @@ export const IbacIndividual = () => {
         </HvStack>
         <IndividualParameters paramsData={paramsData} />
         <Box mt={2}>
-          <PlotlyDataChart bioParamChartData={bioParamChartData} />
+          <PlotlyDataChart
+           bioParamChartData={bioParamChartData} 
+           onRangeChange={handleRangeChange} 
+          />
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
