@@ -1,9 +1,11 @@
+/** @jsxImportSource @emotion/react */
 import React, { useContext, useEffect } from "react";
 import { Box, Grid, Button, Divider } from "@mui/material";
 import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 import ReactApexChart from "react-apexcharts";
 import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
+import { keyframes } from "@emotion/react";
 
 // Import SVG icons
 import totalSensorsIcon from "../assets/greyLocation.svg";
@@ -12,8 +14,16 @@ import totalZoneIcon from "../assets/greyDirection.svg";
 // Fixed Chart Colors
 const chartColors = ["#29991d", "#E30613", "#ff9933"]; // Green, Red, Amber
 
+// Blinking animation for alarms
+const blinkAnimation = keyframes`
+  0% { opacity: 1; }
+  30% { opacity: 0.5; }
+  100% { opacity: 1; }
+`;
+
 const FloorCards = ({ floorData }) => {
   const { value, setValue } = useContext(MyContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updatedColors = floorData.map((floor) => {
@@ -26,7 +36,6 @@ const FloorCards = ({ floorData }) => {
     setValue(updatedColors);
   }, [floorData, setValue]);
 
-  const navigate = useNavigate();
   const goToFloor = (floor) => {
     navigate("floorwise?floor=" + floor);
   };
@@ -150,24 +159,26 @@ const FloorCards = ({ floorData }) => {
                     style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }}
                   />
 
-                  {/* Total Detected Alarms */}
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
+                  {/* Total Detected Alarms Button */}
+                  <Button
+                    variant="contained"
+                    sx={{
+                      border: floor.totalAlarms > 0 ? "1px solid #E30613" : "1px solid #29991d",
+                      backgroundColor: floor.totalAlarms > 0 ? "#E30613" : "#29991d",
+                      color: "white",
+                      textTransform: "none",
+                      alignSelf: "center",
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      animation: floor.totalAlarms > 0 ? `${blinkAnimation} 1s infinite` : "none",
+                    }}
                   >
-                    <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
-                      Total Detected Alarms
-                    </HvTypography>
-                    <HvTypography
-                      variant="body"
-                      style={{ fontWeight: "bold", color: borderColor }}
-                    >
-                      {floor.totalAlarms || "00"}
-                    </HvTypography>
-                  </Box>
+                      <span>Total Detected Alarms</span>
+                      <span>{floor.totalAlarms || "00"}</span>
+                  </Button>
 
-                  {/* Button */}
+                  {/* Go to Floor Button */}
                   <Button
                     variant="contained"
                     color="primary"
