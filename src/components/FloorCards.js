@@ -10,7 +10,7 @@ import totalSensorsIcon from "../assets/greyLocation.svg";
 import totalZoneIcon from "../assets/greyDirection.svg";
 
 // Fixed Chart Colors
-const chartColors = ["#29991d", "#E30613", "#ff1f1f"]; // Green, Red, Amber
+const chartColors = ["#29991d", "#E30613", "#ff9933"]; // Green, Red, Amber
 
 const FloorCards = ({ floorData }) => {
   const { value, setValue } = useContext(MyContext);
