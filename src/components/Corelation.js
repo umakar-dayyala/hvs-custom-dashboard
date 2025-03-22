@@ -45,7 +45,7 @@ const Corelation = () => {
     <Box>
         <HvCard bgcolor='white' style={{borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}} statusColor="red"> 
             <HvCardContent>
-                <HvTypography variant="title3">Intensity Chart</HvTypography>
+                <HvTypography variant="title3">Corelation Chart</HvTypography>
                 <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }} >
                 <Table sx={{ minWidth: "100%" }} aria-label="customized table">
                   <TableBody>

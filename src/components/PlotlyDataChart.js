@@ -1,77 +1,98 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
 import { HvCard } from "@hitachivantara/uikit-react-core";
 import DateTimeRangePicker from "./DateTimeRangePicker";
-import { Paper } from "@mui/material";
-import { background, border } from "@chakra-ui/react";
-import { legendClasses } from "@mui/x-charts";
 
-
-const PlotlyDataChart = ({ data }) => {
- 
-  const keys = Object.keys(data).filter((key) => key !== "Time");
-  const [selectedRange, setSelectedRange] = useState([
-    data.Time[0],
-    data.Time[data.Time.length - 1],
-  ]);
+const PlotlyDataChart = ({ bioParamChartData ,onRangeChange }) => {
+  const [selectedRange, setSelectedRange] = useState([null, null]);
   const [rate, setRate] = useState(1);
+
+  // Initialize selectedRange when data changes
+  useEffect(() => {
+    if (bioParamChartData && bioParamChartData.Time && bioParamChartData.Time.length > 0) {
+      setSelectedRange([bioParamChartData.Time[0], bioParamChartData.Time[bioParamChartData.Time.length - 1]]);
+    }
+  }, [bioParamChartData]);
 
   const handleRangeChange = (range, selectedRate) => {
     setSelectedRange(range);
     setRate(selectedRate);
+    if (onRangeChange) {
+      onRangeChange(range);  
+    }
   };
 
-  const filteredIndices = data.Time
-    .map((time, index) => ({ index, time: new Date(time) }))
-    .filter(({ time }) => time >= new Date(selectedRange[0]) && time <= new Date(selectedRange[1]));
+  const keys = bioParamChartData ? Object.keys(bioParamChartData).filter((key) => key !== "Time") : [];
 
-  const filteredData = {
-    Time: filteredIndices.map(({ index }) => data.Time[index]),
-    ...keys.reduce((acc, key) => {
-      acc[key] = filteredIndices.map(({ index }) => data[key][index]);
-      return acc;
-    }, {}),
-  };
+  // Handle no data gracefully
+  let traces = [];
+  if (bioParamChartData && bioParamChartData.Time && bioParamChartData.Time.length > 0) {
+    const filteredIndices = bioParamChartData.Time
+      .map((time, index) => ({ index, time: new Date(time) }))
+      .filter(({ time }) => time >= new Date(selectedRange[0]) && time <= new Date(selectedRange[1]));
 
-  const colors = ["blue", "green", "orange", "red", "purple", "brown", "cyan"];
-  
-  const traces = keys.map((key, index) => ({
-    x: filteredData.Time.filter((_, i) => i % rate === 0),
-    y: filteredData[key].filter((_, i) => i % rate === 0),
-    mode: "lines+markers",
-    name: key,
-    line: { color: colors[index % colors.length] },
-    marker: { size: 6 },
-  }));
+    const filteredData = {
+      Time: filteredIndices.map(({ index }) => bioParamChartData.Time[index]),
+      ...keys.reduce((acc, key) => {
+        acc[key] = filteredIndices.map(({ index }) => bioParamChartData[key][index]);
+        return acc;
+      }, {}),
+    };
+
+    const colors = ["blue", "green", "orange", "red", "purple", "brown", "cyan"];
+
+    traces = keys.map((key, index) => ({
+      x: filteredData.Time.filter((_, i) => i % rate === 0),
+      y: filteredData[key].filter((_, i) => i % rate === 0),
+      mode: "lines+markers",
+      name: key,
+      line: { color: colors[index % colors.length] },
+      marker: { size: 6 },
+    }));
+  }
 
   const layout = {
-   
     xaxis: { title: "Time", tickangle: 45 },
     yaxis: { title: "Count" },
-    legend: { 
-      orientation: "h", // Vertical stacking
-      x: 0.3, // Position it next to the chart
-      y: -0.5, // Center vertically
-      
-      font: { size: 15 }, // Increase font size
-      traceorder: "normal", // Keep order intact
-      
+    legend: {
+      orientation: "h",
+      x: 0.3,
+      y: -0.5,
+      font: { size: 15 },
+      traceorder: "normal",
     },
-    margin: { t: 50, b: 80, l: 50, r: 50 }, // Increase right margin for legend space
-    plot_bgcolor: "#F5F6F6",  // Set the chart background to gray
-   
-    
-  
+    margin: { t: 50, b: 80, l: 50, r: 50 },
+    plot_bgcolor: "#F5F6F6",
   };
-  
+
   return (
-    <HvCard bgcolor="white" height="auto" statusColor="red" style={{borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem",paddingLeft:"1rem" }}>
-      <DateTimeRangePicker onChange={handleRangeChange} />
-      {/* <QuickTimeSelector/> */}
+    <HvCard
+      bgcolor="white"
+      height="auto"
+      statusColor="red"
+      style={{
+        borderRadius: "0px",
+        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+      }}
+    >
+      {/* Always Show Date Picker */}
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingLeft: "1rem" }}>
+        <DateTimeRangePicker onChange={handleRangeChange} />
       </div>
-      <div style={{ width: "100%" }}>
-        <Plot config={{ displayModeBar: false }} data={traces} layout={layout} useResizeHandler style={{ width: "100%", height: "100%" }} />
+
+      {/* Show Chart or "No Data" Message */}
+      <div style={{ width: "100%", height: "400px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        {traces.length > 0 ? (
+          <Plot
+            config={{ displayModeBar: false }}
+            data={traces}
+            layout={layout}
+            useResizeHandler
+            style={{ width: "100%", height: "100%" }}
+          />
+        ) : (
+          <div style={{ padding: "1rem", textAlign: "center" }}>No Data To Display</div>
+        )}
       </div>
     </HvCard>
   );

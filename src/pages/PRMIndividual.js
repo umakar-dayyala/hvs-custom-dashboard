@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -13,6 +13,8 @@ import radioicon from "../assets/rRadiological.svg";
 import gradioicon from "../assets/gRadiological.svg";
 import PredictionChart from '../components/PredictionChart';
 import IntensityChart from '../components/IntensityChart';
+import Breadcrumbs from '../components/Breadcrumbs';
+import ToggleButtons from '../components/ToggleButtons';
 
 const dummyData = [
   { alarmCount: 1, alarmType: "Bio Alarm", location: "Lab A", timeRange: "10:00 AM - 10:20 AM" },
@@ -81,45 +83,49 @@ const responseData = {
 };
 
 export const PRMIndividual = () => {
+  const [toggleState, setToggleState] = useState("Operator");
+
   return (
-    <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <Box>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Breadcrumbs />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <ToggleButtons onToggleChange={setToggleState} />
+        </div>
+      </div>
+
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon}  rbell={rbell}/>
-          {/* <Alertbar alerts={dummyData} /> */}
-          <Alertbar/>
-          
-        </HvStack>
-        <IndividualParameters sampleData={sampleData} />
-        {/* <ChartComponent /> */}
-        <Box mt={2}>
-        <PlotlyDataChart data={chartData} />
-        </Box>
-      </Box>
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"} > 
-          <AnomalyChart responseData={responseData} />
+        <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <HvStack direction="column" divider spacing="sm">
+            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} />
+            <Alertbar />
+          </HvStack>
+          <IndividualParameters sampleData={sampleData} />
+          <Box mt={2}>
+            <PlotlyDataChart data={chartData} />
           </Box>
-        {/* </div> */}
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
+        </Box>
+
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+          <Box width={"50%"}>
+            <AnomalyChart responseData={responseData} />
+          </Box>
           <Box width={"50%"}>
             <OutlierChart responseData={responseData} />
           </Box>
-        {/* </div> */}
-      </Box>
+        </Box>
 
-      <Box style={{ display: "flex", flexDirection: "row", width: "100%"  }} mt={2} gap={2}>
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"} > 
-          <IntensityChart/>
+        {/* Conditional Rendering for IntensityChart and PredictionChart */}
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+          <Box width={toggleState === "Operator" ? "100%" : "50%"}>
+            <IntensityChart />
           </Box>
-        {/* </div> */}
-        {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
-          <Box width={"50%"}>
-            <PredictionChart/>
-          </Box>
-        {/* </div> */}
+          {toggleState !== "Operator" && (
+            <Box width={"50%"}>
+              <PredictionChart />
+            </Box>
+          )}
+        </Box>
       </Box>
     </Box>
   );
