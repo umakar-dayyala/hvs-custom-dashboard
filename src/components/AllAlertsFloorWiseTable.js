@@ -85,7 +85,7 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
 
                     {/* Alarm Type with Icon */}
                     <TableCell className="table-cell">
-                      <Box style={{ display: "flex", alignItems: "center", justifyContent: "flexstart", gap: "0.25rem", padding: "0.5rem" }}>
+                      <Box style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.25rem", padding: "0.5rem" }}>
                         {sensorTypeIcons[alert.sensor_type] && (
                           <img
                             src={sensorTypeIcons[alert.sensor_type]}
