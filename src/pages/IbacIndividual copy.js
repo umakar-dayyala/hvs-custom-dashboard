@@ -19,10 +19,11 @@ import {
 } from "../service/IbacSensorService";
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
-import Alertbar from "../components/Alertbar";
-import Breadcrumbs from "../components/Breadcrumbs";
-import ToggleButtons from "../components/ToggleButtons";
-import ConfirmationModal from "../components/ConfirmationModal";
+import Alertbar from '../components/Alertbar';
+
+import Breadcrumbs from '../components/Breadcrumbs';
+import ToggleButtons from '../components/ToggleButtons';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 export const IbacIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -34,16 +35,16 @@ export const IbacIndividual = () => {
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
 
-  // **Separate State for Each Chart's Time Range**
-  const [plotlyTimeRange, setPlotlyTimeRange] = useState([dayjs().subtract(5, "minute").toISOString(), dayjs().toISOString()]);
-  const [anomalyTimeRange, setAnomalyTimeRange] = useState([dayjs().subtract(5, "minute").toISOString(), dayjs().toISOString()]);
-  const [outlierTimeRange, setOutlierTimeRange] = useState([dayjs().subtract(5, "minute").toISOString(), dayjs().toISOString()]);
+
+  // New States for Time Range
+  const [fromTime, setFromTime] = useState(dayjs().subtract(5, "minute").toISOString());
+  const [toTime, setToTime] = useState(dayjs().toISOString());
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
-
   useEffect(() => {
+    // Real-time data updates (WebSocket)
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id") || "1149";
 
@@ -66,66 +67,75 @@ export const IbacIndividual = () => {
         console.log("WebSocket closed");
       }
     };
-  }, []);
+  }, []); // Run once on mount
 
-  // **Fetch Data for Each Chart Separately**
-  const fetchData = async (deviceId, fromTime, toTime, setDataFunc, fetchFunc) => {
+  // Fetch Data Function (includes fromTime and toTime)
+  const fetchData = async (fromTime, toTime) => {
+
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
+    // const formattedFromTime = "'2024/11/15 17:15:30.543'";
+    // const formattedToTime = "'2026/03/20 12:10:38.140'";
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const deviceId = queryParams.get("device_id");
+    // console.log("Device ID: ", deviceId);
+    //const deviceId = "1148";
+    try {
+      // Fetch Charts with Time Range
+      const chart = await fetchBioParamChartData(deviceId, formattedFromTime, formattedToTime);
+      setBioParamChartData(chart.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
 
     try {
-      const response = await fetchFunc(deviceId, formattedFromTime, formattedToTime);
-      setDataFunc(response.data);
+      const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
+      setAnomalyChartData(anomaly.data);
+      console.log("Anomaly Data for checking from ibac" +JSON.stringify(anomaly.data));
+
     } catch (error) {
-      console.error(`Error fetching data:`, error);
+      console.error("Error fetching data:", error);
+    }
+
+    try {
+      const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
+      setOutlierChartData(outlier.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   };
 
+  // Initial Data Fetch and Refetch when Time Changes
   useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
+    fetchData(fromTime, toTime);
+  }, [fromTime, toTime]);
 
-    fetchData(deviceId, plotlyTimeRange[0], plotlyTimeRange[1], setBioParamChartData, fetchBioParamChartData);
-  }, [plotlyTimeRange]);
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
-
-    fetchData(deviceId, anomalyTimeRange[0], anomalyTimeRange[1], setAnomalyChartData, fetchAnomalyChartData);
-  }, [anomalyTimeRange]);
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
-
-    fetchData(deviceId, outlierTimeRange[0], outlierTimeRange[1], setOutlierChartData, fetchOutlierChartData);
-  }, [outlierTimeRange]);
-
-  // **Independent Range Handlers**
-  const handlePlotlyRangeChange = (range) => setPlotlyTimeRange([range[0].toISOString(), range[1].toISOString()]);
-  const handleAnomalyRangeChange = (range) => setAnomalyTimeRange([range[0].toISOString(), range[1].toISOString()]);
-  const handleOutlierRangeChange = (range) => setOutlierTimeRange([range[0].toISOString(), range[1].toISOString()]);
+  // Handle Range Change from PlotlyDataChart
+  const handleRangeChange = (range) => {
+    setFromTime(range[0].toISOString());
+    setToTime(range[1].toISOString());
+  };
 
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state);
-      setShowModal(true);
+      setNewState(state); // Store new state temporarily
+      setShowModal(true); // Show confirmation modal
     } else {
-      setToggleState(state);
+      setToggleState(state); // Directly update state if no confirmation needed
     }
   };
 
   const handleConfirmChange = () => {
     if (newState) {
-      setToggleState(newState);
+      setToggleState(newState); // Apply only confirmed changes
     }
-    setShowModal(false);
+    setShowModal(false); // Close modal
   };
 
   const handleCancelChange = () => {
-    setNewState(null);
-    setShowModal(false);
+    setNewState(null); // Reset temporary state
+    setShowModal(false); // Close modal without changing state
   };
 
   return (
@@ -134,6 +144,7 @@ export const IbacIndividual = () => {
         <Breadcrumbs />
         <div style={{ display: "flex", gap: "10px" }}>
           <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+
         </div>
       </div>
 
@@ -144,15 +155,24 @@ export const IbacIndividual = () => {
         </HvStack>
         <IndividualParameters paramsData={paramsData} />
         <Box mt={2}>
-          <PlotlyDataChart bioParamChartData={bioParamChartData} onRangeChange={handlePlotlyRangeChange} />
+          <PlotlyDataChart
+           bioParamChartData={bioParamChartData} 
+           onRangeChange={handleRangeChange} 
+          />
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={"50%"}>
-            <AnomalyChart anomalyChartData={anomalyChartData} onRangeChange={handleAnomalyRangeChange} />
+            <AnomalyChart
+              anomalyChartData={anomalyChartData}
+              onRangeChange={handleRangeChange}
+            />
           </Box>
           <Box width={"50%"}>
-            <OutlierChart outlierChartData={outlierChartData} onRangeChange={handleOutlierRangeChange} />
+            <OutlierChart
+              outlierChartData={outlierChartData}
+              onRangeChange={handleRangeChange}
+            />
           </Box>
         </Box>
 
@@ -180,3 +200,5 @@ export const IbacIndividual = () => {
     </Box>
   );
 };
+
+

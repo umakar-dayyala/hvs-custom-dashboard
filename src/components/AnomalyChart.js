@@ -6,7 +6,7 @@ import DateTimeRangePicker from "./DateTimeRangePicker";
 import dayjs from "dayjs";
 import "../css/Anomaly.css";
 
-const AnomalyChart = ({ anomalyChartData }) => {
+const AnomalyChart = ({ anomalyChartData,onRangeChange }) => {
   const [selectedDataset, setSelectedDataset] = useState("");
   const [filteredData, setFilteredData] = useState(null);
   const [selectedRange, setSelectedRange] = useState([dayjs().subtract(5, "minute"), dayjs()]);
@@ -35,6 +35,10 @@ const AnomalyChart = ({ anomalyChartData }) => {
 
   const handleDateRangeChange = (range) => {
     setSelectedRange(range);
+    if (onRangeChange) {
+      onRangeChange(range);
+    }
+    
   };
 
   // 🛠️ Filter data based on the selected time range

@@ -7,9 +7,14 @@ export const fetchBioParamChartData = async (deviceId, fromTime, toTime) => {
   try {
     const url = `${API_BASE_URL}/getIbacChart`;
     const params = {
-      param_device_id: deviceId,
+      // param_device_id: deviceId,
+      param_device_id: 1148,
       param_start_date: `${fromTime}`,  // Add single quotes around the dates
       param_end_date: `${toTime}`,
+
+    
+    // param_start_date: "'2024/11/15 17:15:30.543'",  // Add single quotes around the dates
+    // param_end_date: "'2025/03/19 12:10:38.140'",
     };
     // console.log("Request URL:", url);
     // console.log("Request Params:", params);
@@ -30,7 +35,8 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/getIbacChartAnomaly`;
       const params = {
-        param_device_id: deviceId,
+        // param_device_id: deviceId,
+        param_device_id: 1148,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };
@@ -52,7 +58,8 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/getIbacChartOutlier`;
       const params = {
-        param_device_id: deviceId,
+        // param_device_id: deviceId,
+        param_device_id:1148,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };

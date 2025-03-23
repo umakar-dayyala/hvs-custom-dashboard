@@ -40,74 +40,46 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   
  
 
-const VRMadditionalParameters = () => {
-  return (
-    <Box>
-        <HvCard bgcolor='white' style={{borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}} statusColor="red"> 
-            <HvCardContent>
-                <HvTypography variant="title3">System Settings Supervisor View</HvTypography>
-                <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }} >
-                <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                  <TableBody>
-                    
-                  <StyledTableRow >
+  const VRMadditionalParameters = ({ addParams }) => {
+    return (
+      <Box>
+        <HvCard
+          bgcolor="white"
+          style={{
+            borderRadius: "0px",
+            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+          }}
+          statusColor="red"
+        >
+          <HvCardContent>
+            <HvTypography variant="title3">System Settings Supervisor View</HvTypography>
+            <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
+              <Table sx={{ minWidth: "100%" }} aria-label="customized table">
+                <TableBody>
+                  {addParams && addParams.length > 0 ? (
+                    Object.entries(addParams[0]).map(([key, value], index) => (
+                      <StyledTableRow key={index}>
                         <StyledTableCell component="th" scope="row">
-                          DET 1 STATUS
+                          {key}
                         </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
+                        <StyledTableCell align="right">{value}</StyledTableCell>
                       </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          DET 2 STATUS
-                        </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          DET 1 BGHIGH
-                        </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
-                      </StyledTableRow>
-
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          DET 1 BGLOW
-                        </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          DET 1 BGLOW
-                        </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          DET 1 BGLOW
-                        </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          DET 1 BGLOW
-                        </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          DET 1 BGLOW
-                        </StyledTableCell>
-                        <StyledTableCell align="right">00</StyledTableCell>
-                      </StyledTableRow>
-            
-                  </TableBody>
-                </Table>
-              </TableContainer>
-                
-            </HvCardContent>
+                    ))
+                  ) : (
+                    <StyledTableRow>
+                      <StyledTableCell colSpan={2} align="center">
+                        No Data Available
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </HvCardContent>
         </HvCard>
-    </Box>
-  )
-}
-
-export default VRMadditionalParameters
+      </Box>
+    );
+  };
+  
+  export default VRMadditionalParameters;
+  

@@ -16,12 +16,12 @@ const IndividualKPI = ({ kpiData, rbell }) => {
         minWidth: "200px",
         marginTop: "2rem",
         backgroundColor: "white",
-        position: "relative", // Needed for absolute positioning of the bell
-         borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"
+        position: "relative",
+        borderRadius: "0px",
+        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
       }}
       statusColor={isAlarmActive ? "red" : "green"}
     >
-      {/* Bell Icon in Top-Right */}
       <img
         src={rbell}
         alt="bell"
@@ -29,7 +29,7 @@ const IndividualKPI = ({ kpiData, rbell }) => {
           position: "absolute",
           bottom: "0.5rem",
           right: "0.5rem",
-          height: "70%", // Adjusts dynamically with the card
+          height: "70%",
         }}
       />
 
@@ -63,6 +63,16 @@ const IndividualKPI = ({ kpiData, rbell }) => {
 };
 
 const KPIContainer = ({ ricon, gicon, kpiData, rbell }) => {
+  if (!kpiData || kpiData.length === 0) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "2rem" }}>
+        <HvTypography variant="title1" style={{ fontWeight: "bold" }}>
+          No Data Available
+        </HvTypography>
+      </div>
+    );
+  }
+
   const isAlarmActive = kpiData.some((kpi) => parseInt(kpi.value) > 0);
 
   return (

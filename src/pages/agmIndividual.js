@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -10,85 +10,139 @@ import gbioicon from "../assets/gRadiological.svg";
 import PlotlyDataChart from '../components/PlotlyDataChart';
 import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
-import IntensityChart from '../components/IntensityChart';
-import PredictionChart from '../components/PredictionChart';
 import AGMadditionalParameters from '../components/AGMadditionalParameters';
-
-
-const sampleData = [{
-  "Radiation Readings": {
-    "radiation_parameters": "Values",
-    "dose_rate": "999999",
-
-  },
-  "Device Faults": {
-    "fault_parameters": "Status",
-    "lv_status": "Fault",
-    "det_statu": "Healthy",
-    "rtc_status": "Fault",
-    "HV Status": "Healthy",
-    "sd_card_tatus ": "Fault",
-    "mother_board_controller_status": "Healthy"
-  },
-  "AGM Sensor Health Reading": {
-    "health_parameters": "Values",
-    "HV (High Voltage)": "00"
-  },
-
-}];
-
-const chartData = {
-  "Time": [
-    "2025-03-17T15:32:15.497Z",
-    "2025-03-17T15:32:17.435Z",
-    "2025-03-17T15:32:18.775Z",
-    "2025-02-17T15:32:19.733Z",
-    "2025-02-17T15:32:20.694Z",
-    "2025-02-17T15:32:21.954Z",
-  ],
-  "dose rate": [2, 3, 1, 5, 4, 6],
-  "Over Range ": [5, 8, 6, 9, 7, 10],
-  "Over load": [10, 12, 14, 15, 16, 18],
-
-};
-
-const kpiData = [
-  { "title": "Dose Rate Alarm", "value": "01" },
-  { "title": "Over Range", "value": "00" },
-  { "title": "Over Load", "value": "11" },
-];
-
-const responseData = {
-  "labels": [
-    "2025-03-10T15:32:15.497Z",
-    "2025-03-17T15:32:17.435Z",
-    "2025-03-17T15:32:18.775Z",
-    "2025-03-17T15:32:19.733Z",
-    "2025-03-17T15:32:20.694Z",
-    "2025-03-17T15:32:21.954Z",
-  ],
-  "datasets": [
-    {
-      "label": "Dose rate",
-      "data": [2325, 2330, 2338, 2345, 2350, 2360, 2375, 2380, 2390, 2400],
-      "anomalyValues": [0, 0, 0, 0, 0, 1],
-    },
-    {
-      "label": "Over Load",
-      "data": [208636, 208636, 208636, 208636, 208636, 208636],
-      "anomalyValues": [0, 0, 0, 0, 0, 1],
-    },
-    {
-      "label": "Over Range",
-      "data": [208636, 150, 208636, 208636, 208636, 208636],
-      "anomalyValues": [0, 0, 0, 0, 0, 1],
-    },
-
-  ],
-};
+import { getLiveStreamingDataForSensors } from "../service/WebSocket";
+import dayjs from 'dayjs';
+// import { fetchAGMParamChartData, fetchAnomalyChartData, fetchOutlierChartData } from '../service/AGMSensorService';
+import { fetchAGMParamChartData } from '../service/AGMSensorService';
+import { fetchAnomalyChartData,fetchOutlierChartData } from '../service/AGMSensorService';
+import Breadcrumbs from '../components/Breadcrumbs';
+import ToggleButtons from '../components/ToggleButtons';
+import ConfirmationModal from '../components/ConfirmationModal';
+import IntensityChartAGM from '../components/IntensityChartAGM';
 
 export const AgmIndividual = () => {
+   const [paramsData, setParamsData] = useState([]);
+    const [agmParamChartData, setAgmParamChartData] = useState({});
+    const [kpiData, setKpiData] = useState([]);
+    const [anomalyChartData, setAnomalyChartData] = useState({});
+    const [outlierChartData, setOutlierChartData] = useState({});
+    const [toggleState, setToggleState] = useState("Operator");
+    const [showModal, setShowModal] = useState(false);
+    const [newState, setNewState] = useState(null);
+    const [addParams,setAddParams] = useState([]);
+  // New States for Time Range
+    const [fromTime, setFromTime] = useState(dayjs().subtract(5, "minute").toISOString());
+    const [toTime, setToTime] = useState(dayjs().toISOString());
+  
+    const formatDateForApi = (isoDate) => {
+      return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
+    };
+
+    useEffect(() => {
+      // Real-time data updates (WebSocket)
+      const queryParams = new URLSearchParams(window.location.search);
+      const deviceId = queryParams.get("device_id") ;
+      console.log("Device ID AGM: ", deviceId);
+  
+      const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+        // console.log("SSE KPI Data data data:"+ JSON.stringify(data));
+        if (err) {
+          console.error("Error receiving data:", err);
+        } else {
+            setKpiData(data.kpiData);
+            setParamsData(data.parametersData);
+            setAddParams(data.supervisor_data);
+            
+        }
+      });
+  
+      return () => {
+        if (eventSource) {
+          eventSource.close();
+          console.log("WebSocket closed");
+        }
+      };
+    }, []); // Run once on mount
+  
+    // Fetch Data Function (includes fromTime and toTime)
+    const fetchData = async (fromTime, toTime) => {
+  
+      const formattedFromTime = formatDateForApi(fromTime);
+      const formattedToTime = formatDateForApi(toTime);
+      // const formattedFromTime = "'2025-01-25 00:00:54.500'";
+      // const formattedToTime = "'2025-03-11 00:01:10.500'";
+  
+      const queryParams = new URLSearchParams(window.location.search);
+      const deviceId = queryParams.get("device_id");
+      console.log("Device ID: ", deviceId);
+      // const deviceId = "5";
+      try {
+        // Fetch Charts with Time Range
+        const chart = await fetchAGMParamChartData (deviceId, formattedFromTime, formattedToTime);
+        setAgmParamChartData(chart.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+  
+      try {
+        const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
+        setAnomalyChartData(anomaly.data);
+        console.log("Anomaly Data for checking from ibac" +JSON.stringify(anomaly.data));
+  
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+  
+      try {
+        const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
+        setOutlierChartData(outlier.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    // Initial Data Fetch and Refetch when Time Changes
+    useEffect(() => {
+      fetchData(fromTime, toTime);
+    }, [fromTime, toTime]);
+  
+    // Handle Range Change from PlotlyDataChart
+    const handleRangeChange = (range) => {
+      setFromTime(range[0].toISOString());
+      setToTime(range[1].toISOString());
+    };
+
+    const handleToggleClick = (state) => {
+      if (toggleState === "Operator" && state === "Supervisor") {
+        setNewState(state); // Store new state temporarily
+        setShowModal(true); // Show confirmation modal
+      } else {
+        setToggleState(state); // Directly update state if no confirmation needed
+      }
+    };
+  
+    const handleConfirmChange = () => {
+      if (newState) {
+        setToggleState(newState); // Apply only confirmed changes
+      }
+      setShowModal(false); // Close modal
+    };
+  
+    const handleCancelChange = () => {
+      setNewState(null); // Reset temporary state
+      setShowModal(false); // Close modal without changing state
+    };
+  
+
   return (
+    <Box>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Breadcrumbs />
+          <div style={{ display: "flex", gap: "10px" }}>
+          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+          </div>
+        </div>
     <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
@@ -97,21 +151,30 @@ export const AgmIndividual = () => {
           <Alertbar />
 
         </HvStack>
-        <IndividualParameters sampleData={sampleData} />
+        <IndividualParameters paramsData={paramsData}  />
         {/* <ChartComponent /> */}
         <Box mt={2}>
-          <PlotlyDataChart data={chartData} />
+        <PlotlyDataChart
+           bioParamChartData={agmParamChartData} 
+           onRangeChange={handleRangeChange} 
+          />
         </Box>
       </Box>
       <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
         {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
         <Box width={"50%"} >
-          <AnomalyChart responseData={responseData} />
+        <AnomalyChart
+              anomalyChartData={anomalyChartData}
+              onRangeChange={handleRangeChange}
+            />
         </Box>
         {/* </div> */}
         {/* <div style={{ flex: 1, minWidth: "48%" }}> */}
         <Box width={"50%"}>
-          <OutlierChart responseData={responseData} />
+        <OutlierChart
+              outlierChartData={outlierChartData}
+              onRangeChange={handleRangeChange}
+            />
         </Box>
         {/* </div> */}
       </Box>
@@ -122,12 +185,22 @@ export const AgmIndividual = () => {
         gap={2}
       >
         <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-          <IntensityChart />
+          <IntensityChartAGM/>
         </Box>
         <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "80%" }}>
-          <AGMadditionalParameters />
+          <AGMadditionalParameters  addParams={addParams}/>
         </Box>
       </Box>
+      {showModal && (
+                <ConfirmationModal
+                  open={showModal}
+                  onClose={handleCancelChange}
+                  onConfirm={handleConfirmChange}
+                  title="Confirm Role Change"
+                  message="Are you sure you want to switch to Supervisor mode?"
+                />
+              )}
+  </Box>
     </Box>
   );
 };
