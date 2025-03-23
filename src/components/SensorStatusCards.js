@@ -50,7 +50,7 @@ const SensorStatusCards = (props) => {
         let alertBorder = false;
         let progressPercentage = 0;
 
-        if (card.title === "Unhealthy Sensors") {
+        if (card.title === "Faulty Sensors") {
           const [unhealthy, total] = sensorValue.split("/").map(Number);
           progressPercentage = (unhealthy / total) * 100;
           sensorValue = `${unhealthy}/${total}`;
@@ -85,7 +85,7 @@ const SensorStatusCards = (props) => {
             )}
 
             <HvCardContent>
-              {card.title === "Unhealthy Sensors" && (
+              {card.title === "Faulty Sensors" && (
                 <div className="progress-bar-container">
                   <div className="progress-bar">
                     <div

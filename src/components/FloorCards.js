@@ -1,20 +1,29 @@
+/** @jsxImportSource @emotion/react */
 import React, { useContext, useEffect } from "react";
 import { Box, Grid, Button, Divider } from "@mui/material";
 import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 import ReactApexChart from "react-apexcharts";
 import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
+import { keyframes } from "@emotion/react";
 
 // Import SVG icons
 import totalSensorsIcon from "../assets/greyLocation.svg";
 import totalZoneIcon from "../assets/greyDirection.svg";
-import jumpToFloor from "../assets/greyJumpToFloor.svg";
 
-// Chart Colors
-const chartColors = ["#28A745", "#ff9933", "#E30613"]; // Active, Inactive, Unhealthy
+// Fixed Chart Colors
+const chartColors = ["#29991d", "#E30613", "#ff9933"]; // Green, Red, Amber
+
+// Blinking animation for alarms
+const blinkAnimation = keyframes`
+  0% { opacity: 1; }
+  30% { opacity: 0.5; }
+  100% { opacity: 1; }
+`;
 
 const FloorCards = ({ floorData }) => {
   const { value, setValue } = useContext(MyContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updatedColors = floorData.map((floor) => {
@@ -27,7 +36,6 @@ const FloorCards = ({ floorData }) => {
     setValue(updatedColors);
   }, [floorData, setValue]);
 
-  const navigate = useNavigate();
   const goToFloor = (floor) => {
     navigate("floorwise?floor=" + floor);
   };
@@ -36,14 +44,43 @@ const FloorCards = ({ floorData }) => {
     <Box mt={2}>
       <Grid container spacing={8} justifyContent="center">
         {floorData.map((floor, index) => {
-          const borderColor = floor.unhealthySensors > 0 || floor.totalAlarms > 0 ? "#E30613" : "#28A745";
+          const borderColor =
+            floor.unhealthySensors > 0 || floor.totalAlarms > 0
+              ? "#E30613"
+              : "#28A745";
 
+          // Calculate total sensors (sum of Active, Inactive, Faulty)
+          const totalSensors =
+            (floor.activeSensors || 0) +
+            (floor.inactiveSensors || 0);
+
+          // Chart options with fixed colors and sum in the center
           const chartOptions = {
             chart: { type: "donut" },
-            labels: ["Active", "Inactive", "Unhealthy"],
+            labels: ["Active", "Inactive", "Faulty Sensors"],
             legend: { show: true, position: "bottom" },
-            colors: chartColors,
-            dataLabels: { enabled: false },
+            colors: chartColors, // Fixed Colors
+            dataLabels: {
+              enabled: true,
+              formatter: (val) => Math.round(val) + "%",
+            },
+            plotOptions: {
+              pie: {
+                donut: {
+                  size: "60%", // Controls the donut ring size
+                  labels: {
+                    show: true,
+                    total: {
+                      show: true,
+                      label: "Total",
+                      fontSize: "16px",
+                      color: "#000",
+                      formatter: () => `${totalSensors}`,
+                    },
+                  },
+                },
+              },
+            },
           };
 
           const chartSeries = [
@@ -64,25 +101,53 @@ const FloorCards = ({ floorData }) => {
                   height="100%"
                 >
                   {/* Floor Name */}
-                  <HvTypography variant="title3" style={{ fontWeight: "bold", marginTop: 8, color: borderColor }}>
+                  <HvTypography
+                    variant="title3"
+                    style={{
+                      fontWeight: "bold",
+                      marginTop: 8,
+                      color: borderColor,
+                    }}
+                  >
                     {floor.floor.toUpperCase()}
                   </HvTypography>
 
                   {/* Donut Chart */}
                   <Box display="flex" justifyContent="center" mt={2} mb={2}>
-                    <ReactApexChart options={chartOptions} series={chartSeries} type="donut" width="100%" height={200} />
+                    <ReactApexChart
+                      options={chartOptions}
+                      series={chartSeries}
+                      type="donut"
+                      width="100%"
+                      height={200}
+                    />
                   </Box>
 
                   {/* Total Zones and Sensors */}
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={1}
+                  >
                     <Box display="flex" alignItems="center">
-                      <img src={totalZoneIcon} alt="Total Zone" width={16} height={16} />
+                      <img
+                        src={totalZoneIcon}
+                        alt="Total Zone"
+                        width={16}
+                        height={16}
+                      />
                       <HvTypography variant="body" ml={1}>
                         Total Zones: <strong>{floor.totalZones}</strong>
                       </HvTypography>
                     </Box>
                     <Box display="flex" alignItems="center">
-                      <img src={totalSensorsIcon} alt="Total Sensors" width={16} height={16} />
+                      <img
+                        src={totalSensorsIcon}
+                        alt="Total Sensors"
+                        width={16}
+                        height={16}
+                      />
                       <HvTypography variant="body" ml={1}>
                         Total Sensors: <strong>{floor.totalSensors}</strong>
                       </HvTypography>
@@ -90,19 +155,30 @@ const FloorCards = ({ floorData }) => {
                   </Box>
 
                   {/* Divider */}
-                  <Divider style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }} />
+                  <Divider
+                    style={{ backgroundColor: "#D1D5DB", margin: "8px 0" }}
+                  />
 
-                  {/* Total Detected Alarms */}
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <HvTypography variant="body" style={{ color: "#2F2F2F" }}>
-                      Total Detected Alarms
-                    </HvTypography>
-                    <HvTypography variant="body" style={{ fontWeight: "bold", color: borderColor }}>
-                      {floor.totalAlarms || "00"}
-                    </HvTypography>
-                  </Box>
+                  {/* Total Detected Alarms Button */}
+                  <Button
+                    variant="contained"
+                    sx={{
+                      border: floor.totalAlarms > 0 ? "1px solid #E30613" : "1px solid #29991d",
+                      backgroundColor: floor.totalAlarms > 0 ? "#E30613" : "#29991d",
+                      color: "white",
+                      textTransform: "none",
+                      alignSelf: "center",
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      animation: floor.totalAlarms > 0 ? `${blinkAnimation} 1s infinite` : "none",
+                    }}
+                  >
+                      <span>Total Detected Alarms</span>
+                      <span>{floor.totalAlarms || "00"}</span>
+                  </Button>
 
-                  {/* Button */}
+                  {/* Go to Floor Button */}
                   <Button
                     variant="contained"
                     color="primary"
