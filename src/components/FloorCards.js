@@ -10,6 +10,7 @@ import { keyframes } from "@emotion/react";
 // Import SVG icons
 import totalSensorsIcon from "../assets/greyLocation.svg";
 import totalZoneIcon from "../assets/greyDirection.svg";
+import floorIcon from "../assets/rJumpToFloor.svg";
 
 // Fixed Chart Colors
 const chartColors = ["#29991d", "#E30613", "#ff9933"]; // Green, Red, Amber
@@ -100,20 +101,33 @@ const FloorCards = ({ floorData }) => {
                   justifyContent="space-between"
                   height="100%"
                 >
-                  {/* Floor Name */}
-                  <HvTypography
-                    variant="title3"
-                    style={{
-                      fontWeight: "bold",
-                      marginTop: 8,
-                      color: borderColor,
-                    }}
-                  >
-                    {floor.floor.toUpperCase()}
-                  </HvTypography>
+                  {/* Floor Name with Icon */}
+                  <Box display="flex" alignItems="center" justifyContent="space-between" mt={1} mb={2}>
+                    {/* Floor Name */}
+                    <HvTypography
+                      variant="title3"
+                      style={{
+                        fontWeight: "bold",
+                        color: borderColor,
+                      }}
+                    >
+                      {floor.floor.toUpperCase()}
+                    </HvTypography>
 
+                    {/* Floor Icon */}
+                    <img
+                      src={floorIcon}  // Replace with your floor-specific icon if needed
+                      alt="Floor Icon"
+                      width={20}
+                      height={20}
+                      style={{
+                        marginLeft: 8,
+                        filter: floor.totalAlarms === 0 ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)" : "none",
+                      }}
+                    />
+                  </Box>
                   {/* Donut Chart */}
-                  <Box display="flex" justifyContent="center" mt={2} mb={2}>
+                  <Box display="flex" justifyContent="center" mt={1} mb={1}>
                     <ReactApexChart
                       options={chartOptions}
                       series={chartSeries}
@@ -174,8 +188,8 @@ const FloorCards = ({ floorData }) => {
                       animation: floor.totalAlarms > 0 ? `${blinkAnimation} 1s infinite` : "none",
                     }}
                   >
-                      <span>Total Detected Alarms</span>
-                      <span>{floor.totalAlarms || "00"}</span>
+                    <span>Total Detected Alarms</span>
+                    <span>{floor.totalAlarms || "00"}</span>
                   </Button>
 
                   {/* Go to Floor Button */}
