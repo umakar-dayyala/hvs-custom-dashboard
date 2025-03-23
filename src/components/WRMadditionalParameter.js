@@ -40,7 +40,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   
  
 
-  const AGMadditionalParameters = ({ addParams }) => {
+  const WRMadditionalParameters = ({ addParams }) => {
     return (
       <Box>
         <HvCard
@@ -81,5 +81,5 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     );
   };
   
-  export default AGMadditionalParameters;
+  export default WRMadditionalParameters;
   

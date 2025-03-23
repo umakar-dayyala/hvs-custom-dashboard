@@ -1,37 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import IndividualKPI from '../components/IndividualKPI';
-import IndividualParameters from '../components/IndividualParameters';
-import { HvStack } from '@hitachivantara/uikit-react-core';
-import OutlierChart from '../components/OutlierChart';
-import AnomalyChart from '../components/AnomalyChart';
-import { Alert, Box } from '@mui/material';
-import PlotlyDataChart from '../components/PlotlyDataChart';
-import rbell from "../assets/rbell.svg";
-import Alertbar from '../components/Alertbar';
-import PredictionChart from '../components/PredictionChart';
-import IntensityChart from '../components/IntensityChart';
+import React, { useEffect, useState } from "react";
+import IndividualKPI from "../components/IndividualKPI";
+import IndividualParameters from "../components/IndividualParameters";
+import { HvStack } from "@hitachivantara/uikit-react-core";
+import OutlierChart from "../components/OutlierChart";
+import AnomalyChart from "../components/AnomalyChart";
+import IntensityChart from "../components/IntensityChart";
+import PredictionChart from "../components/PredictionChart";
+import { Box } from "@mui/material";
 import bioicon from "../assets/rBiological.svg";
 import gbioicon from "../assets/gBiological.svg";
-import Breadcrumbs from '../components/Breadcrumbs';
-import ToggleButtons from '../components/ToggleButtons';
+import PlotlyDataChart from "../components/PlotlyDataChart";
+import rbell from "../assets/rbell.svg";
 import {
-  fetchMABParamChartData,
+  fetchWRMParamChartData,
   fetchAnomalyChartData,
   fetchOutlierChartData,
-} from "../service/MABSensorService";
+} from "../service/WRMSensorService";
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
-import ConfirmationModal from '../components/ConfirmationModal';
+import Alertbar from "../components/Alertbar";
+import Breadcrumbs from "../components/Breadcrumbs";
+import ToggleButtons from "../components/ToggleButtons";
+import ConfirmationModal from "../components/ConfirmationModal";
+import WRMadditionalParameters from "../components/WRMadditionalParameter";
 
-export const MABIndividual = () => {
+export const WRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
-  const [mabParamChartData, setMabParamChartData] = useState({});
+  const [wrmParamChartData, setWrmParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
   const [anomalyChartData, setAnomalyChartData] = useState({});
   const [outlierChartData, setOutlierChartData] = useState({});
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
+  const [addParams, setAddParams] = useState([]);
 
   // Separate time ranges for each component
   const [plotlyRange, setPlotlyRange] = useState({
@@ -54,7 +56,7 @@ export const MABIndividual = () => {
   useEffect(() => {
     // Real-time data updates (WebSocket)
     const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id") || "1149";
+    const deviceId = queryParams.get("device_id");
 
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
@@ -62,6 +64,7 @@ export const MABIndividual = () => {
       } else {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
+        setAddParams(data.supervisor_data);
       }
     });
 
@@ -83,13 +86,13 @@ export const MABIndividual = () => {
     console.log("Device ID: ", deviceId);
 
     try {
-      if (component === 'PlotlyDataChart') {
-        const chart = await fetchMABParamChartData(deviceId, formattedFromTime, formattedToTime);
-        setMabParamChartData(chart.data);
-      } else if (component === 'AnomalyChart') {
+      if (component === "PlotlyDataChart") {
+        const chart = await fetchWRMParamChartData(deviceId, formattedFromTime, formattedToTime);
+        setWrmParamChartData(chart.data);
+      } else if (component === "AnomalyChart") {
         const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
         setAnomalyChartData(anomaly.data);
-      } else if (component === 'OutlierChart') {
+      } else if (component === "OutlierChart") {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
         setOutlierChartData(outlier.data);
       }
@@ -100,26 +103,26 @@ export const MABIndividual = () => {
 
   // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
-    if (component === 'PlotlyDataChart') {
+    if (component === "PlotlyDataChart") {
       setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
-    } else if (component === 'AnomalyChart') {
+    } else if (component === "AnomalyChart") {
       setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
-    } else if (component === 'OutlierChart') {
+    } else if (component === "OutlierChart") {
       setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
     }
   };
 
   // Fetch data when the range changes for each component
   useEffect(() => {
-    fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
+    fetchData(plotlyRange.fromTime, plotlyRange.toTime, "PlotlyDataChart");
   }, [plotlyRange]);
 
   useEffect(() => {
-    fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
+    fetchData(anomalyRange.fromTime, anomalyRange.toTime, "AnomalyChart");
   }, [anomalyRange]);
 
   useEffect(() => {
-    fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
+    fetchData(outlierRange.fromTime, outlierRange.toTime, "OutlierChart");
   }, [outlierRange]);
 
   // Toggle state handling
@@ -146,57 +149,58 @@ export const MABIndividual = () => {
 
   return (
     <Box>
-      <Box>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Breadcrumbs />
-          <div style={{ display: "flex", gap: "10px" }}>
-            <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
-          </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Breadcrumbs />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
         </div>
+      </div>
 
-        <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
-              <Alertbar />
-            </HvStack>
-            <IndividualParameters paramsData={paramsData} />
-            <Box mt={2}>
-              <PlotlyDataChart
-                bioParamChartData={mabParamChartData}
-                onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
-              />
-            </Box>
+      <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <HvStack direction="column" divider spacing="sm">
+          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+          <Alertbar />
+        </HvStack>
+        <IndividualParameters paramsData={paramsData} />
+        <Box mt={2}>
+          <PlotlyDataChart
+            bioParamChartData={wrmParamChartData}
+            onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
+          />
+        </Box>
+
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+          <Box width={"50%"}>
+            <AnomalyChart
+              anomalyChartData={anomalyChartData}
+              onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
+            />
           </Box>
-
-          <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-            <Box width={"50%"}>
-              <AnomalyChart
-                anomalyChartData={anomalyChartData}
-                onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
-              />
-            </Box>
-            <Box width={"50%"}>
-              <OutlierChart
-                outlierChartData={outlierChartData}
-                onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
-              />
-            </Box>
-          </Box>
-
-          {/* Conditional Rendering for PredictionChart */}
-          <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-            <Box width={toggleState === "Operator" ? "100%" : "50%"}>
-              <IntensityChart />
-            </Box>
-            {toggleState !== "Operator" && (
-              <Box width={"50%"}>
-                <PredictionChart />
-              </Box>
-            )}
+          <Box width={"50%"}>
+            <OutlierChart
+              outlierChartData={outlierChartData}
+              onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
+            />
           </Box>
         </Box>
+
+        <Box display={"flex"} style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+          <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <IntensityChart />
+          </Box>
+          {toggleState !== "Operator" && (
+            <>
+              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <WRMadditionalParameters addParams={addParams} />
+              </Box>
+              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <PredictionChart />
+              </Box>
+            </>
+          )}
+        </Box>
       </Box>
+
       {showModal && (
         <ConfirmationModal
           open={showModal}

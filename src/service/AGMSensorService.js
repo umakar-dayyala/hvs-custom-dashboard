@@ -4,6 +4,76 @@ import axios from "axios";
 const API_BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api`
 
 
+export const fetchAGMParamChartData = async (deviceId, fromTime, toTime) => {
+  try {
+    const url = `${API_BASE_URL}/agm/getAgmChart`;
+    const params = {
+      param_device_id: deviceId,
+      // param_device_id: 5,
+      param_start_date: `${fromTime}`,  // Add single quotes around the dates
+      param_end_date: `${toTime}`,
+    };
+    // console.log("Request URL:", url);
+    // console.log("Request Params:", params);
+
+    const response = await axios.get(url, { params });
+
+    // console.log("Fetched bio param chart data:"+JSON.stringify(response.data));
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching bio param chart data:", error);
+    throw error;
+  }
+};
+
+
+export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
+  try {
+      const url = `${API_BASE_URL}/agm/getAgmChartAnomaly`;
+      const params = {
+        param_device_id: deviceId,
+        // param_device_id: 5,
+        param_start_date: `${fromTime}`,  // Add single quotes around the dates
+        param_end_date: `${toTime}`,
+      };
+  
+      console.log("Request URL:", url);
+      console.log("Request Params:", params);
+  
+      const response = await axios.get(url, { params });
+  
+      console.log("Fetched anomaly chart data:"+JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching anomaly chart data:", error);
+      throw error;
+    }
+  };
+
+export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
+  try {
+      const url = `${API_BASE_URL}/agm/getAgmChartOutlier`;
+      const params = {
+        param_device_id: deviceId,
+        // param_device_id: 5,
+        param_start_date: `${fromTime}`,  // Add single quotes around the dates
+        param_end_date: `${toTime}`,
+      };
+  
+      console.log("Request URL:", url);
+      console.log("Request Params:", params);
+  
+      const response = await axios.get(url, { params });
+      console.log("Fetched bio param chart data:"+JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching outlier chart data:", error);
+      throw error;
+    }
+  };
+
+
 export const getAGMSensordashboardData = async (device_id) => {
   console.log("API getAGMSensordashboardData called with device_id:", device_id);
   try {

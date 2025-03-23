@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -15,130 +15,201 @@ import gchemicon from "../assets/gChemical.svg";
 import Corelation from '../components/Corelation';
 import ToggleButtons from '../components/ToggleButtons';
 import Breadcrumbs from '../components/Breadcrumbs';
-
-const dummyData = [
-  { alarmCount: 1, alarmType: "Bio Alarm", location: "Lab A", timeRange: "10:00 AM - 10:20 AM" },
-];
-
-const sampleData = [{
-  "Values": {
-    "Hydrocarbon concentration (CH)": "82",
-    "Arsenic Concentration (CAS) (mg/m3)": "09",
-    "Cyanide Concentration (CHNO) (mg/m3)": "09",
-    "Phosphorus Concentration (CP) (ug/m3)": "09",
-    "Sulphur Concentration (CS) (mg/m3)": "09",
-  },
-  "Health Faults": {
-    "Power Supply too low ": "BG Low",
-    "Device Fault": "BG High",
-    "Lack of Hydrogen": "Fault",
-    "Maintenance Required": "Fault",
-    " Purge (Pendind)": "Fault",
-    " Monitor": "Fault",
-  },
-  "System Settings  ": {
-    "Detector Ready": "No Fault",
-    "Test Mode in Progress  ": "No Fault",
-    
-  },
- 
-}];
-
-const chartData = {
-  "Time": [
-    "2025-03-17T15:32:15.497Z",
-    "2025-03-17T15:32:17.435Z",
-    "2025-03-17T15:32:18.775Z",
-    "2025-02-17T15:32:19.733Z",
-    "2025-02-17T15:32:20.694Z",
-    "2025-02-17T15:32:21.954Z",
-  ],
-  "DET 01 Count": [2, 3, 1, 5, 4, 6],
-  "DET 02 Count": [5, 8, 6, 9, 7, 10],
-};
-
-const kpiData = [
-  { "title": "AlrmCH", "value": "01" },
-  { "title": "Alarm As", "value": "00" },
-  { "title": "Alarm CN", "value": "00" },
-  { "title": "Alarm G", "value": "00" },
-  { "title": " Alarm HD", "value": "00" },
-];
-
-const responseData = {
-  "labels": [
-    "2025-03-10T15:32:15.497Z",
-    "2025-03-17T15:32:17.435Z",
-    "2025-03-17T15:32:18.775Z",
-    "2025-03-17T15:32:19.733Z",
-    "2025-03-17T15:32:20.694Z",
-    "2025-03-17T15:32:21.954Z",
-  ],
-  "datasets": [
-    {
-      "label": "DET 01 Count",
-      "data": [208636, 208636, 208636, 208636, 208636, 208636],
-      "anomalyValues": [0, 0, 0, 0, 0, 1],
-    },
-    {
-      "label": "DET 02 Count",
-      "data": [208636, 208636, 208636, 208636, 208636, 2086360],
-      "anomalyValues": [0, 0, 0, 0, 1, 1],
-    },
-  ],
-};
+import {
+  fetchAP4CParamChartData,
+  fetchAnomalyChartData,
+  fetchOutlierChartData,
+} from "../service/AP4CSensorService";
+import { getLiveStreamingDataForSensors } from "../service/WebSocket";
+import dayjs from "dayjs";
+import ConfirmationModal from '../components/ConfirmationModal';
 
 export const AP4CIndividual = () => {
-    const [toggleState, setToggleState] = useState("Operator");
-  
-    return (
-      <Box>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Breadcrumbs />
-          <div style={{ display: "flex", gap: "10px" }}>
-            <ToggleButtons onToggleChange={setToggleState} />
-          </div>
+  const [paramsData, setParamsData] = useState([]);
+  const [ap4cParamChartData, setap4cParamChartData] = useState({});
+  const [kpiData, setKpiData] = useState([]);
+  const [anomalyChartData, setAnomalyChartData] = useState({});
+  const [outlierChartData, setOutlierChartData] = useState({});
+  const [toggleState, setToggleState] = useState("Operator");
+  const [showModal, setShowModal] = useState(false);
+  const [newState, setNewState] = useState(null);
+
+  // Separate time ranges for each component
+  const [plotlyRange, setPlotlyRange] = useState({
+    fromTime: dayjs().subtract(5, "minute").toISOString(),
+    toTime: dayjs().toISOString(),
+  });
+  const [anomalyRange, setAnomalyRange] = useState({
+    fromTime: dayjs().subtract(5, "minute").toISOString(),
+    toTime: dayjs().toISOString(),
+  });
+  const [outlierRange, setOutlierRange] = useState({
+    fromTime: dayjs().subtract(5, "minute").toISOString(),
+    toTime: dayjs().toISOString(),
+  });
+
+  const formatDateForApi = (isoDate) => {
+    return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
+  };
+
+  useEffect(() => {
+    // Real-time data updates (WebSocket)
+    const queryParams = new URLSearchParams(window.location.search);
+    const deviceId = queryParams.get("device_id");
+
+    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+      if (err) {
+        console.error("Error receiving data:", err);
+      } else {
+        setKpiData(data.kpiData);
+        setParamsData(data.parametersData);
+      }
+    });
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+        console.log("WebSocket closed");
+      }
+    };
+  }, []); // Run once on mount
+
+  // Fetch Data Function (includes fromTime and toTime)
+  const fetchData = async (fromTime, toTime, component) => {
+    const formattedFromTime = formatDateForApi(fromTime);
+    const formattedToTime = formatDateForApi(toTime);
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const deviceId = queryParams.get("device_id");
+    console.log("Device ID: ", deviceId);
+
+    try {
+      if (component === "PlotlyDataChart") {
+        const chart = await fetchAP4CParamChartData(deviceId, formattedFromTime, formattedToTime);
+        setap4cParamChartData(chart.data);
+      } else if (component === "AnomalyChart") {
+        const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
+        setAnomalyChartData(anomaly.data);
+      } else if (component === "OutlierChart") {
+        const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
+        setOutlierChartData(outlier.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // Handle Range Change for each component
+  const handleRangeChange = (range, component) => {
+    if (component === "PlotlyDataChart") {
+      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+    } else if (component === "AnomalyChart") {
+      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+    } else if (component === "OutlierChart") {
+      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+    }
+  };
+
+  // Fetch data when the range changes for each component
+  useEffect(() => {
+    fetchData(plotlyRange.fromTime, plotlyRange.toTime, "PlotlyDataChart");
+  }, [plotlyRange]);
+
+  useEffect(() => {
+    fetchData(anomalyRange.fromTime, anomalyRange.toTime, "AnomalyChart");
+  }, [anomalyRange]);
+
+  useEffect(() => {
+    fetchData(outlierRange.fromTime, outlierRange.toTime, "OutlierChart");
+  }, [outlierRange]);
+
+  // Toggle state handling
+  const handleToggleClick = (state) => {
+    if (toggleState === "Operator" && state === "Supervisor") {
+      setNewState(state); // Store new state temporarily
+      setShowModal(true); // Show confirmation modal
+    } else {
+      setToggleState(state); // Directly update state if no confirmation needed
+    }
+  };
+
+  const handleConfirmChange = () => {
+    if (newState) {
+      setToggleState(newState); // Apply only confirmed changes
+    }
+    setShowModal(false); // Close modal
+  };
+
+  const handleCancelChange = () => {
+    setNewState(null); // Reset temporary state
+    setShowModal(false); // Close modal without changing state
+  };
+
+  return (
+    <Box>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Breadcrumbs />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
         </div>
-  
+      </div>
+
+      <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell} />
-              <Alertbar />
-            </HvStack>
-            <IndividualParameters sampleData={sampleData} />
-            <Box mt={2}>
-              <PlotlyDataChart data={chartData} />
-            </Box>
-          </Box>
-  
-          <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-            <Box width={"50%"}>
-              <AnomalyChart responseData={responseData} />
-            </Box>
-            <Box width={"50%"}>
-              <OutlierChart responseData={responseData} />
-            </Box>
-          </Box>
-  
-          {/* Conditional Rendering for IntensityChart, Corelation, and PredictionChart */}
-          <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} gap={2}>
-            <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-              <IntensityChart />
-            </Box>
-            {toggleState !== "Operator" && (
-              <>
-                <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                  <Corelation />
-                </Box>
-                <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                  <PredictionChart />
-                </Box>
-              </>
-            )}
+          <HvStack direction="column" divider spacing="sm">
+            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell} />
+            <Alertbar />
+          </HvStack>
+          <IndividualParameters paramsData={paramsData} />
+          <Box mt={2}>
+            <PlotlyDataChart
+              bioParamChartData={ap4cParamChartData}
+              onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
+            />
           </Box>
         </Box>
+
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+          <Box width={"50%"}>
+            <AnomalyChart
+              anomalyChartData={anomalyChartData}
+              onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
+            />
+          </Box>
+          <Box width={"50%"}>
+            <OutlierChart
+              outlierChartData={outlierChartData}
+              onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
+            />
+          </Box>
+        </Box>
+
+        {/* Conditional Rendering for IntensityChart, Corelation, and PredictionChart */}
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} gap={2}>
+          <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <IntensityChart />
+          </Box>
+          {toggleState !== "Operator" && (
+            <>
+              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <Corelation />
+              </Box>
+              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <PredictionChart />
+              </Box>
+            </>
+          )}
+        </Box>
       </Box>
-    );
-  };
-  
+      {showModal && (
+        <ConfirmationModal
+          open={showModal}
+          onClose={handleCancelChange}
+          onConfirm={handleConfirmChange}
+          title="Confirm Role Change"
+          message="Are you sure you want to switch to Supervisor mode?"
+        />
+      )}
+    </Box>
+  );
+};
