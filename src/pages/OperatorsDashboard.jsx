@@ -99,6 +99,7 @@ const OperatorDashboard = () => {
             <HvTypography variant="title3" >
                 <ScrollingText/>
             </HvTypography>
+            <HorizontalDivider />
             </Box>
 
             <Box display="flex" mt={2} flexDirection="column" alignItems="center">
