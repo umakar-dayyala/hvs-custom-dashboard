@@ -6,17 +6,23 @@ import VerticalDivider from "./VerticalDivider";
 // Import SVG icons
 import totalZonesIcon from "../assets/greyDirection.svg";
 import totalSensorsIcon from "../assets/greyLocation.svg";
-import radiologicalIcon from "../assets/gRadiological.svg";
-import biologicalIcon from "../assets/gBiological.svg";
-import chemicalIcon from "../assets/gChemical.svg";
-import activeSensorsIcon from "../assets/onlineWifi.svg";  // Change to the correct icon
-import inactiveSensorsIcon from "../assets/rWifiIcon.svg";  // Change to the correct icon
+import gRadiologicalIcon from "../assets/gRadiological.svg";
+import gBiologicalIcon from "../assets/gBiological.svg";
+import gChemicalIcon from "../assets/gChemical.svg";
+import rRadiologicalIcon from "../assets/rRadiological.svg";
+import rBiologicalIcon from "../assets/rBiological.svg";
+import rChemicalIcon from "../assets/rChemical.svg";
+import activeSensorsIcon from "../assets/onlineWifi.svg";
+import inactiveSensorsIcon from "../assets/rWifiIcon.svg";
 
 // Sensor type to icon mapping
-const sensorIcons = {
-  radiological: radiologicalIcon,
-  biological: biologicalIcon,
-  chemical: chemicalIcon,
+const getSensorIcon = (type, count) => {
+  const icons = {
+    radiological: count > 1 ? rRadiologicalIcon : gRadiologicalIcon,
+    biological: count > 1 ? rBiologicalIcon : gBiologicalIcon,
+    chemical: count > 1 ? rChemicalIcon : gChemicalIcon,
+  };
+  return icons[type] || null;
 };
 
 // Common inline style
@@ -52,26 +58,41 @@ const FloorSummary = ({ data = [] }) => {
           <Box display="flex" alignItems="center">
             {/* Sensor Counts */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={chemicalIcon} alt="Chemical Icon" width={16} height={16} />
+              <img
+                src={getSensorIcon("chemical", floor.chemical_alerts)}
+                alt="Chemical Icon"
+                width={20}
+                height={20}
+              />
               <HvTypography variant="label">{floor.chemical_alerts}</HvTypography>
               <VerticalDivider />
             </Box>
 
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={biologicalIcon} alt="Biological Icon" width={16} height={16} />
+              <img
+                src={getSensorIcon("biological", floor.biological_alerts)}
+                alt="Biological Icon"
+                width={20}
+                height={20}
+              />
               <HvTypography variant="label">{floor.biological_alerts}</HvTypography>
               <VerticalDivider />
             </Box>
 
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={radiologicalIcon} alt="Radiological Icon" width={16} height={16} />
+              <img
+                src={getSensorIcon("radiological", floor.radiological_alerts)}
+                alt="Radiological Icon"
+                width={20}
+                height={20}
+              />
               <HvTypography variant="label">{floor.radiological_alerts}</HvTypography>
               <VerticalDivider />
             </Box>
 
             {/* Total Zones */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={totalZonesIcon} alt="Total Zones Icon" width={16} height={16} />
+              <img src={totalZonesIcon} alt="Total Zones Icon" width={20} height={20} />
               <HvTypography>
                 Total Zones <HvTypography variant="label">{floor.total_zones}</HvTypography>
               </HvTypography>
@@ -80,7 +101,7 @@ const FloorSummary = ({ data = [] }) => {
 
             {/* Total Locations */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={totalSensorsIcon} alt="Total Locations Icon" width={16} height={16} />
+              <img src={totalSensorsIcon} alt="Total Locations Icon" width={20} height={20} />
               <HvTypography>
                 Total Locations <HvTypography variant="label">{floor.total_location}</HvTypography>
               </HvTypography>
@@ -89,7 +110,7 @@ const FloorSummary = ({ data = [] }) => {
 
             {/* Active Sensors */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={activeSensorsIcon} alt="Active Sensors Icon" width={16} height={16} />
+              <img src={activeSensorsIcon} alt="Active Sensors Icon" width={20} height={20} />
               <HvTypography>
                 Active Sensors <HvTypography variant="label">{floor.active_sensors}</HvTypography>
               </HvTypography>
@@ -98,7 +119,7 @@ const FloorSummary = ({ data = [] }) => {
 
             {/* Inactive Sensors */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={16} height={16} />
+              <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={20} height={20} />
               <HvTypography>
                 Inactive Sensors <HvTypography variant="label">{floor.inactive_sensors}</HvTypography>
               </HvTypography>
