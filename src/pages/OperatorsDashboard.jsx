@@ -10,6 +10,7 @@ import SensorLegend from "../components/SensorLegend";
 import HorizontalDivider from "../components/HorizontalDivider";
 import { css } from "@emotion/react";
 import Loader from "../components/Loader"; // importing the loader from the component 
+import ScrollingText from "../components/ScrollingText";
 
 const scrollContainer = css`
   height: 100vh;
@@ -96,7 +97,7 @@ const OperatorDashboard = () => {
 
                 <HorizontalDivider />
             <HvTypography variant="title3" >
-                Operators Dashboard - Main Page
+                <ScrollingText/>
             </HvTypography>
             </Box>
 
