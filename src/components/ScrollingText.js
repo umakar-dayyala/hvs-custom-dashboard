@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import { keyframes } from "@emotion/react";
 import { getSensorData } from "../service/summaryServices";
 
-
+// Define the scrolling animation that makes it look like the text is continuously coming from the left
 const scrollText = keyframes`
   0% {
     transform: translateX(-100%);
@@ -13,6 +13,12 @@ const scrollText = keyframes`
   }
 `;
 
+// Define the blinking background animation for alarms
+const blinkAnimation = keyframes`
+  0% { opacity: 1; }
+  30% { opacity: 0.5; }
+  100% { opacity: 1; }
+`;
 const ScrollingText = () => {
   const [hasAlarm, setHasAlarm] = useState(false);
 
@@ -43,16 +49,14 @@ const ScrollingText = () => {
         width: "100%",
         overflow: "hidden",
         whiteSpace: "nowrap",
-        backgroundColor: "transparent", // Made background transparent
+        backgroundColor: hasAlarm ? "#E30613" : "transparent", // Updated alert background color
         padding: "8px",
         position: "relative",
         border: hasAlarm ? "2px solid red" : "1px solid black", // Border changes dynamically
         borderRadius: "5px",
-        color: hasAlarm ? "red" : "green",
+        color: hasAlarm ? "white" : "green", // Text color changes to white when alarm
         textAlign: "center",
-        boxShadow: hasAlarm
-          ? "rgba(255, 0, 0, 0.5) 0px 4px 12px"
-          : "rgba(0, 0, 0, 0.1) 0px 4px 12px",
+        animation: hasAlarm ? `${blinkAnimation} 1s infinite` : "none",
         marginTop: "10px",
       }}
     >
@@ -70,6 +74,7 @@ const ScrollingText = () => {
             display: "inline-block",
             whiteSpace: "nowrap",
             animation: `${scrollText} 10s linear infinite`, // Slowed down the animation
+            fontWeight: "bold", // Made text bold
           }}
         >
           {fullText}
