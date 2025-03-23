@@ -8,6 +8,7 @@ export const fetchMABParamChartData = async (deviceId, fromTime, toTime) => {
     const url = `${API_BASE_URL}/getMabChart`;
     const params = {
       param_device_id: deviceId,
+      // param_device_id: 1150,
       param_start_date: `${fromTime}`,  // Add single quotes around the dates
       param_end_date: `${toTime}`,
     };
@@ -31,6 +32,7 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
       const url = `${API_BASE_URL}/getMabChartAnomaly`;
       const params = {
         param_device_id: deviceId,
+        // param_device_id: 1150,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };
@@ -53,6 +55,7 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
       const url = `${API_BASE_URL}/getMabChartOutlier`;
       const params = {
         param_device_id: deviceId,
+        // param_device_id: 1150,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };

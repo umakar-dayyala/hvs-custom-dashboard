@@ -32,6 +32,7 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
       const url = `${API_BASE_URL}/getPrmChartAnomaly`;
       const params = {
         param_device_id: deviceId,
+        // param_device_id: 43,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
 
@@ -58,6 +59,7 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
       const url = `${API_BASE_URL}/getPrmChartOutlier`;
       const params = {
         param_device_id: deviceId,
+        // param_device_id: 43,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
         // param_device_id:43,

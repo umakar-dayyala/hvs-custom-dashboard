@@ -11,9 +11,6 @@ export const  fetchWRMParamChartData = async (deviceId, fromTime, toTime) => {
       param_start_date: `${fromTime}`,  // Add single quotes around the dates
       param_end_date: `${toTime}`,
 
-      // param_device_id: 1145,
-      // param_start_date: "'2024-11-22 23:00:54.350'",  // Add single quotes around the dates
-      // param_end_date: "'2024-11-22 23:00:54.350'",
     };
     // console.log("Request URL:", url);
     // console.log("Request Params:", params);

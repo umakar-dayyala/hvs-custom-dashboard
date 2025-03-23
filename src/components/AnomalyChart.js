@@ -6,15 +6,17 @@ import DateTimeRangePicker from "./DateTimeRangePicker";
 import dayjs from "dayjs";
 import "../css/Anomaly.css";
 
-const AnomalyChart = ({ anomalyChartData,onRangeChange }) => {
+const AnomalyChart = ({ anomalyChartData, onRangeChange }) => {
   const [selectedDataset, setSelectedDataset] = useState("");
   const [filteredData, setFilteredData] = useState(null);
   const [selectedRange, setSelectedRange] = useState([dayjs().subtract(5, "minute"), dayjs()]);
 
+  // Check if anomalyChartData is valid
   const isValidData =
     anomalyChartData &&
     Array.isArray(anomalyChartData.datasets) &&
-    anomalyChartData.datasets.length > 0;
+    anomalyChartData.datasets.length > 0 &&
+    Array.isArray(anomalyChartData.labels);
 
   useEffect(() => {
     if (isValidData) {
@@ -38,27 +40,35 @@ const AnomalyChart = ({ anomalyChartData,onRangeChange }) => {
     if (onRangeChange) {
       onRangeChange(range);
     }
-    
   };
 
   // 🛠️ Filter data based on the selected time range
   const filterData = ([start, end]) => {
+    if (!isValidData) return; // Exit if data is invalid
+
+    // Ensure labels and datasets exist
+    if (!anomalyChartData.labels || !anomalyChartData.datasets) return;
+
     const filteredLabels = anomalyChartData.labels.filter((label) => {
       const timestamp = dayjs(label);
       return timestamp.isAfter(start) && timestamp.isBefore(end);
     });
 
-    const filteredDatasets = anomalyChartData.datasets.map((dataset) => ({
-      ...dataset,
-      data: dataset.data.filter((_, index) => filteredLabels.includes(anomalyChartData.labels[index])),
-      anomalyValues: dataset.anomalyValues.filter((_, index) => filteredLabels.includes(anomalyChartData.labels[index])),
-    }));
+    const filteredDatasets = anomalyChartData.datasets.map((dataset) => {
+      if (!dataset.data || !dataset.anomalyValues) return dataset; // Skip if data or anomalyValues is missing
+
+      return {
+        ...dataset,
+        data: dataset.data.filter((_, index) => filteredLabels.includes(anomalyChartData.labels[index])),
+        anomalyValues: dataset.anomalyValues.filter((_, index) => filteredLabels.includes(anomalyChartData.labels[index])),
+      };
+    });
 
     setFilteredData({ labels: filteredLabels, datasets: filteredDatasets });
   };
 
   // Get the currently selected dataset safely
-  const currentDataset = filteredData?.datasets.find((d) => d.label === selectedDataset) || filteredData?.datasets[0];
+  const currentDataset = filteredData?.datasets?.find((d) => d.label === selectedDataset) || filteredData?.datasets?.[0];
 
   // Extract normal and anomaly data points
   const normalX = [];
@@ -66,18 +76,20 @@ const AnomalyChart = ({ anomalyChartData,onRangeChange }) => {
   const anomalyX = [];
   const anomalyY = [];
 
-  currentDataset?.data.forEach((value, index) => {
-    if (currentDataset.anomalyValues[index] === 0) {
-      normalX.push(filteredData.labels[index]);
-      normalY.push(value);
-    } else {
-      anomalyX.push(filteredData.labels[index]);
-      anomalyY.push(value);
-    }
-  });
+  if (currentDataset && filteredData?.labels) {
+    currentDataset.data?.forEach((value, index) => {
+      if (currentDataset.anomalyValues?.[index] === 0) {
+        normalX.push(filteredData.labels[index]);
+        normalY.push(value);
+      } else {
+        anomalyX.push(filteredData.labels[index]);
+        anomalyY.push(value);
+      }
+    });
+  }
 
   // 🛡️ Check if there's valid data after filtering
-  const hasData = filteredData && filteredData.datasets.some((dataset) => dataset.data.length > 0);
+  const hasData = filteredData && filteredData.datasets?.some((dataset) => dataset.data?.length > 0);
 
   return (
     <HvCard

@@ -11,23 +11,17 @@ import bioicon from "../assets/rBiological.svg";
 import gbioicon from "../assets/gBiological.svg";
 import PlotlyDataChart from "../components/PlotlyDataChart";
 import rbell from "../assets/rbell.svg";
-
 import {
   fetchWRMParamChartData,
-} from "../service/WRMSensorService";
-
-import{
-    fetchAnomalyChartData,
+  fetchAnomalyChartData,
   fetchOutlierChartData,
-} from "../service/IbacSensorService";
-
+} from "../service/WRMSensorService";
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
-import Alertbar from '../components/Alertbar';
-
-import Breadcrumbs from '../components/Breadcrumbs';
-import ToggleButtons from '../components/ToggleButtons';
-import ConfirmationModal from '../components/ConfirmationModal';
+import Alertbar from "../components/Alertbar";
+import Breadcrumbs from "../components/Breadcrumbs";
+import ToggleButtons from "../components/ToggleButtons";
+import ConfirmationModal from "../components/ConfirmationModal";
 import WRMadditionalParameters from "../components/WRMadditionalParameter";
 
 export const WRMIndividual = () => {
@@ -39,91 +33,99 @@ export const WRMIndividual = () => {
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
-  const[addParams, setAddParams] = useState([]);
+  const [addParams, setAddParams] = useState([]);
 
-
-  // New States for Time Range
-  const [fromTime, setFromTime] = useState(dayjs().subtract(5, "minute").toISOString());
-  const [toTime, setToTime] = useState(dayjs().toISOString());
+  // Separate time ranges for each component
+  const [plotlyRange, setPlotlyRange] = useState({
+    fromTime: dayjs().subtract(5, "minute").toISOString(),
+    toTime: dayjs().toISOString(),
+  });
+  const [anomalyRange, setAnomalyRange] = useState({
+    fromTime: dayjs().subtract(5, "minute").toISOString(),
+    toTime: dayjs().toISOString(),
+  });
+  const [outlierRange, setOutlierRange] = useState({
+    fromTime: dayjs().subtract(5, "minute").toISOString(),
+    toTime: dayjs().toISOString(),
+  });
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
-  // useEffect(() => {
-  //   // Real-time data updates (WebSocket)
-  //   const queryParams = new URLSearchParams(window.location.search);
-  //   const deviceId = queryParams.get("device_id") ;
 
-  //   const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-  //     if (err) {
-  //       console.error("Error receiving data:", err);
-  //     } else {
-        
-  //         setKpiData(data.kpiData);
-  //         setParamsData(data.parametersData);
-  //         setAddParams(data.supervisor_data);
-       
-  //     }
-  //   });
+  useEffect(() => {
+    // Real-time data updates (WebSocket)
+    const queryParams = new URLSearchParams(window.location.search);
+    const deviceId = queryParams.get("device_id");
 
-  //   return () => {
-  //     if (eventSource) {
-  //       eventSource.close();
-  //       console.log("WebSocket closed");
-  //     }
-  //   };
-  // }, []); // Run once on mount
+    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+      if (err) {
+        console.error("Error receiving data:", err);
+      } else {
+        setKpiData(data.kpiData);
+        setParamsData(data.parametersData);
+        setAddParams(data.supervisor_data);
+      }
+    });
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+        console.log("WebSocket closed");
+      }
+    };
+  }, []); // Run once on mount
 
   // Fetch Data Function (includes fromTime and toTime)
-  const fetchData = async (fromTime, toTime) => {
-
+  const fetchData = async (fromTime, toTime, component) => {
     const formattedFromTime = formatDateForApi(fromTime);
-    console.log("Formatted From Time: ", formattedFromTime);
     const formattedToTime = formatDateForApi(toTime);
-    console.log("Formatted To Time: ", toTime);
-    // const formattedFromTime = "'2024/11/15 17:15:30.543'";
-    // const formattedToTime = "'2026/03/20 12:10:38.140'";
 
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
     console.log("Device ID: ", deviceId);
-    //const deviceId = "1148";
-    try {
-      // Fetch Charts with Time Range
-      const chart = await fetchWRMParamChartData(deviceId, formattedFromTime, formattedToTime);
-      setWrmParamChartData(chart.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
 
     try {
-      const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-      setAnomalyChartData(anomaly.data);
-      console.log("Anomaly Data for checking from ibac" +JSON.stringify(anomaly.data));
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-
-    try {
-      const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-      setOutlierChartData(outlier.data);
+      if (component === "PlotlyDataChart") {
+        const chart = await fetchWRMParamChartData(deviceId, formattedFromTime, formattedToTime);
+        setWrmParamChartData(chart.data);
+      } else if (component === "AnomalyChart") {
+        const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
+        setAnomalyChartData(anomaly.data);
+      } else if (component === "OutlierChart") {
+        const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
+        setOutlierChartData(outlier.data);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  // Initial Data Fetch and Refetch when Time Changes
+  // Handle Range Change for each component
+  const handleRangeChange = (range, component) => {
+    if (component === "PlotlyDataChart") {
+      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+    } else if (component === "AnomalyChart") {
+      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+    } else if (component === "OutlierChart") {
+      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+    }
+  };
+
+  // Fetch data when the range changes for each component
   useEffect(() => {
-    fetchData(fromTime, toTime);
-  }, [fromTime, toTime]);
+    fetchData(plotlyRange.fromTime, plotlyRange.toTime, "PlotlyDataChart");
+  }, [plotlyRange]);
 
-  // Handle Range Change from PlotlyDataChart
-  const handleRangeChange = (range) => {
-    setFromTime(range[0].toISOString());
-    setToTime(range[1].toISOString());
-  };
+  useEffect(() => {
+    fetchData(anomalyRange.fromTime, anomalyRange.toTime, "AnomalyChart");
+  }, [anomalyRange]);
 
+  useEffect(() => {
+    fetchData(outlierRange.fromTime, outlierRange.toTime, "OutlierChart");
+  }, [outlierRange]);
+
+  // Toggle state handling
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
       setNewState(state); // Store new state temporarily
@@ -151,7 +153,6 @@ export const WRMIndividual = () => {
         <Breadcrumbs />
         <div style={{ display: "flex", gap: "10px" }}>
           <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
-
         </div>
       </div>
 
@@ -163,8 +164,8 @@ export const WRMIndividual = () => {
         <IndividualParameters paramsData={paramsData} />
         <Box mt={2}>
           <PlotlyDataChart
-           bioParamChartData={wrmParamChartData} 
-           onRangeChange={handleRangeChange} 
+            bioParamChartData={wrmParamChartData}
+            onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
           />
         </Box>
 
@@ -172,32 +173,33 @@ export const WRMIndividual = () => {
           <Box width={"50%"}>
             <AnomalyChart
               anomalyChartData={anomalyChartData}
-              onRangeChange={handleRangeChange}
+              onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
             />
           </Box>
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
-              onRangeChange={handleRangeChange}
+              onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
             />
           </Box>
         </Box>
+
         <Box display={"flex"} style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-        <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                <IntensityChart />
-              </Box>
-              {toggleState !== "Operator" && (
-                <>
-                  <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                    <WRMadditionalParameters addParams={addParams} />
-                  </Box>
-                  <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                    <PredictionChart />
-                  </Box>
-                </>
-              )}
-            </Box>
+          <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <IntensityChart />
           </Box>
+          {toggleState !== "Operator" && (
+            <>
+              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <WRMadditionalParameters addParams={addParams} />
+              </Box>
+              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                <PredictionChart />
+              </Box>
+            </>
+          )}
+        </Box>
+      </Box>
 
       {showModal && (
         <ConfirmationModal
@@ -211,5 +213,3 @@ export const WRMIndividual = () => {
     </Box>
   );
 };
-
-

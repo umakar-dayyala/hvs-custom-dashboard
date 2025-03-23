@@ -8,6 +8,7 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange }) => {
 
   const [selectedRange, setSelectedRange] = useState([null, null]);
   const [rate, setRate] = useState(1);
+  const [visibleTraces, setVisibleTraces] = useState({}); // Track visibility of traces
 
   const parseDate = (timeString) => {
     if (typeof timeString !== "string") {
@@ -16,7 +17,6 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange }) => {
     }
     return new Date(timeString.replace(/\//g, "-"));
   };
-  
 
   useEffect(() => {
     if (bioParamChartData?.Time?.length > 0) {
@@ -59,20 +59,36 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange }) => {
 
     traces = keys.map((key, index) => ({
       x: filteredData.Time.filter((_, i) => i % rate === 0),
-      y: filteredData[key].filter((_, i) => i % rate === 0).map(v => (v > 1e12 ? v / 1e6 : v)), // Scale large numbers
+      y: filteredData[key].filter((_, i) => i % rate === 0), // No scaling of y-axis values
       mode: "lines+markers",
       name: key,
       line: { color: colors[index % colors.length] },
       marker: { size: 6 },
+      visible: visibleTraces[key] !== false, // Use visibility state
     }));
   }
 
   const layout = {
-    xaxis: { title: "Time", tickangle: 45 },
+    xaxis: {
+      title: "Time",
+      tickangle: -15, // Slight tilt for better readability
+      tickformat: "%Y-%m-%d<br>%H:%M", // New date appears once, time on new line
+      showgrid: true, // Optional: Show grid for clarity
+      automargin: true,
+    },
     yaxis: { title: "Count" },
     legend: { orientation: "h", x: 0.3, y: -0.5, font: { size: 15 }, traceorder: "normal" },
     margin: { t: 50, b: 80, l: 50, r: 50 },
     plot_bgcolor: "#F5F6F6",
+  };
+
+  // Handle legend toggle
+  const handleLegendClick = (data) => {
+    const clickedTraceName = data[0].name; // Name of the clicked trace
+    setVisibleTraces((prev) => ({
+      ...prev,
+      [clickedTraceName]: !prev[clickedTraceName], // Toggle visibility
+    }));
   };
 
   return (
@@ -91,7 +107,14 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange }) => {
 
       <div style={{ width: "100%", height: "400px", display: "flex", justifyContent: "center", alignItems: "center" }}>
         {traces.length > 0 ? (
-          <Plot config={{ displayModeBar: false }} data={traces} layout={layout} useResizeHandler style={{ width: "100%", height: "100%" }} />
+          <Plot
+            config={{ displayModeBar: false }}
+            data={traces}
+            layout={layout}
+            useResizeHandler
+            style={{ width: "100%", height: "100%" }}
+            onRestyle={handleLegendClick} // Handle legend click
+          />
         ) : (
           <div style={{ padding: "1rem", textAlign: "center" }}>No Data To Display</div>
         )}

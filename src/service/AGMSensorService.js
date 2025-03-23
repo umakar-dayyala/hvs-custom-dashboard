@@ -8,8 +8,8 @@ export const fetchAGMParamChartData = async (deviceId, fromTime, toTime) => {
   try {
     const url = `${API_BASE_URL}/agm/getAgmChart`;
     const params = {
-      // param_device_id: deviceId,
-      param_device_id: 5,
+      param_device_id: deviceId,
+      // param_device_id: 5,
       param_start_date: `${fromTime}`,  // Add single quotes around the dates
       param_end_date: `${toTime}`,
     };
@@ -32,8 +32,8 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/agm/getAgmChartAnomaly`;
       const params = {
-        // param_device_id: deviceId,
-        param_device_id: 5,
+        param_device_id: deviceId,
+        // param_device_id: 5,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };
@@ -55,8 +55,8 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/agm/getAgmChartOutlier`;
       const params = {
-        // param_device_id: deviceId,
-        param_device_id: 5,
+        param_device_id: deviceId,
+        // param_device_id: 5,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };

@@ -7,8 +7,8 @@ export const fetchBioParamChartData = async (deviceId, fromTime, toTime) => {
   try {
     const url = `${API_BASE_URL}/getIbacChart`;
     const params = {
-      // param_device_id: deviceId,
-      param_device_id: 1148,
+      param_device_id: deviceId,
+      // param_device_id: 1148,
       param_start_date: `${fromTime}`,  // Add single quotes around the dates
       param_end_date: `${toTime}`,
 
@@ -35,8 +35,8 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/getIbacChartAnomaly`;
       const params = {
-        // param_device_id: deviceId,
-        param_device_id: 1148,
+        param_device_id: deviceId,
+        // param_device_id: 1148,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };
@@ -58,8 +58,8 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/getIbacChartOutlier`;
       const params = {
-        // param_device_id: deviceId,
-        param_device_id:1148,
+        param_device_id: deviceId,
+        // param_device_id:1148,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
         param_end_date: `${toTime}`,
       };
