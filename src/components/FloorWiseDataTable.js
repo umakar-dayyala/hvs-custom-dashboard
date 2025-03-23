@@ -7,14 +7,28 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Box
 } from "@mui/material";
 import { HvButton, HvTypography } from "@hitachivantara/uikit-react-core";
 import { useNavigate } from "react-router-dom";
 import CheckCircleIcon from "../assets/rightMark.svg";
 import CancelIcon from "../assets/crossMark.svg";
+import RadiationIcon from "../assets/rRadiological.svg"; // Example icons, replace as needed
+import BioIcon from "../assets/rBiological.svg";
+import ChemicalIcon from "../assets/rChemical.svg";
+import GRadiationIcon from "../assets/gRadiological.svg";
+import GBioIcon from "../assets/gBiological.svg";
+import GChemicalIcon from "../assets/gChemical.svg";
 import "../css/FloorWiseDataTable.css";
 
 const FloorWiseDataTable = ({ data }) => {
+
+  // Sensor Type Icons Mapping
+  const sensorTypeIcons = (alarmCount) => ({
+    Radiation: alarmCount > 0 ? RadiationIcon : GRadiationIcon,
+    Biological: alarmCount > 0 ? BioIcon : GBioIcon,
+    Chemical: alarmCount > 0 ? ChemicalIcon : GChemicalIcon,
+  });
   const navigate = useNavigate();
 
   const routeName = (detector) => {
@@ -51,7 +65,7 @@ const FloorWiseDataTable = ({ data }) => {
               "Location",
               "Detector",
               "Offline/Online",
-              "Alarm & Alerts",
+              // "Alarm & Alerts",
               "Description",
               "",
             ].map((header) => (
@@ -82,37 +96,60 @@ const FloorWiseDataTable = ({ data }) => {
                   <HvTypography>{row?.s_no?.location || "-"}</HvTypography>
                 </TableCell>
 
-                {/* Detector with Link */}
                 <TableCell className="table-cell">
-                  <HvTypography
-                    color="atmo2" // Blue text color from HVS Kit
-                    style={{
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      color: "#0073E6", // Ensures blue color, adjust if needed
-                    }}
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    sx={{ cursor: "pointer" }}
                     onClick={() => handleDetectorClick(row?.s_no?.device_id, row?.s_no?.detector)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.25rem",
+                      padding: "0.5rem",
+                    }}
                   >
-                    {row?.s_no?.detector || "-"}
-                  </HvTypography>
+
+                    {/* Sensor Icon */}
+
+                    {sensorTypeIcons(row?.s_no?.alarms_and_alerts)[row?.s_no?.senor_type] && (
+                      <img
+                        src={sensorTypeIcons(row?.s_no?.alarms_and_alerts)[row?.s_no?.senor_type]}
+                        alt={row?.s_no?.senor_type}
+                        style={{ width: "30px", height: "30px" }}
+                      />
+                    )}
+
+                    {/* Sensor Name */}
+                    <HvTypography
+                      color="atmo2"
+                      style={{
+                        textDecoration: "underline",
+                        color: "#0073E6", // Keeps the clickable blue color
+                      }}
+                    >
+                      {row?.s_no?.detector || "-"}
+                    </HvTypography>
+                  </Box>
                 </TableCell>
 
                 {/* Offline/Online */}
                 <TableCell className="table-cell">
                   <img
-                    src={row?.s_no?.status === "Online" ? CheckCircleIcon : CancelIcon}
-                    alt={row?.s_no?.status ? "Online" : "Offline"}
+                    src={row?.s_no?.offline_online === "Online" ? CheckCircleIcon : CancelIcon}
+                    alt={row?.s_no?.offline_online ? "Online" : "Offline"}
                     className="status-icon"
                   />
                 </TableCell>
 
-                {/* Alarm & Alerts */}
+                {/* Alarm & Alerts
                 <TableCell className="table-cell">
                   <HvTypography>0{row?.s_no?.alarms_and_alerts || "-"}</HvTypography>
-                </TableCell>
-                
+                </TableCell> */}
+
                 <TableCell className="table-cell">
-                  <HvTypography>{row?.s_no?.alarm_fault_columns || "0"}</HvTypography>
+                  <HvTypography>{row?.s_no?.alarm_fault_columns || "-"}</HvTypography>
                 </TableCell>
 
                 {/* Stop Button */}
@@ -126,7 +163,7 @@ const FloorWiseDataTable = ({ data }) => {
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="table-cell">
-                <HvTypography>No data available</HvTypography>
+                <HvTypography>No data to display</HvTypography>
               </TableCell>
             </TableRow>
           )}
