@@ -30,6 +30,7 @@ import Loader from "./components/Loader";
 
 
 
+
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -67,7 +68,8 @@ const App = () => {
               <Route path="/AP4CIndividual" element={<AP4CIndividual/>}/>
               <Route path="/MABIndividual" element={<MABIndividual/>}/>
               <Route path="/agmindividual" element={<AgmIndividual/>}/>
-              <Route path="/loader" element={<Loader/>}/>
+              
+
 
              
             </Routes>
