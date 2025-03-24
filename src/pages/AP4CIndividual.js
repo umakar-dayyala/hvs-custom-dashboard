@@ -23,6 +23,8 @@ import {
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
 import ConfirmationModal from '../components/ConfirmationModal';
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
 
 export const AP4CIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -33,23 +35,18 @@ export const AP4CIndividual = () => {
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
+  const [notifications,setNotifications]=useState([]);
+  const [param,setParam]=useState([]);
 
   // Separate time ranges for each component
-  const [plotlyRange, setPlotlyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [anomalyRange, setAnomalyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [outlierRange, setOutlierRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
-  const formatDateForApi = (isoDate) => {
-    return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
+  const formatDateForApi = (date) => {
+    if (!date) return null;
+    // If date is already a Date object or can be converted by dayjs
+    return `'${dayjs(date).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
   useEffect(() => {
@@ -63,6 +60,8 @@ export const AP4CIndividual = () => {
       } else {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
+        setParam(data.parametersData);
+        setNotifications(data.Notifications);
       }
     });
 
@@ -101,26 +100,38 @@ export const AP4CIndividual = () => {
 
   // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
+    if (!range || !range[0] || !range[1]) return;
+    
+    // Ensure we have valid Date objects
+    const fromDate = range[0] instanceof Date ? range[0] : new Date(range[0]);
+    const toDate = range[1] instanceof Date ? range[1] : new Date(range[1]);
+
     if (component === "PlotlyDataChart") {
-      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setPlotlyRange({ fromTime: fromDate, toTime: toDate });
     } else if (component === "AnomalyChart") {
-      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setAnomalyRange({ fromTime: fromDate, toTime: toDate });
     } else if (component === "OutlierChart") {
-      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setOutlierRange({ fromTime: fromDate, toTime: toDate });
     }
   };
 
   // Fetch data when the range changes for each component
   useEffect(() => {
-    fetchData(plotlyRange.fromTime, plotlyRange.toTime, "PlotlyDataChart");
+    if (plotlyRange.fromTime && plotlyRange.toTime) {
+      fetchData(plotlyRange.fromTime, plotlyRange.toTime, "PlotlyDataChart");
+    }
   }, [plotlyRange]);
 
   useEffect(() => {
-    fetchData(anomalyRange.fromTime, anomalyRange.toTime, "AnomalyChart");
+    if (anomalyRange.fromTime && anomalyRange.toTime) {
+      fetchData(anomalyRange.fromTime, anomalyRange.toTime, "AnomalyChart");
+    }
   }, [anomalyRange]);
 
   useEffect(() => {
-    fetchData(outlierRange.fromTime, outlierRange.toTime, "OutlierChart");
+    if (outlierRange.fromTime && outlierRange.toTime) {
+      fetchData(outlierRange.fromTime, outlierRange.toTime, "OutlierChart");
+    }
   }, [outlierRange]);
 
   // Toggle state handling
@@ -157,10 +168,10 @@ export const AP4CIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell} />
+            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell}  amberBell={amberBell} greenBell={greenBell}/>
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={paramsData} />
+          <IndividualParameters paramsData={param}  notifications={notifications}/>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={ap4cParamChartData}

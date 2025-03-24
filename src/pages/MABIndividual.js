@@ -22,6 +22,9 @@ import {
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
 import ConfirmationModal from '../components/ConfirmationModal';
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
+
 
 export const MABIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -32,6 +35,8 @@ export const MABIndividual = () => {
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
+   const [notifications,setNotifications]=useState([]);
+    const [param,setParam]=useState([]);
 
   // Separate time ranges for each component
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
@@ -53,6 +58,8 @@ export const MABIndividual = () => {
       } else {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
+        setParam(data.parametersData);
+        setNotifications(data.Notifications);
       }
     });
 
@@ -160,10 +167,10 @@ export const MABIndividual = () => {
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
               <Alertbar />
             </HvStack>
-            <IndividualParameters paramsData={paramsData} />
+            <IndividualParameters paramsData={param} notifications={notifications}/>
             <Box mt={2}>
               <PlotlyDataChart
                 bioParamChartData={mabParamChartData}
