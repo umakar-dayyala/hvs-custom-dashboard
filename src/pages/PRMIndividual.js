@@ -18,6 +18,9 @@ import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from 'dayjs';
 import { fetchPRMParamChartData, fetchAnomalyChartData, fetchOutlierChartData } from '../service/PRMSensorService';
 import ConfirmationModal from '../components/ConfirmationModal';
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
+
 
 export const PRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -28,20 +31,13 @@ export const PRMIndividual = () => {
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
+  const [notifications,setNotifications]=useState([]);
+  const [param,setParam]=useState([]);
 
   // Separate time ranges for each component
-  const [plotlyRange, setPlotlyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [anomalyRange, setAnomalyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [outlierRange, setOutlierRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
@@ -58,6 +54,8 @@ export const PRMIndividual = () => {
       } else {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
+        setParam(data.parametersData);
+        setNotifications(data.Notifications);
       }
     });
 
@@ -94,16 +92,29 @@ export const PRMIndividual = () => {
     }
   };
 
-  // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
+    if (!Array.isArray(range) || range.length < 2) {
+      console.error("Invalid range format:", range);
+      return;
+    }
+  
+    const fromTime = dayjs(range[0]).isValid() ? dayjs(range[0]).toISOString() : null;
+    const toTime = dayjs(range[1]).isValid() ? dayjs(range[1]).toISOString() : null;
+  
+    if (!fromTime || !toTime) {
+      console.error("Invalid date values in range:", range);
+      return;
+    }
+  
     if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setPlotlyRange({ fromTime, toTime });
     } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setAnomalyRange({ fromTime, toTime });
     } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setOutlierRange({ fromTime, toTime });
     }
   };
+  
 
   // Fetch data when the range changes for each component
   useEffect(() => {
@@ -152,14 +163,15 @@ export const PRMIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} />
+            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={paramsData} />
+          <IndividualParameters paramsData={param} notifications={notifications} />
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={prmParamChartData}
               onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
+              title={'Radiation Readings'}
             />
           </Box>
         </Box>
@@ -169,12 +181,14 @@ export const PRMIndividual = () => {
             <AnomalyChart
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
+              title={'Anomaly Detection'}
             />
           </Box>
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
+              title={'Outlier Detection'}
             />
           </Box>
         </Box>

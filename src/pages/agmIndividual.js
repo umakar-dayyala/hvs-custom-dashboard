@@ -19,6 +19,10 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import ToggleButtons from '../components/ToggleButtons';
 import ConfirmationModal from '../components/ConfirmationModal';
 import IntensityChartAGM from '../components/IntensityChartAGM';
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
+import IntensityChart from '../components/IntensityChart';
+import PredictionChart from '../components/PredictionChart';
 
 export const AgmIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -30,20 +34,13 @@ export const AgmIndividual = () => {
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
   const [addParams, setAddParams] = useState([]);
+  const [param,setParam]=useState([]);
+  const [notifications,setNotifications]=useState([]);
 
-  // Time range states for each component
-  const [plotlyRange, setPlotlyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [anomalyRange, setAnomalyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [outlierRange, setOutlierRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
+   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+    const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+    const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null
+    });
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
@@ -62,6 +59,8 @@ export const AgmIndividual = () => {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
         setAddParams(data.supervisor_data);
+        setParam(data.parametersData);
+        setNotifications(data.Notifications);
       }
     });
 
@@ -98,16 +97,24 @@ export const AgmIndividual = () => {
     }
   };
 
-  // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
+    const fromTime = new Date(range[0]); // Ensure it's a Date object
+    const toTime = new Date(range[1]);
+  
+    if (isNaN(fromTime) || isNaN(toTime)) {
+      console.error("Invalid date range:", range);
+      return;
+    }
+  
     if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setPlotlyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
     } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setAnomalyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
     } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setOutlierRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
     }
   };
+  
 
   // Fetch data when the range changes for each component
   useEffect(() => {
@@ -155,14 +162,15 @@ export const AgmIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+            <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={paramsData} />
+          <IndividualParameters paramsData={param} notifications={notifications}/>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={agmParamChartData}
               onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
+              title={'Radiation Readings'}
             />
           </Box>
         </Box>
@@ -171,23 +179,29 @@ export const AgmIndividual = () => {
             <AnomalyChart
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
+              title={'Anomaly Detection'}
             />
           </Box>
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
+              title={'Outlier Detection'}
             />
           </Box>
         </Box>
-        <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} mb={2} gap={2}>
-          <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <IntensityChartAGM />
+        {/* Conditional Rendering for IntensityChart and PredictionChart */}
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+          <Box width={toggleState === "Operator" ? "100%" : "50%"}>
+            <IntensityChart />
           </Box>
-          <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "80%" }}>
-            <AGMadditionalParameters addParams={addParams} />
+          {toggleState !== "Operator" && (
+            <Box width={"50%"}>
+              <PredictionChart />
+            </Box>
+            
+          )}
           </Box>
-        </Box>
         {showModal && (
           <ConfirmationModal
             open={showModal}
@@ -200,4 +214,5 @@ export const AgmIndividual = () => {
       </Box>
     </Box>
   );
+  
 };
