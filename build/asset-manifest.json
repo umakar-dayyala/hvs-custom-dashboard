@@ -1,14 +1,13 @@
 {
   "files": {
     "main.css": "/static/css/main.389b9bab.css",
-    "main.js": "/static/js/main.4ff0280d.js",
+    "main.js": "/static/js/main.efc656b9.js",
     "static/media/gBiological.svg": "/static/media/gBiological.c079b517e9835ba2c7a11b151116d78e.svg",
     "static/media/rBiological.svg": "/static/media/rBiological.40fa73ad37621d894a6b95e31967d614.svg",
     "static/media/gChemical.svg": "/static/media/gChemical.9da90d5da11f49f98acfa84567a507d6.svg",
     "static/media/rChemical.svg": "/static/media/rChemical.b1f5394628ab364ecccff41301bdc808.svg",
     "static/media/gRadiological.svg": "/static/media/gRadiological.9919aa9ff2a08a5012aa31d8154e96a3.svg",
     "static/media/rRadiological.svg": "/static/media/rRadiological.848cf755084a784b3836625936f31465.svg",
-    "static/media/rJumpToFloor.svg": "/static/media/rJumpToFloor.27d14b20a130d835786d11d463b4c134.svg",
     "static/media/greyDirection.svg": "/static/media/greyDirection.f11136cd7a8dbbb8a41a6d9bfbc446eb.svg",
     "static/media/rightMark.svg": "/static/media/rightMark.0568161b367f06b0466da19f7e5edca2.svg",
     "static/media/onlineWifi.svg": "/static/media/onlineWifi.79d04170f5d572a9979be841b446c14b.svg",
@@ -16,12 +15,14 @@
     "index.html": "/index.html",
     "static/media/crossMark.svg": "/static/media/crossMark.5d535011d6c619ac1b3d1c3186abee5d.svg",
     "static/media/greyLocation.svg": "/static/media/greyLocation.1397e51f8e7cd05eb7249813f079c60f.svg",
+    "static/media/amberBell.svg": "/static/media/amberBell.507abcda2e48b067d45fefc0bfddcf86.svg",
     "static/media/rbell.svg": "/static/media/rbell.23b182fc116b2c399063a975bdae2bb4.svg",
+    "static/media/greenBell.svg": "/static/media/greenBell.4d8fa01a38c83d046c874f2440f4d818.svg",
     "main.389b9bab.css.map": "/static/css/main.389b9bab.css.map",
-    "main.4ff0280d.js.map": "/static/js/main.4ff0280d.js.map"
+    "main.efc656b9.js.map": "/static/js/main.efc656b9.js.map"
   },
   "entrypoints": [
     "static/css/main.389b9bab.css",
-    "static/js/main.4ff0280d.js"
+    "static/js/main.efc656b9.js"
   ]
 }
