@@ -36,18 +36,9 @@ export const WRMIndividual = () => {
   const [addParams, setAddParams] = useState([]);
 
   // Separate time ranges for each component
-  const [plotlyRange, setPlotlyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [anomalyRange, setAnomalyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [outlierRange, setOutlierRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
@@ -101,16 +92,24 @@ export const WRMIndividual = () => {
     }
   };
 
-  // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
-    if (component === "PlotlyDataChart") {
-      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
-    } else if (component === "AnomalyChart") {
-      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
-    } else if (component === "OutlierChart") {
-      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+    const fromTime = new Date(range[0]); // Ensure it's a Date object
+    const toTime = new Date(range[1]);
+  
+    if (isNaN(fromTime) || isNaN(toTime)) {
+      console.error("Invalid date range:", range);
+      return;
+    }
+  
+    if (component === 'PlotlyDataChart') {
+      setPlotlyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
+    } else if (component === 'AnomalyChart') {
+      setAnomalyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
+    } else if (component === 'OutlierChart') {
+      setOutlierRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
     }
   };
+  
 
   // Fetch data when the range changes for each component
   useEffect(() => {

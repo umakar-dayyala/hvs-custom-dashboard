@@ -7,7 +7,7 @@ export const fetchVRMParamChartData = async (deviceId, fromTime, toTime) => {
   try {
     const url = `${API_BASE_URL}/getVrmChart`;
     const params = {
-      param_device_id: deviceId,
+      param_device_id: deviceId,  
       param_start_date: `${fromTime}`,  // Add single quotes around the dates
       param_end_date: `${toTime}`,
     };
@@ -27,8 +27,9 @@ export const fetchVRMParamChartData = async (deviceId, fromTime, toTime) => {
 
 
 export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
+
   try {
-      const url = `${API_BASE_URL}/getVrmChartOutlier`;
+      const url = `${API_BASE_URL}/getVrmChartAnomaly`;
       const params = {
         param_device_id: deviceId,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates
@@ -51,6 +52,7 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
 export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/getVrmChartOutlier`;
+      console.log("called");
       const params = {
         param_device_id: deviceId,
         param_start_date: `${fromTime}`,  // Add single quotes around the dates

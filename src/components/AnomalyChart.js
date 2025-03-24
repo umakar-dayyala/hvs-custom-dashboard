@@ -6,10 +6,10 @@ import DateTimeRangePicker from "./DateTimeRangePicker";
 import dayjs from "dayjs";
 import "../css/Anomaly.css";
 
-const AnomalyChart = ({ anomalyChartData, onRangeChange }) => {
+const AnomalyChart = ({ anomalyChartData, onRangeChange ,title}) => {
   const [selectedDataset, setSelectedDataset] = useState("");
   const [filteredData, setFilteredData] = useState(null);
-  const [selectedRange, setSelectedRange] = useState([dayjs().subtract(5, "minute"), dayjs()]);
+  const [selectedRange, setSelectedRange] = useState();
 
   // Check if anomalyChartData is valid
   const isValidData =
@@ -39,6 +39,7 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange }) => {
     setSelectedRange(range);
     if (onRangeChange) {
       onRangeChange(range);
+      console.log("onRangeChange:", range);
     }
   };
 
@@ -93,89 +94,100 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange }) => {
 
   return (
     <HvCard
+    style={{
+      height: "100%",
+      width: "100%",
+      backgroundColor: "white",
+      borderRadius: "0px",
+      boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+    }}
+    statusColor="red"
+  >
+    {/* Title, Select, and DateTimeRangePicker in a Single Row */}
+    <div
       style={{
-        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between", // Ensures proper spacing
+        padding: "1rem",
         width: "100%",
-        backgroundColor: "white",
-        minHeight: "500px",
-        borderRadius: "0px",
-        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
       }}
-      statusColor="red"
     >
-      {/* Select and Date Picker */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "1rem",
-          paddingBottom: "1rem",
-          paddingLeft: "1rem",
-          width: "100%",
-        }}
-      >
-        <Select
-          id="quick-select2"
-          value={selectedDataset}
-          onChange={handleDatasetChange}
-          variant="outlined"
-          style={{ marginTop: "1rem", height: "2rem" }}
-        >
-          {isValidData &&
-            anomalyChartData.datasets.map((dataset) => (
+      <HvTypography variant="title2">{title}</HvTypography>
+  
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        {isValidData && (
+          <Select
+            id="quick-select2"
+            value={selectedDataset}
+            onChange={handleDatasetChange}
+            variant="outlined"
+            style={{ height: "2rem" }}
+          >
+            {anomalyChartData.datasets.map((dataset) => (
               <MenuItem key={dataset.label} value={dataset.label}>
                 {dataset.label}
               </MenuItem>
             ))}
-        </Select>
+          </Select>
+        )}
+  
         <DateTimeRangePicker onChange={handleDateRangeChange} />
       </div>
-
-      {/* Show "No Data to Display" if no data after filtering */}
-      {isValidData ? (
-        hasData ? (
-          <Box>
-            <Plot
-              config={{ displayModeBar: false }}
-              data={[
-                {
-                  x: normalX,
-                  y: normalY,
-                  mode: "lines+markers",
-                  name: "Normal Data",
-                  marker: { color: "blue", size: 6 },
-                  line: { color: "blue", width: 2 },
+    </div>
+  
+    {/* Show "No Data to Display" if no data after filtering */}
+    {isValidData ? (
+      hasData ? (
+        <Box>
+          <Plot
+            config={{ displayModeBar: false }}
+            data={[
+              {
+                x: filteredData.labels,
+                y: currentDataset.data,
+                mode: "lines+markers",
+                name: "Data",
+                marker: {
+                  color: currentDataset.data.map((_, index) =>
+                    currentDataset.anomalyValues[index] === 1 ? "red" : "blue"
+                  ),
+                  size: 6,
                 },
-                {
-                  x: anomalyX,
-                  y: anomalyY,
-                  mode: "markers",
-                  name: "Anomalies",
-                  marker: { color: "red", size: 10, symbol: "circle" },
+                line: {
+                  color: "blue",
+                  width: 2,
                 },
-              ]}
-              layout={{
-                xaxis: { title: "Time", tickangle: 45 },
-                yaxis: { title: "Values", automargin: true },
-                margin: { t: 60, b: 80, l: 80, r: 50 },
-                dragmode: "zoom",
-                plot_bgcolor: "#F5F6F6",
-              }}
-              style={{ height: "100%", width: "100%" }}
-              useResizeHandler={true}
-            />
-          </Box>
-        ) : (
-          <div style={{ padding: "1rem", textAlign: "center" }}>
-            <HvTypography variant="title4">No Data to Display</HvTypography>
-          </div>
-        )
+              },
+            ]}
+            layout={{
+              xaxis: {
+                showticklabels: false,
+                title: "",
+                showgrid: false,
+                zeroline: false,
+              },
+              yaxis: { title: "Values", automargin: true },
+              margin: { t: 60, b: 80, l: 80, r: 50 },
+              dragmode: "zoom",
+              plot_bgcolor: "#F5F6F6",
+            }}
+            style={{ height: "100%", width: "100%" }}
+            useResizeHandler={true}
+          />
+        </Box>
       ) : (
         <div style={{ padding: "1rem", textAlign: "center" }}>
-          <HvTypography variant="label">No Data Available</HvTypography>
+          <HvTypography variant="title4">No Data to Display</HvTypography>
         </div>
-      )}
-    </HvCard>
+      )
+    ) : (
+      <div style={{ padding: "1rem", textAlign: "center" }}>
+        <HvTypography variant="label">No Data Available</HvTypography>
+      </div>
+    )}
+  </HvCard>
+  
   );
 };
 
