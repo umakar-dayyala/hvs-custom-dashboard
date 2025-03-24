@@ -12,8 +12,9 @@ const SensorAlertTable = ({ sensorsData,title }) => {
         Chemical: ChemicalIcon,
     };
 
+    const validSensorsData = Array.isArray(sensorsData) ? sensorsData : [];
     // Group sensors by zone -> location -> sensors
-    const groupedData = sensorsData.reduce((acc, item) => {
+    const groupedData = validSensorsData.reduce((acc, item) => {
         const { zone, location, detector, alarms_and_alerts, detector_type } = item.s_no;
 
         if (!acc[zone]) acc[zone] = {};
