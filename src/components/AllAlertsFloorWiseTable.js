@@ -27,7 +27,7 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
           {/* Floor Title */}
           <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
           <HvTypography variant="title3" style={{ margin: "16px 0" }}>
-            {floor.floorName}
+            {floor.floorName + " Zone"}
           </HvTypography>
 
           {/* Table */}
@@ -38,7 +38,7 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                 <TableRow className="header-row">
                   {[
                     "Sl No",
-                    "Zone",
+                    // "Zone",
                     "Location",
                     "No of Alarm",
                     "Time Stamp of Alarm",
@@ -64,9 +64,9 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                     </TableCell>
 
                     {/* Zone */}
-                    <TableCell className="table-cell zone-cell">
+                    {/* <TableCell className="table-cell zone-cell">
                       <HvTypography>{alert.zone}</HvTypography>
-                    </TableCell>
+                    </TableCell> */}
 
                     {/* Location */}
                     <TableCell className="table-cell location-cell">
@@ -98,13 +98,23 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                     </TableCell>
 
                     {/* Correlated Alarm */}
-                    <TableCell className="table-cell">
+                    {/* <TableCell className="table-cell">
                       <img
                         src={alert.correlated_alarms === "No" ? CancelIcon : CheckCircleIcon}
                         alt={alert.correlated_alarms === "No" ? "No" : "Yes"}
                         className="status-icon"
                       />
+                    </TableCell> */}
+
+                    {/* Correlated Alarm */}
+                    <TableCell className="table-cell">
+                      {alert.correlated_alarms && alert.correlated_alarms !== "No" ? (
+                        <HvTypography>{alert.correlated_alarms}</HvTypography>
+                      ) : (
+                        <HvTypography>N/A</HvTypography>
+                      )}
                     </TableCell>
+
 
                     {/* Incident Status */}
                     <TableCell className="table-cell">

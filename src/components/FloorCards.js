@@ -1,17 +1,21 @@
 /** @jsxImportSource @emotion/react */
 import React, { useState, useContext, useEffect } from "react";
-import { Box, Grid, Button } from "@mui/material";
+import { Box, Grid, Button, Divider } from "@mui/material";
 import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 import ReactApexChart from "react-apexcharts";
 import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
-import { Divider } from "@mui/material";
-
 
 // Import SVG icons
 import totalZoneIcon from "../assets/greyDirection.svg";
 import floorIcon from "../assets/rJumpToFloor.svg";
+import gChemical from "../assets/gChemical.svg";
+import gBiological from "../assets/gBiological.svg";
+import gRadiation from "../assets/gRadiological.svg";
+import alertChemical from "../assets/rChemical.svg";
+import alertBiological from "../assets/rBiological.svg";
+import alertRadiation from "../assets/rRadiological.svg";
 
 // Fixed Chart Colors
 const chartColors = ["#29991d", "RGB(128, 128,128)", "#ff9933", "red"];
@@ -37,6 +41,7 @@ const FloorCards = ({ floorData }) => {
 
   useEffect(() => {
     const updatedColors = floorData.map((floor) => {
+      console.log(JSON.stringify(floorData))
       const hasAlert =
         (floor.unhealthySensors && floor.unhealthySensors > 0) ||
         (floor.totalAlarms && floor.totalAlarms > 0);
@@ -45,10 +50,10 @@ const FloorCards = ({ floorData }) => {
 
     setValue(updatedColors);
 
-    // Refresh chart every 10 seconds to restart animation
+    // Refresh chart every 20 seconds to restart animation
     const interval = setInterval(() => {
       setChartKey((prevKey) => prevKey + 1);
-    }, 10000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, [floorData, setValue]);
@@ -66,11 +71,11 @@ const FloorCards = ({ floorData }) => {
               ? "#E30613"
               : "#28A745";
 
-          // Calculate total sensors
           const totalSensors =
             (floor.activeSensors || 0) + (floor.inactiveSensors || 0);
 
-          // Chart options
+          console.log(totalSensors)
+
           const chartOptions = {
             chart: {
               type: "donut",
@@ -78,8 +83,6 @@ const FloorCards = ({ floorData }) => {
                 enabled: true,
                 easing: "linear",
                 speed: 2000,
-                animateGradually: { enabled: true, delay: 100 },
-                dynamicAnimation: { enabled: true, speed: 2000 },
               },
               toolbar: { show: false },
             },
@@ -127,29 +130,38 @@ const FloorCards = ({ floorData }) => {
           return (
             <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={index}>
               <HvCard statusColor={borderColor} sx={{ width: "100%", height: "100%" }}>
-                <Box
-                  p={2}
-                  display="flex"
-                  backgroundColor="white"
-                  flexDirection="column"
-                  justifyContent="space-between"
-                  height="100%"
-                >
-                  {/* Floor Name with Icon */}
-                  <Box display="flex" alignItems="center" justifyContent="space-between" mt={1} mb={2}>
-                    <HvTypography
-                      variant="title3"
-                      style={{
-                        fontWeight: "bold",
-                        color: borderColor,
-                      }}
-                    >
-                      {floor.floor.toUpperCase()}
-                    </HvTypography>
+                <Box p={2} display="flex" backgroundColor="white" flexDirection="column" height="100%">
 
-                    {/* Floor Icon with Zoom & Blink Effect */}
-                    <Box
-                      component="img"
+                  {/* Alert Icons with Counts and Separators */}
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Box display="flex" gap={2} alignItems="center">
+                      <Box display="flex" alignItems="center" gap={1.5}>
+                        <img src={floor.chemicalAlerts > 0 ? alertChemical : gChemical} alt="Chemical Alert" width={24} height={24} />
+                        <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
+                          {floor.chemicalAlerts || 0}
+                        </HvTypography>
+                      </Box>
+
+                      <HvTypography variant="caption" mx={1}>|</HvTypography>
+
+                      <Box display="flex" alignItems="center" gap={1.5}>
+                        <img src={floor.biologicalAlerts > 0 ? alertBiological : gBiological} alt="Biological Alert" width={24} height={24} />
+                        <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
+                          {floor.biologicalAlerts || 0}
+                        </HvTypography>
+                      </Box>
+
+                      <HvTypography variant="caption" mx={1}>|</HvTypography>
+
+                      <Box display="flex" alignItems="center" gap={1.5}>
+                        <img src={floor.radiologicalAlerts > 0 ? alertRadiation : gRadiation} alt="Radiation Alert" width={24} height={24} />
+                        <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
+                          {floor.radiologicalAlerts || 0}
+                        </HvTypography>
+                      </Box>
+                    </Box>
+
+                    <Box component="img"
                       src={floorIcon}
                       alt="Floor Icon"
                       width={30}
@@ -160,23 +172,34 @@ const FloorCards = ({ floorData }) => {
                           ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
                           : "none",
                         animation: `${zoomBlinkAnimation} 1.5s infinite ease-in-out`,
-                      }}
-                    />
+                      }} />
                   </Box>
 
-                  {/* Donut Chart (ONLY the slices animate) */}
+                  {/* Floor Name */}
+                  <HvTypography variant="title3" style={{ fontWeight: "bold", color: borderColor, }}>
+                    {floor.floor.toUpperCase()}
+                  </HvTypography>
+
+                  {/* Donut Chart */}
                   <Box display="flex" justifyContent="center" mt={1} mb={1} sx={{ width: "100%", height: "200px" }}>
-                    <ReactApexChart
-                      key={chartKey}
-                      options={chartOptions}
-                      series={chartSeries}
-                      type="donut"
-                      width="100%"
-                      height={200}
-                    />
+                    {/* Check if all values in chartSeries are 0, undefined, or null */}
+                    {chartSeries.every((value) => value === 0 || value === undefined || value === null) ? (
+                      <HvTypography variant="body2" color="textSecondary">
+                        No sensors available to display
+                      </HvTypography>
+                    ) : (
+                      <ReactApexChart
+                        key={chartKey}
+                        options={chartOptions}
+                        series={chartSeries}
+                        type="donut"
+                        width="100%"
+                        height={200}
+                      />
+                    )}
                   </Box>
 
-          {/* Total Detected Alarms Button */}
+                  {/* Total Detected Alarms Button */}
                   <Button
                     variant="contained"
                     sx={{
@@ -192,7 +215,7 @@ const FloorCards = ({ floorData }) => {
                     }}
                   >
                     <span>Total Detected Alarms</span>
-                    <span>{floor.totalAlarms || "00"}</span>
+                    <span>{floor.totalAlarms|| "00"}</span>
                   </Button>
 
                   {/* Divider */}
@@ -223,8 +246,10 @@ const FloorCards = ({ floorData }) => {
                     >
                       Go to Floor
                     </Button>
-                  </Box>           
-                 </Box>
+
+                  </Box>
+
+                </Box>
               </HvCard>
             </Grid>
           );

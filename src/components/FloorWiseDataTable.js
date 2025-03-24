@@ -66,7 +66,7 @@ const FloorWiseDataTable = ({ data }) => {
               "Action",
             ].map((header) => (
               <TableCell key={header} className="table-cell1">
-                <HvTypography variant="label">{header}</HvTypography>
+                <HvTypography variant="label1">{header}</HvTypography>
               </TableCell>
             ))}
           </TableRow>

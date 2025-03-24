@@ -111,26 +111,33 @@ const SensorStatusCards = (props) => {
   const chartSeries = [
     { name: "Active", data: [Number(sensorSummary.active)] },
     { name: "Inactive", data: [Number(sensorSummary.inactive)] },
-    { name: "Unhelaty Sensors", data: [Number(sensorSummary.faulty.split("/")[0] || 0)] },
+    { name: "Unhealthy Sensors", data: [Number(sensorSummary.faulty.split("/")[0] || 0)] },
   ];
 
   return (
     <div className="sensor-status-container">
       {cards.map((card, index) => {
-        if (card.title === "Total Sensor" || card.title === "Inactive Sensor" || card.title === "Active Sensor" || card.title === "Faulty Sensors") {
+        if (card.title === "Total Sensor" || card.title === "Inactive Sensor" || card.title === "Active Sensor" || card.title === "Faulty Sensors" || card.title === 'Disconnected Sensor') {
           return null; // Skip rendering these since they'll be in the summary
         }
 
         let sensorValue = card.value;
+
         let alertBorder = false;
         let cardContentColor = "green"; // Default color
-        let textColor = "black"; // Default text color
+        let textColor = "white"; // Always white text for the sensor value
 
-        if (!["Total Sensor", "Inactive Sensor", "Active Sensor"].includes(card.title)) {
-          sensorValue = Number(sensorValue);
-          alertBorder = sensorValue > 0;
-          cardContentColor = alertBorder ? "red" : "green"; 
-          textColor = alertBorder ? "white" : "black";
+        // Check if the card title is one of the alarm types
+        if (["Chemical Alarms", "Biological Alarms", "Radiological Alarms"].includes(card.title)) {
+          // Split the faulty value using "/"
+          const [alertValue] = card.value.split("/").map(Number);
+          alertBorder = alertValue > 1; // Alert if first value > 1
+          cardContentColor = alertBorder ? "red" : "green";
+        }
+        if (["Open Incident", "CBRN Alarms"].includes(card.title)) {
+          alertBorder = card.value > 1;
+          cardContentColor = alertBorder ? "red" : "green";
+
         }
 
         const currentImage =
@@ -144,17 +151,13 @@ const SensorStatusCards = (props) => {
               {...props}
             >
               <HvCardHeader title={<HvTypography variant="title2">{card.title}</HvTypography>} />
-              
+
               {currentImage && <img src={currentImage} alt={card.title} className="sensor-icon" />}
-              
+
               <HvCardContent style={{ backgroundColor: cardContentColor }}>
                 <div className="sensor-card-content">
                   <HvTypography variant="title1" style={{ color: textColor }}>
-                    {sensorValue === 0 || isNaN(sensorValue) ? (
-                      <span style={{ color: "white" }}>00</span>
-                    ) : (
-                      sensorValue.toString().padStart(2, "0")
-                    )}
+                    {card.value}
                   </HvTypography>
                 </div>
               </HvCardContent>
@@ -167,13 +170,13 @@ const SensorStatusCards = (props) => {
                 {...props}
               >
                 <HvCardContent style={{ padding: "5px 0 0 0" }}>
-                  <div  style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                  <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                     <ReactApexChart
                       options={chartOptions}
                       series={chartSeries}
                       type="bar"
-                      width="100%" 
-                      height="110" 
+                      width="100%"
+                      height="110"
                     />
                   </div>
                 </HvCardContent>

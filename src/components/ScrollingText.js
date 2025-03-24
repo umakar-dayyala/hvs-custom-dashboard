@@ -6,10 +6,10 @@ import { getSensorData } from "../service/summaryServices";
 // Define the scrolling animation
 const scrollText = keyframes`
   0% {
-    transform: translateX(-100%);
+    transform: translateX(100vw);
   }
   100% {
-    transform: translateX(100vw);
+    transform: translateX(-100%);
   }
 `;
 
@@ -58,7 +58,7 @@ const ScrollingText = () => {
         color: "white", // Text is always white
         textAlign: "center",
         animation: `${blinkAnimation} 1s infinite`, // Blinking applies to both states
-        marginTop: "10px",
+        // marginTop: "10px",
       }}
     >
       <Box

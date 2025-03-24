@@ -12,10 +12,11 @@ export const getSensorData = async () => {
     // Transform API response to match expected format
     return [
       { title: "CBRN Alarms", value: data.cbrn_alarms.toString() },
-      { title: "Chemical Alarms", value: data.chemical_alerts.toString() },
-      { title: "Biological Alarms", value: data.biological_alerts.toString() },
-      { title: "Radiological Alarms", value: data.radiological_alerts.toString() },
+      { title: "Chemical Alarms", value: data.chemical_alarms.toString() },
+      { title: "Biological Alarms", value: data.biological_alarms.toString() },
+      { title: "Radiological Alarms", value: data.radiological_alarms.toString() },
       { title: "Total Sensor", value: data.total_sensors.toString() },
+      {title: "Disconnected Sensor", value:data.disconnected_sensors},
       { title: "Active Sensor", value: data.active_sensors.toString() },
       { title: "Inactive Sensor", value: data.inactive_sensors.toString() },
       { title: "Faulty Sensors", value: data.sensor_health },
