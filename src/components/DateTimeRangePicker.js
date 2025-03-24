@@ -45,6 +45,10 @@ const DateTimeRangePicker = ({ onChange }) => {
       newStartDate = dayjs().subtract(1, "month");
     } else if (value === "lastYear") {
       newStartDate = dayjs().subtract(1, "year");
+    }else if(value === "10min"){
+      newStartDate = dayjs().subtract(10, "minute");
+    }else if(value === "15min"){
+      newStartDate = dayjs().subtract(15, "minute");
     }
     
 
@@ -84,12 +88,12 @@ const DateTimeRangePicker = ({ onChange }) => {
   <MenuItem value="" disabled>
     Select Time
   </MenuItem>
-  <MenuItem value="5min">Last 5 mins</MenuItem>
+  
   <MenuItem value="7min">Last 7 mins</MenuItem>
-  <MenuItem value="hour">Last 1 hour</MenuItem>
-  <MenuItem value="4hours">Last 4 hours</MenuItem>
-  <MenuItem value="24hours">Last 24 hours</MenuItem>
-  <MenuItem value="7days">Last 7 days</MenuItem>
+  <MenuItem value="10min">Last 10 mins</MenuItem>
+  <MenuItem value="15min">Last 15 mins</MenuItem>
+  {/* <MenuItem value="24hours">Last 24 hours</MenuItem>
+  <MenuItem value="7days">Last 7 days</MenuItem> */}
   {/* <MenuItem value="lastYear">Last Year</MenuItem> */}
 </Select>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import IndividualKPI from "../components/IndividualKPI";
 import IndividualParameters from "../components/IndividualParameters";
 import { HvStack } from "@hitachivantara/uikit-react-core";
@@ -36,16 +36,26 @@ export const IbacIndividual = () => {
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
-  const [notifications,setNotifications]=useState([]);
-  const [param,setParam]=useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [param, setParam] = useState([]);
 
-  // **Separate State for Each Chart's Time Range**
-  const [plotlyTimeRange, setPlotlyTimeRange] = useState({ fromTime: null, toTime: null });
-  const [anomalyTimeRange, setAnomalyTimeRange] = useState({ fromTime: null, toTime: null });
-  const [outlierTimeRange, setOutlierTimeRange] = useState({ fromTime: null, toTime: null });
+  // Track initial mount
+  const initialMount = useRef(true);
 
-  const formatDateForApi = (isoDate) => {
-    return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
+  // Initialize with default 5-minute ranges
+  const defaultRange = {
+    fromTime: dayjs().subtract(5, 'minute').toISOString(),
+    toTime: dayjs().toISOString()
+  };
+
+  // Time range states with default values
+  const [plotlyTimeRange, setPlotlyTimeRange] = useState(defaultRange);
+  const [anomalyTimeRange, setAnomalyTimeRange] = useState(defaultRange);
+  const [outlierTimeRange, setOutlierTimeRange] = useState(defaultRange);
+
+  const formatDateForApi = (date) => {
+    if (!date) return null;
+    return `'${dayjs(date).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
   useEffect(() => {
@@ -67,6 +77,17 @@ export const IbacIndividual = () => {
       }
     });
 
+    // Initial data fetch for all charts
+    if (initialMount.current) {
+      const deviceId = queryParams.get("device_id");
+      if (deviceId) {
+        fetchBioData(deviceId, plotlyTimeRange.fromTime, plotlyTimeRange.toTime);
+        fetchAnomalyData(deviceId, anomalyTimeRange.fromTime, anomalyTimeRange.toTime);
+        fetchOutlierData(deviceId, outlierTimeRange.fromTime, outlierTimeRange.toTime);
+      }
+      initialMount.current = false;
+    }
+
     return () => {
       if (eventSource) {
         eventSource.close();
@@ -75,82 +96,136 @@ export const IbacIndividual = () => {
     };
   }, []);
 
-  // **Fetch Data for Each Chart Separately**
-  const fetchData = async (deviceId, fromTime, toTime, setDataFunc, fetchFunc) => {
-    const formattedFromTime = formatDateForApi(fromTime);
-    const formattedToTime = formatDateForApi(toTime);
-
+  // Separate fetch functions for better error handling
+  const fetchBioData = async (deviceId, fromTime, toTime) => {
+    if (!fromTime || !toTime) return;
     try {
-      const response = await fetchFunc(deviceId, formattedFromTime, formattedToTime);
-      setDataFunc(response.data);
+      const response = await fetchBioParamChartData(
+        deviceId, 
+        formatDateForApi(fromTime), 
+        formatDateForApi(toTime)
+      );
+      setBioParamChartData(response?.data || {});
     } catch (error) {
-      console.error(`Error fetching data:`, error);
+      console.error("Error fetching bio data:", error);
     }
   };
 
+  const fetchAnomalyData = async (deviceId, fromTime, toTime) => {
+    if (!fromTime || !toTime) return;
+    try {
+      const response = await fetchAnomalyChartData(
+        deviceId,
+        formatDateForApi(fromTime),
+        formatDateForApi(toTime)
+      );
+      setAnomalyChartData(response?.data || {});
+    } catch (error) {
+      console.error("Error fetching anomaly data:", error);
+    }
+  };
+
+  const fetchOutlierData = async (deviceId, fromTime, toTime) => {
+    if (!fromTime || !toTime) return;
+    try {
+      const response = await fetchOutlierChartData(
+        deviceId,
+        formatDateForApi(fromTime),
+        formatDateForApi(toTime)
+      );
+      setOutlierChartData(response?.data || {});
+    } catch (error) {
+      console.error("Error fetching outlier data:", error);
+    }
+  };
+
+  // Handler functions with improved validation
+  const handlePlotlyRangeChange = (range) => {
+    if (!range || range.length < 2) {
+      console.error("Invalid range received:", range);
+      return;
+    }
+
+    const [start, end] = range;
+    const fromTime = dayjs(start).isValid() ? dayjs(start).toISOString() : null;
+    const toTime = dayjs(end).isValid() ? dayjs(end).toISOString() : null;
+
+    if (!fromTime || !toTime) {
+      console.error("Invalid date values:", range);
+      return;
+    }
+
+    // Only update if range actually changed
+    if (fromTime !== plotlyTimeRange.fromTime || toTime !== plotlyTimeRange.toTime) {
+      setPlotlyTimeRange({ fromTime, toTime });
+    }
+  };
+
+  const handleAnomalyRangeChange = (range) => {
+    if (!range || range.length < 2) {
+      console.error("Invalid range received:", range);
+      return;
+    }
+
+    const [start, end] = range;
+    const fromTime = dayjs(start).isValid() ? dayjs(start).toISOString() : null;
+    const toTime = dayjs(end).isValid() ? dayjs(end).toISOString() : null;
+
+    if (!fromTime || !toTime) {
+      console.error("Invalid date values:", range);
+      return;
+    }
+
+    if (fromTime !== anomalyTimeRange.fromTime || toTime !== anomalyTimeRange.toTime) {
+      setAnomalyTimeRange({ fromTime, toTime });
+    }
+  };
+
+  const handleOutlierRangeChange = (range) => {
+    if (!range || range.length < 2) {
+      console.error("Invalid range received:", range);
+      return;
+    }
+
+    const [start, end] = range;
+    const fromTime = dayjs(start).isValid() ? dayjs(start).toISOString() : null;
+    const toTime = dayjs(end).isValid() ? dayjs(end).toISOString() : null;
+
+    if (!fromTime || !toTime) {
+      console.error("Invalid date values:", range);
+      return;
+    }
+
+    if (fromTime !== outlierTimeRange.fromTime || toTime !== outlierTimeRange.toTime) {
+      setOutlierTimeRange({ fromTime, toTime });
+    }
+  };
+
+  // Effect hooks for data fetching
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-
-    fetchData(deviceId, plotlyTimeRange[0], plotlyTimeRange[1], setBioParamChartData, fetchBioParamChartData);
+    if (deviceId && !initialMount.current) {
+      fetchBioData(deviceId, plotlyTimeRange.fromTime, plotlyTimeRange.toTime);
+    }
   }, [plotlyTimeRange]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-
-    fetchData(deviceId, anomalyTimeRange[0], anomalyTimeRange[1], setAnomalyChartData, fetchAnomalyChartData);
+    if (deviceId && !initialMount.current) {
+      fetchAnomalyData(deviceId, anomalyTimeRange.fromTime, anomalyTimeRange.toTime);
+    }
   }, [anomalyTimeRange]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-
-    fetchData(deviceId, outlierTimeRange[0], outlierTimeRange[1], setOutlierChartData, fetchOutlierChartData);
+    if (deviceId && !initialMount.current) {
+      fetchOutlierData(deviceId, outlierTimeRange.fromTime, outlierTimeRange.toTime);
+    }
   }, [outlierTimeRange]);
 
-  const handlePlotlyRangeChange = (range) => {
-    const start = dayjs(range[0]); // Ensure it's a dayjs object
-    const end = dayjs(range[1]);
-  
-    if (!start.isValid() || !end.isValid()) {
-      console.error("Invalid date range:", range);
-      return;
-    }
-  
-    setPlotlyTimeRange([start.toISOString(), end.toISOString()]);
-  };
-  
-  const handleAnomalyRangeChange = (range) => {
-    console.log("Received range:", range); // Debugging log
-  
-    const start = dayjs(range[0]); 
-    const end = dayjs(range[1]);
-  
-    if (!start.isValid() || !end.isValid()) {
-      console.error("Invalid date range received:", range);
-      return;
-    }
-  
-    setAnomalyTimeRange([start.toISOString(), end.toISOString()]);
-  };
-  
-  const handleOutlierRangeChange = (range) => {
-    if (!range || range.length < 2) {
-        console.error("Invalid range received:", range);
-        return;
-    }
-
-    const start = new Date(range[0]);
-    const end = new Date(range[1]);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        console.error("Invalid date values:", range);
-        return;
-    }
-
-    setOutlierTimeRange([start.toISOString(), end.toISOString()]);
-};
 
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
