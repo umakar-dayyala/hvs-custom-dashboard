@@ -35,16 +35,17 @@ const zoomBlinkAnimation = keyframes`
 `;
 
 const FloorCards = ({ floorData }) => {
+  console.log("Floor Data: "+JSON.stringify(floorData));
   const { value, setValue } = useContext(MyContext);
   const navigate = useNavigate();
   const [chartKey, setChartKey] = useState(0);
 
   useEffect(() => {
     const updatedColors = floorData.map((floor) => {
-      console.log(JSON.stringify(floorData))
+      const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
       const hasAlert =
         (floor.unhealthySensors && floor.unhealthySensors > 0) ||
-        (floor.totalAlarms && floor.totalAlarms > 0);
+        (totalAlarms && totalAlarms > 0);
       return hasAlert ? "#E30613" : "#28A745";
     });
 
@@ -66,10 +67,13 @@ const FloorCards = ({ floorData }) => {
     <Box mt={2}>
       <Grid container spacing={8} justifyContent="center">
         {floorData.map((floor, index) => {
+          const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
           const borderColor =
-            floor.unhealthySensors > 0 || floor.totalAlarms > 0
-              ? "#E30613"
-              : "#28A745";
+          totalAlarms > 0
+          ? "red"  // Red for alarms
+          : floor.unhealthySensors > 0
+          ? "#ff9933"  // Amber for unhealthy sensors
+          : "#29991d";
 
           const totalSensors =
             (floor.activeSensors || 0) + (floor.inactiveSensors || 0);
@@ -96,7 +100,7 @@ const FloorCards = ({ floorData }) => {
                   floor.activeSensors || 0,
                   floor.inactiveSensors || 0,
                   floor.unhealthySensors || 0,
-                  floor.totalAlarms || 0,
+                  totalAlarms || 0,
                 ];
                 return sensorCounts[seriesIndex] || 0;
               },
@@ -124,7 +128,7 @@ const FloorCards = ({ floorData }) => {
             floor.activeSensors || 0,
             floor.inactiveSensors || 0,
             floor.unhealthySensors || 0,
-            floor.totalAlarms || 0,
+            totalAlarms || 0,
           ];
 
           return (
@@ -136,27 +140,27 @@ const FloorCards = ({ floorData }) => {
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                     <Box display="flex" gap={2} alignItems="center">
                       <Box display="flex" alignItems="center" gap={1.5}>
-                        <img src={floor.chemicalAlerts > 0 ? alertChemical : gChemical} alt="Chemical Alert" width={24} height={24} />
+                        <img src={floor.chemical_alarms > 0 ? alertChemical : gChemical} alt="Chemical Alert" width={24} height={24} />
                         <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
-                          {floor.chemicalAlerts || 0}
+                          {floor.chemical_alarms || 0}
                         </HvTypography>
                       </Box>
 
                       <HvTypography variant="caption" mx={1}>|</HvTypography>
 
                       <Box display="flex" alignItems="center" gap={1.5}>
-                        <img src={floor.biologicalAlerts > 0 ? alertBiological : gBiological} alt="Biological Alert" width={24} height={24} />
+                        <img src={floor.biological_alarms > 0 ? alertBiological : gBiological} alt="Biological Alert" width={24} height={24} />
                         <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
-                          {floor.biologicalAlerts || 0}
+                          {floor.biological_alarms || 0}
                         </HvTypography>
                       </Box>
 
                       <HvTypography variant="caption" mx={1}>|</HvTypography>
 
                       <Box display="flex" alignItems="center" gap={1.5}>
-                        <img src={floor.radiologicalAlerts > 0 ? alertRadiation : gRadiation} alt="Radiation Alert" width={24} height={24} />
+                        <img src={floor.radiological_alarms > 0 ? alertRadiation : gRadiation} alt="Radiation Alert" width={24} height={24} />
                         <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
-                          {floor.radiologicalAlerts || 0}
+                          {floor.radiological_alarms || 0}
                         </HvTypography>
                       </Box>
                     </Box>
@@ -168,7 +172,7 @@ const FloorCards = ({ floorData }) => {
                       height={30}
                       sx={{
                         marginLeft: 1,
-                        filter: floor.totalAlarms === 0
+                        filter: totalAlarms === 0
                           ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
                           : "none",
                         animation: `${zoomBlinkAnimation} 1.5s infinite ease-in-out`,
@@ -203,8 +207,8 @@ const FloorCards = ({ floorData }) => {
                   <Button
                     variant="contained"
                     sx={{
-                      border: floor.totalAlarms > 0 ? "1px solid #E30613" : "1px solid #29991d",
-                      backgroundColor: floor.totalAlarms > 0 ? "#E30613" : "#29991d",
+                      border: totalAlarms > 0 ? "1px solid #E30613" : "1px solid #29991d",
+                      backgroundColor: totalAlarms > 0 ? "#E30613" : "#29991d",
                       color: "white",
                       textTransform: "none",
                       alignSelf: "center",
@@ -215,7 +219,7 @@ const FloorCards = ({ floorData }) => {
                     }}
                   >
                     <span>Total Detected Alarms</span>
-                    <span>{floor.totalAlarms|| "00"}</span>
+                    <span>{totalAlarms|| "00"}</span>
                   </Button>
 
                   {/* Divider */}
