@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -18,6 +18,9 @@ import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from 'dayjs';
 import { fetchPRMParamChartData, fetchAnomalyChartData, fetchOutlierChartData } from '../service/PRMSensorService';
 import ConfirmationModal from '../components/ConfirmationModal';
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
+
 
 export const PRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -28,20 +31,22 @@ export const PRMIndividual = () => {
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [param, setParam] = useState([]);
 
-  // Separate time ranges for each component
-  const [plotlyRange, setPlotlyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [anomalyRange, setAnomalyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [outlierRange, setOutlierRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
+  // Initialize with default 5-minute ranges
+  const defaultRange = {
+    fromTime: dayjs().subtract(5, 'minute').toISOString(),
+    toTime: dayjs().toISOString()
+  };
+
+  // Separate time ranges for each component with initial default values
+  const [plotlyRange, setPlotlyRange] = useState(defaultRange);
+  const [anomalyRange, setAnomalyRange] = useState(defaultRange);
+  const [outlierRange, setOutlierRange] = useState(defaultRange);
+
+  // Track initial mount
+  const initialMount = useRef(true);
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
@@ -58,8 +63,18 @@ export const PRMIndividual = () => {
       } else {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
+        setParam(data.parametersData);
+        setNotifications(data.Notifications);
       }
     });
+
+    // Initial data fetch for all charts
+    if (initialMount.current) {
+      fetchData(defaultRange.fromTime, defaultRange.toTime, 'PlotlyDataChart');
+      fetchData(defaultRange.fromTime, defaultRange.toTime, 'AnomalyChart');
+      fetchData(defaultRange.fromTime, defaultRange.toTime, 'OutlierChart');
+      initialMount.current = false;
+    }
 
     return () => {
       if (eventSource) {
@@ -69,14 +84,15 @@ export const PRMIndividual = () => {
     };
   }, []); // Run once on mount
 
-  // Fetch Data Function (includes fromTime and toTime)
+  // Fetch Data Function
   const fetchData = async (fromTime, toTime, component) => {
+    if (!fromTime || !toTime) return;
+
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
 
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-    console.log("Device ID: ", deviceId);
 
     try {
       if (component === 'PlotlyDataChart') {
@@ -94,29 +110,55 @@ export const PRMIndividual = () => {
     }
   };
 
-  // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
+    if (!Array.isArray(range) || range.length < 2) {
+      console.error("Invalid range format:", range);
+      return;
+    }
+
+    const fromTime = dayjs(range[0]).isValid() ? dayjs(range[0]).toISOString() : null;
+    const toTime = dayjs(range[1]).isValid() ? dayjs(range[1]).toISOString() : null;
+
+    if (!fromTime || !toTime) {
+      console.error("Invalid date values in range:", range);
+      return;
+    }
+
+    // Only update state and fetch data if the range actually changed
     if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      if (fromTime !== plotlyRange.fromTime || toTime !== plotlyRange.toTime) {
+        setPlotlyRange({ fromTime, toTime });
+      }
     } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      if (fromTime !== anomalyRange.fromTime || toTime !== anomalyRange.toTime) {
+        setAnomalyRange({ fromTime, toTime });
+      }
     } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      if (fromTime !== outlierRange.fromTime || toTime !== outlierRange.toTime) {
+        setOutlierRange({ fromTime, toTime });
+      }
     }
   };
 
   // Fetch data when the range changes for each component
   useEffect(() => {
-    fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
+    if (!initialMount.current) {
+      fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
+    }
   }, [plotlyRange]);
 
   useEffect(() => {
-    fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
+    if (!initialMount.current) {
+      fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
+    }
   }, [anomalyRange]);
 
   useEffect(() => {
-    fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
+    if (!initialMount.current) {
+      fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
+    }
   }, [outlierRange]);
+
 
   // Toggle state handling
   const handleToggleClick = (state) => {
@@ -152,14 +194,15 @@ export const PRMIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} />
+            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={paramsData} />
+          <IndividualParameters paramsData={param} notifications={notifications} />
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={prmParamChartData}
               onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
+              title={'Radiation Readings'}
             />
           </Box>
         </Box>
@@ -169,12 +212,14 @@ export const PRMIndividual = () => {
             <AnomalyChart
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
+              title={'Anomaly Detection'}
             />
           </Box>
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
+              title={'Outlier Detection'}
             />
           </Box>
         </Box>

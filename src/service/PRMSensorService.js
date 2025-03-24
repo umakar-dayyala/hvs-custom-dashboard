@@ -9,6 +9,7 @@ export const fetchPRMParamChartData = async (deviceId, fromTime, toTime) => {
     const params = {
       param_device_id: deviceId,
       // param_device_id:43,
+      
       param_start_date: `${fromTime}`,  // Add single quotes around the dates
       param_end_date: `${toTime}`,
     };

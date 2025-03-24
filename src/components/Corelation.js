@@ -40,73 +40,51 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   
  
 
-const Corelation = () => {
-  return (
-    <Box>
-        <HvCard bgcolor='white' style={{borderRadius: "0px",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}} statusColor="red"> 
-            <HvCardContent>
-                <HvTypography variant="title3">Corelation Chart</HvTypography>
-                <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }} >
+  const Corelation = ({ corelationData }) => {
+    // Check if corelationData is empty or undefined
+    const isEmpty = !corelationData || Object.keys(corelationData).length === 0;
+  
+    return (
+      <Box>
+        <HvCard
+          bgcolor="white"
+          style={{
+            height: "500px",
+            borderRadius: "0px",
+            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+          }}
+          statusColor="red"
+        >
+          <HvCardContent>
+            <Box p={2} >
+                            <HvTypography variant="title2">Correlation Chart</HvTypography>
+                            </Box>
+  
+            {isEmpty ? (
+              <Box flex={1} display="flex" justifyContent="center" alignItems="center">
+              <HvTypography variant="title3" >No data Available</HvTypography>
+              </Box>
+            ) : (
+              <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
                 <Table sx={{ minWidth: "100%" }} aria-label="customized table">
                   <TableBody>
-                    
-                      <StyledTableRow >
+                    {Object.entries(corelationData).map(([key, value]) => (
+                      <StyledTableRow key={key}>
                         <StyledTableCell component="th" scope="row">
-                          Example Text
+                          {key}
                         </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
+                        <StyledTableCell align="right">{value}</StyledTableCell>
                       </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          Example Text
-                        </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          Example Text
-                        </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          Example Text
-                        </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          Example Text
-                        </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          Example Text
-                        </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          Example Text
-                        </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow >
-                        <StyledTableCell component="th" scope="row">
-                          Example Text
-                        </StyledTableCell>
-                        <StyledTableCell align="right">Example Text</StyledTableCell>
-                      </StyledTableRow>
-            
+                    ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-                
-            </HvCardContent>
+            )}
+          </HvCardContent>
         </HvCard>
-    </Box>
-  )
-}
-
-export default Corelation
+      </Box>
+    );
+  };
+  
+  export default Corelation ;
+  
