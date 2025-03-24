@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import { keyframes } from "@emotion/react";
 import { getSensorData } from "../service/summaryServices";
 
-// Define the scrolling animation that makes it look like the text is continuously coming from the left
+// Define the scrolling animation
 const scrollText = keyframes`
   0% {
     transform: translateX(-100%);
@@ -13,12 +13,13 @@ const scrollText = keyframes`
   }
 `;
 
-// Define the blinking background animation for alarms
+// Define the blinking animation for alarms and normal state
 const blinkAnimation = keyframes`
   0% { opacity: 1; }
   30% { opacity: 0.5; }
   100% { opacity: 1; }
 `;
+
 const ScrollingText = () => {
   const [hasAlarm, setHasAlarm] = useState(false);
 
@@ -49,14 +50,14 @@ const ScrollingText = () => {
         width: "100%",
         overflow: "hidden",
         whiteSpace: "nowrap",
-        backgroundColor: hasAlarm ? "#E30613" : "transparent", // Updated alert background color
+        backgroundColor: hasAlarm ? "#E30613" : "#008000", // Red for alarm, Green for no alarm
         padding: "8px",
         position: "relative",
-        border: hasAlarm ? "2px solid red" : "1px solid black", // Border changes dynamically
+        border: hasAlarm ? "2px solid red" : "2px solid green", // Red border for alarm, Green for no alarm
         borderRadius: "5px",
-        color: hasAlarm ? "white" : "green", // Text color changes to white when alarm
+        color: "white", // Text is always white
         textAlign: "center",
-        animation: hasAlarm ? `${blinkAnimation} 1s infinite` : "none",
+        animation: `${blinkAnimation} 1s infinite`, // Blinking applies to both states
         marginTop: "10px",
       }}
     >
@@ -73,8 +74,8 @@ const ScrollingText = () => {
           sx={{
             display: "inline-block",
             whiteSpace: "nowrap",
-            animation: `${scrollText} 10s linear infinite`, // Slowed down the animation
-            fontWeight: "bold", // Made text bold
+            animation: `${scrollText} 10s linear infinite`,
+            fontWeight: "bold",
           }}
         >
           {fullText}

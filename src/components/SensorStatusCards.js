@@ -90,7 +90,7 @@ const SensorStatusCards = (props) => {
       enabled: true,
       y: {
         formatter: (val, { seriesIndex }) => {
-          const labels = ["Active", "Inactive", "Faulty"];
+          const labels = ["Active", "Inactive", "Unhealthy Sensors"];
           return `${labels[seriesIndex]} Sensors: ${val}`;
         },
       },
@@ -111,7 +111,7 @@ const SensorStatusCards = (props) => {
   const chartSeries = [
     { name: "Active", data: [Number(sensorSummary.active)] },
     { name: "Inactive", data: [Number(sensorSummary.inactive)] },
-    { name: "Faulty", data: [Number(sensorSummary.faulty.split("/")[0] || 0)] },
+    { name: "Unhelaty Sensors", data: [Number(sensorSummary.faulty.split("/")[0] || 0)] },
   ];
 
   return (
