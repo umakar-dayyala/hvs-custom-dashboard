@@ -30,8 +30,7 @@ const ScrollingText = () => {
       const data = await getSensorData();
       const alarmExists = data.some(
         (card) =>
-          (card.title === "Unhealthy Sensors" && card.value.split("/")[0] > 0) ||
-          (!["Total Sensor", "Inactive Sensor", "Active Sensor"].includes(card.title) && Number(card.value) > 0)
+            card.title === "CBRN Alarms" && Number(card.value) > 0
       );
       setHasAlarm(alarmExists);
     };
