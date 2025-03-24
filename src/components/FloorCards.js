@@ -73,6 +73,10 @@ const FloorCards = ({ floorData }) => {
           ? "red"  // Red for alarms
           : floor.unhealthySensors > 0
           ? "#ff9933"  // Amber for unhealthy sensors
+          : floor.inactiveSensors > 0 || floor.activeSensors === 0
+          ? "RGB(128, 128,128)"  // Grey for inactive sensors
+          : floor.totalSensors === 0
+          ? "RGB(128, 128,128)" // Black for no sensors
           : "#29991d";
 
           const totalSensors =
