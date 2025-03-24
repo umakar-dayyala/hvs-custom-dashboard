@@ -81,14 +81,14 @@ const OperatorDashboard = () => {
             {/* Sticky Header Section */}
             <Box position="sticky" top={0} zIndex={1000} bgcolor={"#f0f1f6"}>
                 {/* Breadcrumbs and Toggle Section */}
-                <Box display="flex" justifyContent="space-between" alignItems="center" p={1}>
+                {/* <Box display="flex" justifyContent="space-between" alignItems="center" p={1}>
                 <Breadcrumbs />
                 <Box display="flex">
                     <SensorLegend />
                 </Box>
-                </Box>
+                </Box> */}
 
-                <HorizontalDivider />
+                {/* <HorizontalDivider /> */}
 
                 {/* Sensor Status Cards */}
                 <Box p={1}>

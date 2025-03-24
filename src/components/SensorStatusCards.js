@@ -1,16 +1,10 @@
-
 import React, { useEffect, useState } from "react";
-// import "../css/sensorStatusCards.css";
 import "../css/SensorStatusCards.css";
-import { FaEye } from "react-icons/fa";
-import {
-  HvCard,
-  HvCardContent,
-  HvCardHeader,
-  HvTypography,
-} from "@hitachivantara/uikit-react-core";
+import { HvCard, HvCardContent, HvCardHeader, HvTypography } from "@hitachivantara/uikit-react-core";
 import { getSensorData } from "../service/summaryServices";
+import ReactApexChart from "react-apexcharts";
 
+// Import Sensor Images
 import gChemical from "../assets/gChemical.svg";
 import gBiological from "../assets/gBiological.svg";
 import gRadiation from "../assets/gRadiological.svg";
@@ -19,6 +13,7 @@ import alertChemical from "../assets/rChemical.svg";
 import alertBiological from "../assets/rBiological.svg";
 import alertRadiation from "../assets/rRadiological.svg";
 
+// Sensor Image Mapping
 const sensorImages = {
   "Chemical Alarms": { normal: gChemical, alert: alertChemical },
   "Biological Alarms": { normal: gBiological, alert: alertBiological },
@@ -32,82 +27,159 @@ const SensorStatusCards = (props) => {
     let interval;
 
     const fetchData = async () => {
-      const data = await getSensorData();
-      setCards(data);
+      try {
+        const data = await getSensorData();
+        setCards((prev) => (JSON.stringify(prev) === JSON.stringify(data) ? prev : data));
+      } catch (error) {
+        console.error("Error fetching sensor data:", error);
+      }
     };
 
     fetchData(); // Initial call
 
-    interval = setInterval(fetchData, 500000000000000); // Fetch every 500ms need to change later
+    interval = setInterval(fetchData, 5000); // Fetch every 5 seconds
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
+  // Extract values for the summary card
+  const sensorSummary = {
+    active: "00",
+    inactive: "00",
+    faulty: "00/00",
+    alert: false,
+  };
+
+  let openIncidentCardIndex = -1;
+
+  cards.forEach((card, index) => {
+    if (card.title === "Open Incident") openIncidentCardIndex = index;
+    if (card.title === "Active Sensor") sensorSummary.active = card.value.padStart(2, "0");
+    if (card.title === "Inactive Sensor") sensorSummary.inactive = card.value.padStart(2, "0");
+    if (card.title === "Faulty Sensors") {
+      sensorSummary.faulty = card.value;
+      const [unhealthy] = card.value.split("/").map(Number);
+      sensorSummary.alert = unhealthy > 0;
+    }
+  });
+
+  // Stacked Progress Bar Configuration with Legend
+  const chartOptions = {
+    chart: {
+      type: "bar",
+      height: "100%", // Ensures chart height takes the full space
+      stacked: true, // Keep the stacked structure for counts
+      toolbar: { show: false },
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        barHeight: "90%",
+      },
+    },
+    stroke: { width: 1, colors: ["#fff"] },
+    xaxis: {
+      categories: [""],
+      labels: { show: false }, // Hide x-axis labels to focus on the count
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
+    yaxis: { labels: { show: false } },
+    grid: { show: false },
+    tooltip: {
+      enabled: true,
+      y: {
+        formatter: (val, { seriesIndex }) => {
+          const labels = ["Active", "Inactive", "Faulty"];
+          return `${labels[seriesIndex]} Sensors: ${val}`;
+        },
+      },
+    },
+    fill: { opacity: 1 },
+    legend: {
+      show: true,
+      position: "top", // Position of the legend
+      horizontalAlign: "center", // Align the legend horizontally
+      labels: {
+        colors: ["#000"], // Set text color of the legend
+      },
+    },
+    colors: ["#29991d", " RGB(128, 128,128)", "#ff9933"], // Green, Amber, Red
+  };
+
+  // Actual count series for the chart (showing counts, not percentages)
+  const chartSeries = [
+    { name: "Active", data: [Number(sensorSummary.active)] },
+    { name: "Inactive", data: [Number(sensorSummary.inactive)] },
+    { name: "Faulty", data: [Number(sensorSummary.faulty.split("/")[0] || 0)] },
+  ];
+
   return (
     <div className="sensor-status-container">
       {cards.map((card, index) => {
+        if (card.title === "Total Sensor" || card.title === "Inactive Sensor" || card.title === "Active Sensor" || card.title === "Faulty Sensors") {
+          return null; // Skip rendering these since they'll be in the summary
+        }
+
         let sensorValue = card.value;
         let alertBorder = false;
-        let progressPercentage = 0;
+        let cardContentColor = "green"; // Default color
+        let textColor = "black"; // Default text color
 
-        if (card.title === "Faulty Sensors") {
-          const [unhealthy, total] = sensorValue.split("/").map(Number);
-          progressPercentage = (unhealthy / total) * 100;
-          sensorValue = `${unhealthy}/${total}`;
-          alertBorder = unhealthy > 0;
-        } else if (!["Total Sensor", "Inactive Sensor", "Active Sensor"].includes(card.title)) {
+        if (!["Total Sensor", "Inactive Sensor", "Active Sensor"].includes(card.title)) {
           sensorValue = Number(sensorValue);
           alertBorder = sensorValue > 0;
-        } else {
-          alertBorder = false; // Ensures these specific cards don't get an alert
+          cardContentColor = alertBorder ? "red" : "green"; 
+          textColor = alertBorder ? "white" : "black";
         }
 
         const currentImage =
-          sensorImages[card.title] && alertBorder
-            ? sensorImages[card.title].alert
-            : sensorImages[card.title]?.normal;
+          sensorImages[card.title]?.[alertBorder ? "alert" : "normal"] || null;
 
         return (
-          <HvCard
-            key={index}
-            statusColor={alertBorder ? "red" : "green"}
-            className={`sensor-card ${alertBorder ? "alert-border" : ""}`}
-            {...props}
-          >
-            <HvCardHeader title={<HvTypography variant="title">{card.title}</HvTypography>} />
-
-            {currentImage && (
-              <img
-                src={currentImage}
-                alt={card.title}
-                className="sensor-icon"
-              />
-            )}
-
-            <HvCardContent>
-              {card.title === "Faulty Sensors" && (
-                <div className="progress-bar-container">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill green"
-                      style={{ width: `${100 - progressPercentage}%` }}
-                    ></div>
-                    <div
-                      className="progress-fill red"
-                      style={{ width: `${progressPercentage}%` }}
-                    ></div>
-                  </div>
+          <React.Fragment key={index}>
+            <HvCard
+              statusColor={alertBorder ? "red" : "green"}
+              className={`sensor-card ${alertBorder ? "alert-border" : ""}`}
+              {...props}
+            >
+              <HvCardHeader title={<HvTypography variant="title2">{card.title}</HvTypography>} />
+              
+              {currentImage && <img src={currentImage} alt={card.title} className="sensor-icon" />}
+              
+              <HvCardContent style={{ backgroundColor: cardContentColor }}>
+                <div className="sensor-card-content">
+                  <HvTypography variant="title1" style={{ color: textColor }}>
+                    {sensorValue === 0 || isNaN(sensorValue) ? (
+                      <span style={{ color: "white" }}>00</span>
+                    ) : (
+                      sensorValue.toString().padStart(2, "0")
+                    )}
+                  </HvTypography>
                 </div>
-              )}
+              </HvCardContent>
+            </HvCard>
 
-              <div className="sensor-card-content">
-                <HvTypography variant="title1">
-                  {sensorValue === 0 ? "00" : sensorValue.toString().padStart(2, "0")}
-                </HvTypography>
-                {/* <FaEye color="#2064B4" /> */}
-              </div>
-            </HvCardContent>
-          </HvCard>
+            {index === openIncidentCardIndex && (
+              <HvCard
+                statusColor="green" // Fixed color for the Sensor Summary card border
+                className="sensor-card"
+                {...props}
+              >
+                <HvCardContent style={{ padding: "5px 0 0 0" }}>
+                  <div  style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                    <ReactApexChart
+                      options={chartOptions}
+                      series={chartSeries}
+                      type="bar"
+                      width="100%" 
+                      height="110" 
+                    />
+                  </div>
+                </HvCardContent>
+              </HvCard>
+            )}
+          </React.Fragment>
         );
       })}
     </div>
