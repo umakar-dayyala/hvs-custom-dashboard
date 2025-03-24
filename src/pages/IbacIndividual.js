@@ -11,6 +11,8 @@ import bioicon from "../assets/rBiological.svg";
 import gbioicon from "../assets/gBiological.svg";
 import PlotlyDataChart from "../components/PlotlyDataChart";
 import rbell from "../assets/rbell.svg";
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
 
 import {
   fetchBioParamChartData,
@@ -23,6 +25,7 @@ import Alertbar from "../components/Alertbar";
 import Breadcrumbs from "../components/Breadcrumbs";
 import ToggleButtons from "../components/ToggleButtons";
 import ConfirmationModal from "../components/ConfirmationModal";
+import Corelation from "../components/Corelation";
 
 export const IbacIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -33,11 +36,13 @@ export const IbacIndividual = () => {
   const [toggleState, setToggleState] = useState("Operator");
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
+  const [notifications,setNotifications]=useState([]);
+  const [param,setParam]=useState([]);
 
   // **Separate State for Each Chart's Time Range**
-  const [plotlyTimeRange, setPlotlyTimeRange] = useState([dayjs().subtract(5, "minute").toISOString(), dayjs().toISOString()]);
-  const [anomalyTimeRange, setAnomalyTimeRange] = useState([dayjs().subtract(5, "minute").toISOString(), dayjs().toISOString()]);
-  const [outlierTimeRange, setOutlierTimeRange] = useState([dayjs().subtract(5, "minute").toISOString(), dayjs().toISOString()]);
+  const [plotlyTimeRange, setPlotlyTimeRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyTimeRange, setAnomalyTimeRange] = useState({ fromTime: null, toTime: null });
+  const [outlierTimeRange, setOutlierTimeRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
@@ -54,6 +59,8 @@ export const IbacIndividual = () => {
         if (data.sensor_name && data.sensor_name.includes("IBAC")) {
           setKpiData(data.kpiData);
           setParamsData(data.parametersData);
+          setParam(data.parametersData);
+          setNotifications(data.Notifications);
         } else {
           console.log("Sensor name does not contain IBAC");
         }
@@ -102,10 +109,48 @@ export const IbacIndividual = () => {
     fetchData(deviceId, outlierTimeRange[0], outlierTimeRange[1], setOutlierChartData, fetchOutlierChartData);
   }, [outlierTimeRange]);
 
-  // **Independent Range Handlers**
-  const handlePlotlyRangeChange = (range) => setPlotlyTimeRange([range[0].toISOString(), range[1].toISOString()]);
-  const handleAnomalyRangeChange = (range) => setAnomalyTimeRange([range[0].toISOString(), range[1].toISOString()]);
-  const handleOutlierRangeChange = (range) => setOutlierTimeRange([range[0].toISOString(), range[1].toISOString()]);
+  const handlePlotlyRangeChange = (range) => {
+    const start = dayjs(range[0]); // Ensure it's a dayjs object
+    const end = dayjs(range[1]);
+  
+    if (!start.isValid() || !end.isValid()) {
+      console.error("Invalid date range:", range);
+      return;
+    }
+  
+    setPlotlyTimeRange([start.toISOString(), end.toISOString()]);
+  };
+  
+  const handleAnomalyRangeChange = (range) => {
+    console.log("Received range:", range); // Debugging log
+  
+    const start = dayjs(range[0]); 
+    const end = dayjs(range[1]);
+  
+    if (!start.isValid() || !end.isValid()) {
+      console.error("Invalid date range received:", range);
+      return;
+    }
+  
+    setAnomalyTimeRange([start.toISOString(), end.toISOString()]);
+  };
+  
+  const handleOutlierRangeChange = (range) => {
+    if (!range || range.length < 2) {
+        console.error("Invalid range received:", range);
+        return;
+    }
+
+    const start = new Date(range[0]);
+    const end = new Date(range[1]);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        console.error("Invalid date values:", range);
+        return;
+    }
+
+    setOutlierTimeRange([start.toISOString(), end.toISOString()]);
+};
 
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
@@ -139,35 +184,43 @@ export const IbacIndividual = () => {
 
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
           <Alertbar />
         </HvStack>
-        <IndividualParameters paramsData={paramsData} />
+        <IndividualParameters paramsData={param} notifications={notifications} />
         <Box mt={2}>
-          <PlotlyDataChart bioParamChartData={bioParamChartData} onRangeChange={handlePlotlyRangeChange} />
+          <PlotlyDataChart bioParamChartData={bioParamChartData} onRangeChange={handlePlotlyRangeChange} title={'Biological Readings'} />
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={"50%"}>
-            <AnomalyChart anomalyChartData={anomalyChartData} onRangeChange={handleAnomalyRangeChange} />
+            <AnomalyChart anomalyChartData={anomalyChartData} onRangeChange={handleAnomalyRangeChange} title={'Anomaly Detection'}/>
           </Box>
           <Box width={"50%"}>
-            <OutlierChart outlierChartData={outlierChartData} onRangeChange={handleOutlierRangeChange} />
+            <OutlierChart outlierChartData={outlierChartData} onRangeChange={handleOutlierRangeChange} title={'Outlier Detection'}/>
           </Box>
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-          <Box width={toggleState === "Operator" ? "100%" : "50%"}>
-            <IntensityChart />
-          </Box>
-          {toggleState !== "Operator" && (
-            <Box width={"50%"}>
-              <PredictionChart />
-            </Box>
-          )}
-        </Box>
+  {toggleState === "Operator" ? (
+    <Box width="100%">
+      <IntensityChart />
+    </Box>
+  ) : (
+    <>
+      <Box width="33.33%">
+        <IntensityChart />
       </Box>
-
+      <Box width="33.33%">
+        <PredictionChart />
+      </Box>
+      <Box width="33.33%">
+        <Corelation /> {/* Add your third component here */}
+      </Box>
+    </>
+  )}
+</Box>
+      </Box>
       {showModal && (
         <ConfirmationModal
           open={showModal}

@@ -34,18 +34,9 @@ export const MABIndividual = () => {
   const [newState, setNewState] = useState(null);
 
   // Separate time ranges for each component
-  const [plotlyRange, setPlotlyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [anomalyRange, setAnomalyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [outlierRange, setOutlierRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
@@ -98,16 +89,28 @@ export const MABIndividual = () => {
     }
   };
 
-  // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
-    if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
-    } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
-    } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
-    }
-  };
+      if (!Array.isArray(range) || range.length < 2) {
+        console.error("Invalid range format:", range);
+        return;
+      }
+    
+      const fromTime = dayjs(range[0]).isValid() ? dayjs(range[0]).toISOString() : null;
+      const toTime = dayjs(range[1]).isValid() ? dayjs(range[1]).toISOString() : null;
+    
+      if (!fromTime || !toTime) {
+        console.error("Invalid date values in range:", range);
+        return;
+      }
+    
+      if (component === 'PlotlyDataChart') {
+        setPlotlyRange({ fromTime, toTime });
+      } else if (component === 'AnomalyChart') {
+        setAnomalyRange({ fromTime, toTime });
+      } else if (component === 'OutlierChart') {
+        setOutlierRange({ fromTime, toTime });
+      }
+    };
 
   // Fetch data when the range changes for each component
   useEffect(() => {

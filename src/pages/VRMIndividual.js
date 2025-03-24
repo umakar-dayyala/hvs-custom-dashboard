@@ -4,7 +4,7 @@ import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
 import OutlierChart from '../components/OutlierChart';
 import AnomalyChart from '../components/AnomalyChart';
-import { Alert, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import PlotlyDataChart from '../components/PlotlyDataChart';
 import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
@@ -17,10 +17,10 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import ToggleButtons from '../components/ToggleButtons';
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from 'dayjs';
-import { fetchVRMParamChartData } from '../service/VRMSensorService';
-import { fetchAnomalyChartData, fetchOutlierChartData } from '../service/VRMSensorService';
+import { fetchVRMParamChartData, fetchAnomalyChartData, fetchOutlierChartData } from '../service/VRMSensorService';
 import ConfirmationModal from '../components/ConfirmationModal';
-import ChartDemo from '../components/chartDemo';
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
 
 export const VRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -32,27 +32,21 @@ export const VRMIndividual = () => {
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
   const [addParams, setAddParams] = useState([]);
+  const [param,setParam]=useState([]);
+  const [notifications,setNotifications]=useState([]);
 
-  // Separate time ranges for each component
-  const [plotlyRange, setPlotlyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [anomalyRange, setAnomalyRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
-  });
-  const [outlierRange, setOutlierRange] = useState({
-    fromTime: dayjs().subtract(5, "minute").toISOString(),
-    toTime: dayjs().toISOString(),
+  // Time range states
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null
   });
 
-  const formatDateForApi = (isoDate) => {
+  const formatDateForApi = (isoDate)   => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
   useEffect(() => {
-    // Real-time data updates (WebSocket)
+    // Real-time WebSocket data updates
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
 
@@ -63,6 +57,8 @@ export const VRMIndividual = () => {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
         setAddParams(data.supervisor_data);
+        setParam(data.parametersData);
+        setNotifications(data.Notifications);
       }
     });
 
@@ -74,43 +70,53 @@ export const VRMIndividual = () => {
     };
   }, []); // Run once on mount
 
-  // Fetch Data Function (includes fromTime and toTime)
+  // Fetch Data Function
   const fetchData = async (fromTime, toTime, component) => {
+    if (!fromTime || !toTime) return;
+
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
-
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-    console.log("Device ID: ", deviceId);
 
     try {
       if (component === 'PlotlyDataChart') {
         const chart = await fetchVRMParamChartData(deviceId, formattedFromTime, formattedToTime);
-        setVRMParamChartData(chart.data);
+        setVRMParamChartData(chart?.data || {}); // Ensure it's not null
       } else if (component === 'AnomalyChart') {
         const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-        setAnomalyChartData(anomaly.data);
-      } else if (component === 'OutlierChart') {
+        setAnomalyChartData(anomaly?.data || {}); // Ensure it's not null
+      }
+       else if (component === 'OutlierChart') {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-        setOutlierChartData(outlier.data);
+        setOutlierChartData(outlier?.data || {}); // Ensure it's not null
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error(`Error fetching ${component} data:`, error);
+      if (component === 'OutlierChart') setOutlierChartData({});
     }
   };
 
-  // Handle Range Change for each component
   const handleRangeChange = (range, component) => {
+    const fromTime = new Date(range[0]); // Ensure it's a Date object
+    const toTime = new Date(range[1]);
+  
+    if (isNaN(fromTime) || isNaN(toTime)) {
+      console.error("Invalid date range:", range);
+      return;
+    }
+  
     if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setPlotlyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
     } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setAnomalyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
     } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime: range[0].toISOString(), toTime: range[1].toISOString() });
+      setOutlierRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
     }
   };
+  
 
-  // Fetch data when the range changes for each component
+  // Fetch data on range changes
   useEffect(() => {
     fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
   }, [plotlyRange]);
@@ -122,27 +128,30 @@ export const VRMIndividual = () => {
   useEffect(() => {
     fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
   }, [outlierRange]);
+  
+  
+  
 
   // Toggle state handling
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state); // Store new state temporarily
-      setShowModal(true); // Show confirmation modal
+      setNewState(state);
+      setShowModal(true);
     } else {
-      setToggleState(state); // Directly update state if no confirmation needed
+      setToggleState(state);
     }
   };
 
   const handleConfirmChange = () => {
     if (newState) {
-      setToggleState(newState); // Apply only confirmed changes
+      setToggleState(newState);
     }
-    setShowModal(false); // Close modal
+    setShowModal(false);
   };
 
   const handleCancelChange = () => {
-    setNewState(null); // Reset temporary state
-    setShowModal(false); // Close modal without changing state
+    setNewState(null);
+    setShowModal(false);
   };
 
   return (
@@ -155,65 +164,45 @@ export const VRMIndividual = () => {
       </div>
 
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} />
-            <Alertbar />
-          </HvStack>
-          <IndividualParameters paramsData={paramsData} />
-          <Box mt={2}>
-            <PlotlyDataChart
-              bioParamChartData={vrmParamChartData}
-              onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
-            />
-          </Box>
+        <HvStack direction="column" divider spacing="sm">
+          <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell}  greenBell ={greenBell}/>
+          <Alertbar />
+        </HvStack>
+        <IndividualParameters paramsData={param} notifications={notifications} />
+        <Box mt={2}>
+          <PlotlyDataChart bioParamChartData={vrmParamChartData} onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')} title={'Radiation Readings'} />
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={"50%"}>
             <AnomalyChart
               anomalyChartData={anomalyChartData}
-              onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
+              onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
+              title={'Anomaly Detection'}
             />
           </Box>
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
-              onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
+              onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
+              title={'Outlier Detection'}
             />
           </Box>
         </Box>
-
-        {/* Conditional Rendering for IntensityChart and other components */}
-        <Box
-          style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }}
-          mt={2}
-          gap={2}
-        >
-          <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+{/* Conditional Rendering for IntensityChart and PredictionChart */}
+<Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+          <Box width={toggleState === "Operator" ? "100%" : "50%"}>
             <IntensityChart />
           </Box>
           {toggleState !== "Operator" && (
-            <>
-              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                <VRMadditionalParameters addParams={addParams} />
-              </Box>
-              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                <PredictionChart />
-              </Box>
-            </>
+            <Box width={"50%"}>
+              <PredictionChart />
+            </Box>
           )}
         </Box>
       </Box>
-      {showModal && (
-        <ConfirmationModal
-          open={showModal}
-          onClose={handleCancelChange}
-          onConfirm={handleConfirmChange}
-          title="Confirm Role Change"
-          message="Are you sure you want to switch to Supervisor mode?"
-        />
-      )}
+
+      {showModal && <ConfirmationModal open={showModal} onClose={handleCancelChange} onConfirm={handleConfirmChange} title="Confirm Role Change" message="Are you sure you want to switch to Supervisor mode?" />}
     </Box>
   );
 };

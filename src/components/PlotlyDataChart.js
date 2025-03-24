@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
-import { HvCard } from "@hitachivantara/uikit-react-core";
+import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 import DateTimeRangePicker from "./DateTimeRangePicker";
+import { Box } from "@mui/material";
 
-const PlotlyDataChart = ({ bioParamChartData, onRangeChange }) => {
-  console.log("bioParamChartData:", JSON.stringify(bioParamChartData));
+const PlotlyDataChart = ({ bioParamChartData, onRangeChange,title }) => {
+  // console.log("bioParamChartData:", JSON.stringify(bioParamChartData));
 
   const [selectedRange, setSelectedRange] = useState([null, null]);
   const [rate, setRate] = useState(1);
@@ -70,14 +71,14 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange }) => {
 
   const layout = {
     xaxis: {
-      title: "Time",
-      tickangle: -15, // Slight tilt for better readability
-      tickformat: "%Y-%m-%d<br>%H:%M", // New date appears once, time on new line
-      showgrid: true, // Optional: Show grid for clarity
-      automargin: true,
+      showticklabels: false, // Hide tick labels
+      title: "", // Remove title
+      showgrid: false, // Remove grid lines
+      zeroline: false, // Remove zero line
     },
+   
     yaxis: { title: "Count" },
-    legend: { orientation: "h", x: 0.3, y: -0.5, font: { size: 15 }, traceorder: "normal" },
+    legend: { orientation: "h", x: 0.4, y: -0.1, font: { size: 15 }, traceorder: "normal" },
     margin: { t: 50, b: 80, l: 50, r: 50 },
     plot_bgcolor: "#F5F6F6",
   };
@@ -101,10 +102,10 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange }) => {
         boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingLeft: "1rem" }}>
-        <DateTimeRangePicker onChange={handleRangeChange} />
-      </div>
-
+      <Box display="flex" gap={2} ml={2} justifyContent="space-between" padding={2}>
+      <HvTypography variant="title2">{title}</HvTypography>
+      <DateTimeRangePicker onChange={handleRangeChange} />    
+      </Box>
       <div style={{ width: "100%", height: "400px", display: "flex", justifyContent: "center", alignItems: "center" }}>
         {traces.length > 0 ? (
           <Plot
