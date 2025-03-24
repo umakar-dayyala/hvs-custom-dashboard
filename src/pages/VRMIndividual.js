@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -32,16 +32,24 @@ export const VRMIndividual = () => {
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
   const [addParams, setAddParams] = useState([]);
-  const [param,setParam]=useState([]);
-  const [notifications,setNotifications]=useState([]);
+  const [param, setParam] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
-  // Time range states
-  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
-  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
-  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null
-  });
+  // Track initial mount
+  const initialMount = useRef(true);
 
-  const formatDateForApi = (isoDate)   => {
+  // Initialize with default 5-minute ranges
+  const defaultRange = {
+    fromTime: dayjs().subtract(5, 'minute').toISOString(),
+    toTime: dayjs().toISOString()
+  };
+
+  // Time range states with default values
+  const [plotlyRange, setPlotlyRange] = useState(defaultRange);
+  const [anomalyRange, setAnomalyRange] = useState(defaultRange);
+  const [outlierRange, setOutlierRange] = useState(defaultRange);
+
+  const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
@@ -62,15 +70,22 @@ export const VRMIndividual = () => {
       }
     });
 
+    // Initial data fetch for all charts
+    if (initialMount.current) {
+      fetchData(defaultRange.fromTime, defaultRange.toTime, 'PlotlyDataChart');
+      fetchData(defaultRange.fromTime, defaultRange.toTime, 'AnomalyChart');
+      fetchData(defaultRange.fromTime, defaultRange.toTime, 'OutlierChart');
+      initialMount.current = false;
+    }
+
     return () => {
       if (eventSource) {
         eventSource.close();
         console.log("WebSocket closed");
       }
     };
-  }, []); // Run once on mount
+  }, []);
 
-  // Fetch Data Function
   const fetchData = async (fromTime, toTime, component) => {
     if (!fromTime || !toTime) return;
 
@@ -82,53 +97,68 @@ export const VRMIndividual = () => {
     try {
       if (component === 'PlotlyDataChart') {
         const chart = await fetchVRMParamChartData(deviceId, formattedFromTime, formattedToTime);
-        setVRMParamChartData(chart?.data || {}); // Ensure it's not null
+        setVRMParamChartData(chart?.data || {});
       } else if (component === 'AnomalyChart') {
         const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-        setAnomalyChartData(anomaly?.data || {}); // Ensure it's not null
-      }
-       else if (component === 'OutlierChart') {
+        setAnomalyChartData(anomaly?.data || {});
+      } else if (component === 'OutlierChart') {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-        setOutlierChartData(outlier?.data || {}); // Ensure it's not null
+        setOutlierChartData(outlier?.data || {});
       }
     } catch (error) {
       console.error(`Error fetching ${component} data:`, error);
-      if (component === 'OutlierChart') setOutlierChartData({});
     }
   };
 
   const handleRangeChange = (range, component) => {
-    const fromTime = new Date(range[0]); // Ensure it's a Date object
-    const toTime = new Date(range[1]);
-  
-    if (isNaN(fromTime) || isNaN(toTime)) {
-      console.error("Invalid date range:", range);
+    if (!Array.isArray(range) || range.length < 2) {
+      console.error("Invalid range format:", range);
       return;
     }
-  
+
+    const fromTime = dayjs(range[0]).isValid() ? dayjs(range[0]).toISOString() : null;
+    const toTime = dayjs(range[1]).isValid() ? dayjs(range[1]).toISOString() : null;
+
+    if (!fromTime || !toTime) {
+      console.error("Invalid date values in range:", range);
+      return;
+    }
+
+    // Only update if range actually changed
     if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
+      if (fromTime !== plotlyRange.fromTime || toTime !== plotlyRange.toTime) {
+        setPlotlyRange({ fromTime, toTime });
+      }
     } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
+      if (fromTime !== anomalyRange.fromTime || toTime !== anomalyRange.toTime) {
+        setAnomalyRange({ fromTime, toTime });
+      }
     } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime: fromTime.toISOString(), toTime: toTime.toISOString() });
+      if (fromTime !== outlierRange.fromTime || toTime !== outlierRange.toTime) {
+        setOutlierRange({ fromTime, toTime });
+      }
     }
   };
-  
 
-  // Fetch data on range changes
+  // Fetch data when ranges change (skipping initial mount)
   useEffect(() => {
-    fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
+    if (!initialMount.current) {
+      fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
+    }
   }, [plotlyRange]);
 
   useEffect(() => {
-    fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
+    if (!initialMount.current) {
+      fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
+    }
   }, [anomalyRange]);
 
   useEffect(() => {
-    fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
+    if (!initialMount.current) {
+      fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
+    }
   }, [outlierRange]);
-  
+
   
   
 
