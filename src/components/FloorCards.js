@@ -13,7 +13,7 @@ import totalZoneIcon from "../assets/greyDirection.svg";
 import floorIcon from "../assets/rJumpToFloor.svg";
 
 // Fixed Chart Colors
-const chartColors = ["#29991d", "#E30613", "#ff9933"]; // Green, Red, Amber
+const chartColors = ["#29991d", "RGB(128, 128,128)", "#ff9933"]; // Green, Red, Amber
 
 // Blinking animation for alarms
 const blinkAnimation = keyframes`
@@ -53,7 +53,8 @@ const FloorCards = ({ floorData }) => {
           // Calculate total sensors (sum of Active, Inactive, Faulty)
           const totalSensors =
             (floor.activeSensors || 0) +
-            (floor.inactiveSensors || 0);
+            (floor.inactiveSensors || 0) +
+            (floor.unhealthySensors || 0);
 
           // Chart options with fixed colors and sum in the center
           const chartOptions = {
@@ -63,7 +64,15 @@ const FloorCards = ({ floorData }) => {
             colors: chartColors, // Fixed Colors
             dataLabels: {
               enabled: true,
-              formatter: (val) => Math.round(val) + "%",
+              formatter: (val, { seriesIndex }) => {
+                // Show actual sensor counts instead of percentage
+                const sensorCounts = [
+                  floor.activeSensors || 0,
+                  floor.inactiveSensors || 0,
+                  floor.unhealthySensors || 0,
+                ];
+                return sensorCounts[seriesIndex] || 0; // Show actual count for each section
+              },
             },
             plotOptions: {
               pie: {
@@ -76,7 +85,7 @@ const FloorCards = ({ floorData }) => {
                       label: "Total",
                       fontSize: "16px",
                       color: "#000",
-                      formatter: () => `${totalSensors}`,
+                      formatter: () => `${totalSensors}`, // Show total sensor count in center
                     },
                   },
                 },
@@ -155,17 +164,6 @@ const FloorCards = ({ floorData }) => {
                         Total Zones: <strong>{floor.totalZones}</strong>
                       </HvTypography>
                     </Box>
-                    <Box display="flex" alignItems="center">
-                      <img
-                        src={totalSensorsIcon}
-                        alt="Total Sensors"
-                        width={16}
-                        height={16}
-                      />
-                      <HvTypography variant="body" ml={1}>
-                        Total Sensors: <strong>{floor.totalSensors}</strong>
-                      </HvTypography>
-                    </Box>
                   </Box>
 
                   {/* Divider */}
@@ -185,7 +183,7 @@ const FloorCards = ({ floorData }) => {
                       width: "100%",
                       display: "flex",
                       justifyContent: "space-between",
-                      animation: floor.totalAlarms > 0 ? `${blinkAnimation} 1s infinite` : "none",
+                      animation: `${blinkAnimation} 1s infinite`, // Always apply blinking
                     }}
                   >
                     <span>Total Detected Alarms</span>
