@@ -32,6 +32,7 @@ const boldText = {
 
 const FloorSummary = ({ data = [] }) => {
   // Check if data is not empty and is an array
+  console.log("Data: "+JSON.stringify(data));
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <Box p={2}>
@@ -59,34 +60,34 @@ const FloorSummary = ({ data = [] }) => {
             {/* Sensor Counts */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
               <img
-                src={getSensorIcon("chemical", floor.chemical_alerts)}
+                src={getSensorIcon("chemical", floor.chemical_alarms)}
                 alt="Chemical Icon"
                 width={20}
                 height={20}
               />
-              <HvTypography variant="label">{floor.chemical_alerts}</HvTypography>
+              <HvTypography variant="label">{floor.chemical_alarms}</HvTypography>
               <VerticalDivider />
             </Box>
 
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
               <img
-                src={getSensorIcon("biological", floor.biological_alerts)}
+                src={getSensorIcon("biological", floor.biological_alarms)}
                 alt="Biological Icon"
                 width={20}
                 height={20}
               />
-              <HvTypography variant="label">{floor.biological_alerts}</HvTypography>
+              <HvTypography variant="label">{floor.biological_alarms}</HvTypography>
               <VerticalDivider />
             </Box>
 
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
               <img
-                src={getSensorIcon("radiological", floor.radiological_alerts)}
+                src={getSensorIcon("radiological", floor.radiological_alarms)}
                 alt="Radiological Icon"
                 width={20}
                 height={20}
               />
-              <HvTypography variant="label">{floor.radiological_alerts}</HvTypography>
+              <HvTypography variant="label">{floor.radiological_alarms}</HvTypography>
               <VerticalDivider />
             </Box>
 
