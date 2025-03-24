@@ -176,7 +176,7 @@ const FloorCards = ({ floorData }) => {
                   </Box>
 
                   {/* Floor Name */}
-                  <HvTypography variant="title3" style={{ fontWeight: "bold", color: borderColor, }}>
+                  <HvTypography variant="title3" style={{ fontWeight: "bold" }}>
                     {floor.floor.toUpperCase()}
                   </HvTypography>
 
