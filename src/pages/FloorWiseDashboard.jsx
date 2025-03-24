@@ -18,6 +18,10 @@ import {
 } from "../service/summaryServices";
 import Breadcrumbs from "../components/Breadcrumbs";
 import SensorLegend from "../components/SensorLegend";
+import FloorWiseChart from "../components/FloorWiseChart";
+import SensorHeatMap from "../components/SensorHeatMap";
+import SensorAlarmHeatmap from "../components/SensorAlarmHeatmap";
+import SensorAlertTable from "../components/SensorAlertMapTable";
 
 const FloorWiseDashboard = () => {
   const location = useLocation();
@@ -36,6 +40,7 @@ const FloorWiseDashboard = () => {
   const [sensorTypeData, setSensorTypeData] = useState([]);
   const [sensorNameData, setSensorNameData] = useState([]);
   const [sensorStatusData, setSensorStatusData] = useState([]);
+  //const [transformSensorData, setTransformSensorData] = useState([]);
 
   const defaultFilters = {
     zone: [],
@@ -175,45 +180,121 @@ const FloorWiseDashboard = () => {
     fetchSensorStatusData(floor, "ALL", "ALL", [], []);
   }, [floor]);
 
+  const transformSensorData = (data) => {
+    if (!Array.isArray(data)) {
+      console.warn("transformSensorData: data is not an array", data);
+      return [];
+    }
+
+    return data.map((item) => {
+      if (!item.s_no) {
+        console.warn("transformSensorData: missing s_no", item);
+        return null;
+      }
+
+      const {
+        zone,
+        detector,
+        location,
+        status,
+        alarms_and_alerts,
+        detector_type,
+        device_id,
+      } = item.s_no;
+
+      return {
+        zone: zone,
+        sensor: detector,
+        location: location,
+        status: status,
+        alarmCount: alarms_and_alerts,
+        sensorType: detector_type,
+        deviceId: device_id,
+      };
+    }).filter(Boolean);  // Remove null entries if s_no is missing
+  };
+  // Safely format the data
+  const formattedSensorsData = transformSensorData(floorSummaryData || []);
+
   return (
     <Box>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Breadcrumbs />
-            <div style={{ display: "flex", gap: "10px" }}>
-                <SensorLegend />
-                {/* <ToggleButtons /> */}
-            </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Breadcrumbs />
+        <div style={{ display: "flex", gap: "10px" }}>
+          {/* <SensorLegend /> */}
+          {/* <ToggleButtons /> */}
         </div>
+      </div>
+      <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
+      <div>
+        {/* <SensorStatusCards /> */}
+      </div>
+      <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
+
+      <Box width="100%">
+        <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
+        {/* Pass floorSummaryData to FloorSummary */}
+        {/* <FloorSummary data={sensorSummary} /> */}
         <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
-        <div>
-            <SensorStatusCards />
-        </div>
-        <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
-
         <Box width="100%">
-            {/* Pass floorSummaryData to FloorSummary */}
-            <FloorSummary data={sensorSummary} />
-
-            <Box width="100%">
-              <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
-            </Box>
-
-            {/* Filters */}
-            <FilterBar 
-              filters={filters} 
-              onFilterApply={handleApplyFilters} 
-              zoneData={zoneData}
-              locationData={locationData}
-              sensorTypeData={sensorTypeData}
-              sensorNameData={sensorNameData}
-              sensorStatusData={sensorStatusData}
-            />
-
-            {/* Data Table */}
-            <DataTable data={floorSummaryData} />
+          {/* <FloorTabs floorData={floorData} onTabChange={handleTabClick} /> */}
+          <FloorSummary data={sensorSummary} />
         </Box>
+
+        {/* Filters */}
+        {/* <FilterBar
+          filters={filters}
+          onFilterApply={handleApplyFilters}
+          zoneData={zoneData}
+          locationData={locationData}
+          sensorTypeData={sensorTypeData}
+          sensorNameData={sensorNameData}
+          sensorStatusData={sensorStatusData}
+        /> */}
+
+        {/* Data Table */}
+        {/* <DataTable data={floorSummaryData} /> */}
+        {/* <FloorWiseChart /> */}
+        <Box
+          display="flex"
+          flexDirection={{ base: "column", md: "row" }}
+        >
+          <Box
+            flex="1"
+            bg="white"
+            p={4}
+            borderRadius="lg"
+            boxShadow="lg"
+            minW="300px"
+          >
+            <SensorAlarmHeatmap
+              sensorsData={formattedSensorsData}
+              title={`${floor} Sensor Status`}
+            />
+          </Box>
+
+          <Box
+            flex="1"
+            bg="white"
+            p={4}
+            borderRadius="lg"
+            boxShadow="lg"
+            minW="300px"
+            borderColor={"#E8E8E8"}
+          >
+            {/* <SensorAlarmHeatmap
+              sensorsData={formattedSensorsData}
+              title={`${floor} Sensor Alarm`}
+            /> */}
+            <SensorAlertTable
+              sensorsData={floorSummaryData}
+              title={`${floor} Sensor Alarms`}
+            />
+          </Box>
+        </Box>
+      </Box>
     </Box>
-);
+  );
 
 
 };
