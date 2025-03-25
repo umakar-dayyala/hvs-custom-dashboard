@@ -14,11 +14,11 @@ const scrollText = keyframes`
 `;
 
 // Define the blinking animation for alarms and normal state
-// const blinkAnimation = keyframes`
-//   0% { opacity: 1; }
-//   30% { opacity: 0.5; }
-//   100% { opacity: 1; }
-// `;
+const blinkAnimation = keyframes`
+  0% { opacity: 1; }
+  30% { opacity: 0.5; }
+  100% { opacity: 1; }
+`;
 
 const ScrollingText = () => {
   const [hasAlarm, setHasAlarm] = useState(false);
@@ -56,7 +56,7 @@ const ScrollingText = () => {
         borderRadius: "5px",
         color: "white", // Text is always white
         textAlign: "center",
-        // animation: `${blinkAnimation} 1s infinite`, // Blinking applies to both states
+        animation: `${blinkAnimation} 1s infinite`, // Blinking applies to both states
         // marginTop: "10px",
       }}
     >
