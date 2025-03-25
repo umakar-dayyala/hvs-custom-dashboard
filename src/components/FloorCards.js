@@ -81,9 +81,7 @@ const FloorCards = ({ floorData }) => {
 
           const totalSensors =
             (floor.activeSensors || 0) + (floor.inactiveSensors || 0);
-
-          console.log(totalSensors)
-
+            
           const chartOptions = {
             chart: {
               type: "donut",
