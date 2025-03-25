@@ -1,8 +1,13 @@
 {
   "files": {
     "main.css": "/static/css/main.b5797881.css",
+<<<<<<< HEAD
     "main.js": "/static/js/main.2eb5499a.js",
     "static/media/ecilIcon.svg": "/static/media/ecilIcon.5acda3d71d0e33f7a8b4e7277a4472dc.svg",
+=======
+    "main.js": "/static/js/main.b770061d.js",
+    "static/media/ECIL_Logo.ico": "/static/media/ECIL_Logo.9af2c8f1522b005f9f0e.ico",
+>>>>>>> f2e98f7a26324f456cd76889c01ddf59f683b0ec
     "static/media/aBiological.svg": "/static/media/aBiological.44f72e432156b5cba49cabf49933502a.svg",
     "static/media/gBiological.svg": "/static/media/gBiological.c079b517e9835ba2c7a11b151116d78e.svg",
     "static/media/rBiological.svg": "/static/media/rBiological.40fa73ad37621d894a6b95e31967d614.svg",
@@ -24,10 +29,18 @@
     "static/media/rbell.svg": "/static/media/rbell.23b182fc116b2c399063a975bdae2bb4.svg",
     "static/media/greenBell.svg": "/static/media/greenBell.4d8fa01a38c83d046c874f2440f4d818.svg",
     "main.b5797881.css.map": "/static/css/main.b5797881.css.map",
+<<<<<<< HEAD
     "main.2eb5499a.js.map": "/static/js/main.2eb5499a.js.map"
   },
   "entrypoints": [
     "static/css/main.b5797881.css",
     "static/js/main.2eb5499a.js"
+=======
+    "main.b770061d.js.map": "/static/js/main.b770061d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b5797881.css",
+    "static/js/main.b770061d.js"
+>>>>>>> f2e98f7a26324f456cd76889c01ddf59f683b0ec
   ]
 }
