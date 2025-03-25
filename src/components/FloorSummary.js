@@ -30,9 +30,10 @@ const boldText = {
   fontWeight: "bold",
 };
 
-const FloorSummary = ({ data = [] }) => {
+const FloorSummary = ({ data = [], sensorCounts = {} }) => {
   // Check if data is not empty and is an array
-  console.log("Data: "+JSON.stringify(data));
+
+  console.log("Data: " + JSON.stringify(data));
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <Box p={2}>
@@ -47,7 +48,7 @@ const FloorSummary = ({ data = [] }) => {
         <Box key={floor.floor} display="flex" alignItems="center" mb={2} pl={1} pr={1}>
           {/* Floor Title */}
           <Box>
-            <HvTypography variant="title3" sx={boldText}>
+            <HvTypography variant="title2" sx={boldText}>
               {floor.floor}
             </HvTypography>
           </Box>
@@ -62,10 +63,13 @@ const FloorSummary = ({ data = [] }) => {
               <img
                 src={getSensorIcon("chemical", floor.chemical_alarms)}
                 alt="Chemical Icon"
-                width={20}
-                height={20}
+                width={30}
+                height={30}
               />
-              <HvTypography variant="label">{floor.chemical_alarms}</HvTypography>
+              <HvTypography variant="title3">
+                Chemical {floor.chemical_alarms}/{sensorCounts.Chemical || 0}
+              </HvTypography>
+
               <VerticalDivider />
             </Box>
 
@@ -73,10 +77,10 @@ const FloorSummary = ({ data = [] }) => {
               <img
                 src={getSensorIcon("biological", floor.biological_alarms)}
                 alt="Biological Icon"
-                width={20}
-                height={20}
+                width={30}
+                height={30}
               />
-              <HvTypography variant="label">{floor.biological_alarms}</HvTypography>
+              <HvTypography variant="title3">Biological {floor.biological_alarms}/{sensorCounts.Biological || 0 }</HvTypography>
               <VerticalDivider />
             </Box>
 
@@ -84,45 +88,45 @@ const FloorSummary = ({ data = [] }) => {
               <img
                 src={getSensorIcon("radiological", floor.radiological_alarms)}
                 alt="Radiological Icon"
-                width={20}
-                height={20}
+                width={30}
+                height={30}
               />
-              <HvTypography variant="label">{floor.radiological_alarms}</HvTypography>
+              <HvTypography variant="title3">Radiological {floor.radiological_alarms}/{sensorCounts.Radiation || 0}</HvTypography>
               <VerticalDivider />
             </Box>
 
             {/* Total Zones */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={totalZonesIcon} alt="Total Zones Icon" width={20} height={20} />
-              <HvTypography>
-                Total Zones <HvTypography variant="label">{floor.total_zones}</HvTypography>
+              <img src={totalZonesIcon} alt="Total Zones Icon" width={30} height={30} />
+              <HvTypography variant="title3">
+                Total Zones <HvTypography variant="label1">{floor.total_zones}</HvTypography>
               </HvTypography>
               <VerticalDivider />
             </Box>
 
             {/* Total Locations */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={totalSensorsIcon} alt="Total Locations Icon" width={20} height={20} />
-              <HvTypography>
-                Total Locations <HvTypography variant="label">{floor.total_location}</HvTypography>
+              <img src={totalSensorsIcon} alt="Total Locations Icon" width={30} height={30} />
+              <HvTypography variant="title3">
+                Total Locations <HvTypography variant="label1">{floor.total_location}</HvTypography>
               </HvTypography>
               <VerticalDivider />
             </Box>
 
             {/* Active Sensors */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={activeSensorsIcon} alt="Active Sensors Icon" width={20} height={20} />
-              <HvTypography>
-                Active Sensors <HvTypography variant="label">{floor.active_sensors}</HvTypography>
+              <img src={activeSensorsIcon} alt="Active Sensors Icon" width={30} height={30} />
+              <HvTypography variant="title3">
+                Active Sensors <HvTypography variant="label1">{floor.active_sensors}</HvTypography>
               </HvTypography>
               <VerticalDivider />
             </Box>
 
             {/* Inactive Sensors */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={20} height={20} />
-              <HvTypography>
-                Inactive Sensors <HvTypography variant="label">{floor.inactive_sensors}</HvTypography>
+              <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={30} height={30} />
+              <HvTypography variant="title3">
+                Inactive Sensors <HvTypography variant="label1">{floor.inactive_sensors}</HvTypography>
               </HvTypography>
             </Box>
           </Box>

@@ -206,6 +206,15 @@ const FloorWiseDashboard = () => {
     fetchSensorStatusData(floor, "ALL", "ALL", [], []);
   }, [floor]);
 
+  const countDetectorTypes = (data) => {
+    return data.reduce((acc, item) => {
+      const type = item.s_no.detector_type;
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+  };
+  const sensorCounts = countDetectorTypes(floorSummaryData || []);
+  
   const transformSensorData = (data) => {
     if (!Array.isArray(data)) {
       console.warn("transformSensorData: data is not an array", data);
@@ -262,7 +271,7 @@ const FloorWiseDashboard = () => {
             <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
             <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
             <Box width="100%">
-              <FloorSummary data={sensorSummary} />
+              <FloorSummary data={sensorSummary} sensorCounts={sensorCounts} />
             </Box>
             <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
               <Box flex="1" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">

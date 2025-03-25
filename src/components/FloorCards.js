@@ -80,9 +80,7 @@ const FloorCards = ({ floorData }) => {
           : "#29991d";
 
           const totalSensors =
-            (floor.activeSensors || 0) + (floor.inactiveSensors || 0);
-
-          console.log(totalSensors)
+            (floor.activeSensors || 0) + (floor.inactiveSensors || 0) + (floor.unhealthySensors);
 
           const chartOptions = {
             chart: {
