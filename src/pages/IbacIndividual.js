@@ -26,6 +26,7 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import ToggleButtons from "../components/ToggleButtons";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Corelation from "../components/Corelation";
+import aicon from "../assets/aBiological.svg";
 
 export const IbacIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -60,20 +61,18 @@ export const IbacIndividual = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id") || "1149";
+    const deviceId = queryParams.get("device_id");
 
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
         console.error("Error receiving data:", err);
       } else {
-        if (data.sensor_name && data.sensor_name.includes("IBAC")) {
+        
           setKpiData(data.kpiData);
           setParamsData(data.parametersData);
           setParam(data.parametersData);
           setNotifications(data.Notifications);
-        } else {
-          console.log("Sensor name does not contain IBAC");
-        }
+       
       }
     });
 
@@ -259,7 +258,7 @@ export const IbacIndividual = () => {
 
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
+          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}/>
           <Alertbar />
         </HvStack>
         <IndividualParameters paramsData={param} notifications={notifications} />

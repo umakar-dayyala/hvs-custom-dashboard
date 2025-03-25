@@ -23,6 +23,8 @@ import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import IntensityChart from '../components/IntensityChart';
 import PredictionChart from '../components/PredictionChart';
+import aicon from "../assets/aRadiological.svg";
+
 
 export const AgmIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -197,7 +199,7 @@ export const AgmIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
+            <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} />
             <Alertbar />
           </HvStack>
           <IndividualParameters paramsData={param} notifications={notifications}/>
