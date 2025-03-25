@@ -17,12 +17,12 @@ import inactiveSensorsIcon from "../assets/rWifiIcon.svg";
 
 // Sensor type to icon mapping
 const getSensorIcon = (type, count) => {
-  const icons = {
-    radiological: count > 1 ? rRadiologicalIcon : gRadiologicalIcon,
-    biological: count > 1 ? rBiologicalIcon : gBiologicalIcon,
-    chemical: count > 1 ? rChemicalIcon : gChemicalIcon,
+   const icons = {
+    radiological: count > 0 ? rRadiologicalIcon : gRadiologicalIcon,
+    biological: count > 0 ? rBiologicalIcon : gBiologicalIcon,
+    chemical: count > 0 ? rChemicalIcon : gChemicalIcon,
   };
-  return icons[type] || null;
+  return icons[type] || null
 };
 
 // Common inline style
@@ -32,8 +32,6 @@ const boldText = {
 
 const FloorSummary = ({ data = [], sensorCounts = {} }) => {
   // Check if data is not empty and is an array
-
-  console.log("Data: " + JSON.stringify(data));
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <Box p={2}>
