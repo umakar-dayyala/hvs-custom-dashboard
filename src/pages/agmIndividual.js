@@ -200,12 +200,12 @@ export const AgmIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}
+            <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyradio}
             dummyKpiData={[
               { title: "Radiological Alarms", value: "No Data" },
-              { title: "Detector Health Faults", value: "No Live Data" },
-              { title: "Analytics Alert", value: "No Live Data" }
-            ]} />
+              { title: "Detector Health Faults", value: "No Data" },
+              { title: "Analytics Alert", value: "No Data" }
+            ]}/>
             <Alertbar />
           </HvStack>
           <IndividualParameters paramsData={param} notifications={notifications}/>

@@ -9,7 +9,7 @@ import {
 
 
 const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
-  const isAlarmActive = parseInt(kpiData.value) > 0;
+  if (!kpiData) return null;
 
   // Determine bell icon based on value and title
   const bellIcon =
@@ -17,7 +17,7 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
       ? null
       : parseInt(kpiData.value) === 0
       ? greenBell
-      : kpiData.title === "Detector Health Faults" || kpiData.title === "Analytics Alert"
+      : ["Detector Health Faults", "Analytics Alert"].includes(kpiData.title)
       ? amberBell
       : rbell;
 
@@ -27,7 +27,7 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
       ? "grey"
       : parseInt(kpiData.value) === 0
       ? "green"
-      : kpiData.title === "Detector Health Faults" || kpiData.title === "Analytics Alert"
+      : ["Detector Health Faults", "Analytics Alert"].includes(kpiData.title)
       ? "#FF9933"
       : "red";
 
@@ -87,15 +87,30 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
 
 const KPIContainer = ({ ricon, gicon, alertIcon, kpiData, rbell, amberBell, greenBell, aicon, greyIcon, dummyKpiData }) => {
   const noData = !kpiData || kpiData.length === 0;
-  
+
   if (noData) {
     kpiData = dummyKpiData || [];
   }
 
-  const isAlarmActive = kpiData.some(kpi => parseInt(kpi.value) > 0);
-  const isCritical = kpiData.some(kpi => (kpi.title !== "CBRN Alarms" && parseInt(kpi.value) > 0));
+  // Condition checks for icon selection
+  const allGreaterThanZero = kpiData.length > 0 && kpiData.every(kpi => parseInt(kpi.value) > 0);
+  const hasRiconCategory = kpiData.some(kpi => 
+    ["Chemical Alarms", "Biological Alarms", "Radiological Alarms"].includes(kpi.title) && parseInt(kpi.value) > 0
+  );
+  const hasAiconCategory = kpiData.some(kpi => 
+    ["Detector Health Faults", "Analytics Alert"].includes(kpi.title) && parseInt(kpi.value) > 0
+  );
 
-  const iconToShow = noData ? greyIcon : isAlarmActive ? ricon : isCritical ? aicon : gicon;
+  // Determine the appropriate icon to display
+  const iconToShow = noData
+    ? greyIcon
+    : allGreaterThanZero
+    ? ricon
+    : hasRiconCategory
+    ? ricon
+    : hasAiconCategory
+    ? aicon
+    : gicon;
 
   return (
     <div
