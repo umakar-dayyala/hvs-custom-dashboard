@@ -6,12 +6,13 @@ import SensorStatusCards from "../components/SensorStatusCards";
 import AllAlertsFloorWiseTable from "../components/AllAlertsFloorWiseTable";
 import Breadcrumbs from "../components/Breadcrumbs";
 import SensorLegend from "../components/SensorLegend";
-import { floorList, 
-getFloorAlartList} from "../service/summaryServices";
+import { floorList, getFloorAlartList } from "../service/summaryServices";
+import Loader from "../components/Loader";
 
 const AllAlertsDashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   const queryParams = new URLSearchParams(location.search);
   const initialFloor = queryParams.get("floor") || "ALL";
@@ -20,7 +21,7 @@ const AllAlertsDashboard = () => {
   const [floor, setFloor] = useState(initialFloor);
   const [floorData, setFloorData] = useState([]);
   const [floorWiseAlertsData, setFloorWiseAlertsData] = useState([]);
-
+  
   const fetchFloorList = async () => {
     try {
       const response = await floorList();
@@ -46,29 +47,40 @@ const AllAlertsDashboard = () => {
   };
   
   useEffect(() => {
-    fetchFloorList();
-    fetchFloorAlertList();
+    const fetchData = async () => {
+      setLoading(true); // Start loading
+      await fetchFloorList();
+      await fetchFloorAlertList();
+      setLoading(false); // Stop loading after both API calls are done
+    };
+
+    fetchData();
   }, [floor]);
 
   return (
     <Box>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Breadcrumbs />
-        <div style={{ display: "flex", gap: "10px" }}>
-          <SensorLegend />
-          {/* <ToggleButtons /> */}
-        </div>
-      </div>
-      {/* Sensor Status Cards */}
-      <SensorStatusCards />
-      <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
+      {loading ? (
+        <Loader /> // Display loader while fetching data
+      ) : (
+        <>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Breadcrumbs />
+            <div style={{ display: "flex", gap: "10px" }}>
+              <SensorLegend />
+            </div>
+          </div>
+          {/* Sensor Status Cards */}
+          <SensorStatusCards />
+          <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
 
-      {/* Floor Tabs */}
-      <Box width="100%">
-        <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
-      </Box>
+          {/* Floor Tabs */}
+          <Box width="100%">
+            <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
+          </Box>
 
-      <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} />
+          <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} />
+        </>
+      )}
     </Box>
   );
 };
