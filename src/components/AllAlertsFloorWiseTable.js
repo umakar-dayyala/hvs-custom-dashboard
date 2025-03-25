@@ -7,6 +7,9 @@ import CancelIcon from "../assets/crossMark.svg";
 import RadiationIcon from "../assets/rRadiological.svg"; // Example icons, replace as needed
 import BioIcon from "../assets/rBiological.svg";
 import ChemicalIcon from "../assets/rChemical.svg";
+import ARadiationIcon from "../assets/aRadiological.svg";
+import ABioIcon from "../assets/aBiological.svg";
+import AChemicalIcon from "../assets/aChemical.svg";
 
 
 // Sensor Type Icons Mapping
@@ -18,6 +21,12 @@ const sensorTypeIcons = {
 
 // DataTable Component
 const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
+  const sensorTypeIcons = (alarm, fault) => ({
+    Radiation: alarm ? RadiationIcon : fault ? ARadiationIcon : ARadiationIcon,
+    Biological: alarm ? BioIcon : fault ? ABioIcon : ABioIcon,
+    Chemical: alarm ? ChemicalIcon : fault ? AChemicalIcon : AChemicalIcon,
+  });
+
   const navigate = useNavigate();
   const routeName = (detector) => {
     const routes = {
@@ -99,24 +108,37 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
 
                     {/* Alarm Type with Icon */}
                     <TableCell className="table-cell">
-                      <Box onClick={() => handleDetectorClick(alert.device_id, alert.detector)}
-                      sx={{ cursor: "pointer" }}
-                        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.25rem", padding: "0.5rem" }}>
-                        {sensorTypeIcons[alert.sensor_type] && (
+                      <Box
+                        onClick={() => handleDetectorClick(alert.device_id, alert.detector)}
+                        sx={{ cursor: "pointer" }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "0.25rem",
+                          padding: "0.5rem",
+                        }}
+                      >
+                        {/* Dynamic Icon Selection */}
+                        {sensorTypeIcons(alert.alarm_columns, alert.fault_columns)[alert.sensor_type] && (
                           <img
-                            src={sensorTypeIcons[alert.sensor_type]}
+                            src={sensorTypeIcons(alert.alarm_columns, alert.fault_columns)[alert.sensor_type]}
                             alt={alert.sensor_type}
                           />
-
                         )}
+
+                        {/* Sensor Name */}
                         <HvTypography
                           color="atmo2"
                           style={{
                             textDecoration: "underline",
                             color: "#0073E6",
                           }}
-                        >{alert.detector}</HvTypography>
+                        >
+                          {alert.detector}
+                        </HvTypography>
                       </Box>
+
                     </TableCell>
 
                     {/* No of Alarm */}
