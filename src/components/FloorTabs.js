@@ -12,7 +12,7 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
   };
 
   const goToAllAlarms = () => {
-    window.location.href = `allalerts`;
+    navigate("/allalerts");
   }
 
   return (
