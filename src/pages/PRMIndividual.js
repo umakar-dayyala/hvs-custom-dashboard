@@ -195,7 +195,12 @@ export const PRMIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}/>
+            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}
+            dummyKpiData={[
+              { title: "Radiological Alarms", value: "No Live Data" },
+              { title: "Detector Health Faults", value: "No Live Data" },
+              { title: "Analytics Alert", value: "No Live Data" }
+            ]}/>
             <Alertbar />
           </HvStack>
           <IndividualParameters paramsData={param} notifications={notifications} />

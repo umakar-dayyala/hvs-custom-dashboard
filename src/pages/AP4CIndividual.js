@@ -199,7 +199,12 @@ export const AP4CIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell}  amberBell={amberBell} greenBell={greenBell} aicon={aicon}/>
+            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell}  amberBell={amberBell} greenBell={greenBell} aicon={aicon}
+            dummyKpiData={[
+              { title: "Chemical Alarms", value: "No Data" },
+              { title: "Detector Health Faults", value: "No Data" },
+              { title: "Analytics Alert", value: "No Data" }
+            ]}/>
             <Alertbar />
           </HvStack>
           <IndividualParameters paramsData={param}  notifications={notifications}/>
