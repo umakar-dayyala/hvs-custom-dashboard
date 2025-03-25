@@ -43,9 +43,7 @@ const FloorCards = ({ floorData }) => {
   useEffect(() => {
     const updatedColors = floorData.map((floor) => {
       const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
-      const hasAlert =
-        (floor.unhealthySensors && floor.unhealthySensors > 0) ||
-        (totalAlarms && totalAlarms > 0);
+      const hasAlert = (totalAlarms && totalAlarms > 0);
       return hasAlert ? "#E30613" : "#28A745";
     });
 
