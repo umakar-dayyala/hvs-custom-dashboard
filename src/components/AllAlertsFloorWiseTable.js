@@ -59,7 +59,8 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
           {/* Floor Title */}
           <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
           <HvTypography variant="title3" style={{ margin: "16px 0" }}>
-            {floor.floorName + " Zone"}
+            {/* {floor.floorName} */}
+            {floor.floorName.replace("Detected Alarm | ", "")}
           </HvTypography>
 
           {/* Table */}

@@ -43,9 +43,7 @@ const FloorCards = ({ floorData }) => {
   useEffect(() => {
     const updatedColors = floorData.map((floor) => {
       const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
-      const hasAlert =
-        (floor.unhealthySensors && floor.unhealthySensors > 0) ||
-        (totalAlarms && totalAlarms > 0);
+      const hasAlert = (totalAlarms && totalAlarms > 0);
       return hasAlert ? "#E30613" : "#28A745";
     });
 
@@ -177,7 +175,7 @@ const FloorCards = ({ floorData }) => {
                         filter: totalAlarms === 0
                           ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
                           : "none",
-                        animation: `${zoomBlinkAnimation} 1.5s infinite ease-in-out`,
+                          animation: totalAlarms > 0 ? `${zoomBlinkAnimation} 1.5s infinite ease-in-out` : "none",
                       }} />
                   </Box>
 
@@ -217,7 +215,7 @@ const FloorCards = ({ floorData }) => {
                       width: "100%",
                       display: "flex",
                       justifyContent: "space-between",
-                      animation: `${blinkAnimation} 1s infinite`,
+                      animation: totalAlarms > 0 ? `${blinkAnimation} 1s infinite` : "none",
                     }}
                   >
                     <span>Total Detected Alarms</span>

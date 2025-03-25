@@ -18,13 +18,14 @@ import inactiveSensorsIcon from "../assets/rWifiIcon.svg";
 // Sensor type to icon mapping
 const getSensorIcon = (type, count) => {
   const icons = {
-    radiological: count > 1 ? rRadiologicalIcon : gRadiologicalIcon,
-    biological: count > 1 ? rBiologicalIcon : gBiologicalIcon,
-    chemical: count > 1 ? rChemicalIcon : gChemicalIcon,
+    radiological: count > 0 ? rRadiologicalIcon : gRadiologicalIcon,
+    biological: count > 0 ? rBiologicalIcon : gBiologicalIcon,
+    chemical: count > 0 ? rChemicalIcon : gChemicalIcon,
   };
-  return icons[type] || null;
+  return icons[type] || null
 };
 
+const getSensorTextColor = (count) => (count > 0 ? "#FF0000" : "#000000")
 // Common inline style
 const boldText = {
   fontWeight: "bold",
@@ -32,8 +33,6 @@ const boldText = {
 
 const FloorSummary = ({ data = [], sensorCounts = {} }) => {
   // Check if data is not empty and is an array
-
-  console.log("Data: " + JSON.stringify(data));
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <Box p={2}>
@@ -67,7 +66,9 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
                 height={30}
               />
               <HvTypography variant="title3">
-                Chemical {floor.chemical_alarms}/{sensorCounts.Chemical || 0}
+                <span style={{ color: getSensorTextColor(floor.chemical_alarms) }}>
+                  Chemical {floor.chemical_alarms}/{sensorCounts.Chemical || 0}
+                </span>
               </HvTypography>
 
               <VerticalDivider />
@@ -80,7 +81,10 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
                 width={30}
                 height={30}
               />
-              <HvTypography variant="title3">Biological {floor.biological_alarms}/{sensorCounts.Biological || 0 }</HvTypography>
+              <HvTypography variant="title3">
+                <span style={{ color: getSensorTextColor(floor.biological_alarms) }}>
+                  Biological {floor.biological_alarms}/{sensorCounts.Biological || 0}
+                </span></HvTypography>
               <VerticalDivider />
             </Box>
 
@@ -91,7 +95,10 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
                 width={30}
                 height={30}
               />
-              <HvTypography variant="title3">Radiological {floor.radiological_alarms}/{sensorCounts.Radiation || 0}</HvTypography>
+              <HvTypography variant="title3">
+                <span style={{ color: getSensorTextColor(floor.radiological_alarms) }}>
+                  Radiological {floor.radiological_alarms}/{sensorCounts.Radiation || 0}
+                </span></HvTypography>
               <VerticalDivider />
             </Box>
 
