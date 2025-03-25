@@ -1,13 +1,14 @@
 {
   "files": {
     "main.css": "/static/css/main.b5797881.css",
-    "main.js": "/static/js/main.90a960a9.js",
+    "main.js": "/static/js/main.2eb5499a.js",
     "static/media/ecilIcon.svg": "/static/media/ecilIcon.5acda3d71d0e33f7a8b4e7277a4472dc.svg",
     "static/media/aBiological.svg": "/static/media/aBiological.44f72e432156b5cba49cabf49933502a.svg",
     "static/media/gBiological.svg": "/static/media/gBiological.c079b517e9835ba2c7a11b151116d78e.svg",
     "static/media/rBiological.svg": "/static/media/rBiological.40fa73ad37621d894a6b95e31967d614.svg",
     "static/media/gChemical.svg": "/static/media/gChemical.9da90d5da11f49f98acfa84567a507d6.svg",
     "static/media/rChemical.svg": "/static/media/rChemical.b1f5394628ab364ecccff41301bdc808.svg",
+    "static/media/aChemical.svg": "/static/media/aChemical.f4b9151a52573087ad6555d9ae1792e4.svg",
     "static/media/gRadiological.svg": "/static/media/gRadiological.9919aa9ff2a08a5012aa31d8154e96a3.svg",
     "static/media/rRadiological.svg": "/static/media/rRadiological.848cf755084a784b3836625936f31465.svg",
     "static/media/aRadiological.svg": "/static/media/aRadiological.1a63aed9675dbee8a41d02eac5420ec6.svg",
@@ -23,10 +24,10 @@
     "static/media/rbell.svg": "/static/media/rbell.23b182fc116b2c399063a975bdae2bb4.svg",
     "static/media/greenBell.svg": "/static/media/greenBell.4d8fa01a38c83d046c874f2440f4d818.svg",
     "main.b5797881.css.map": "/static/css/main.b5797881.css.map",
-    "main.90a960a9.js.map": "/static/js/main.90a960a9.js.map"
+    "main.2eb5499a.js.map": "/static/js/main.2eb5499a.js.map"
   },
   "entrypoints": [
     "static/css/main.b5797881.css",
-    "static/js/main.90a960a9.js"
+    "static/js/main.2eb5499a.js"
   ]
 }
