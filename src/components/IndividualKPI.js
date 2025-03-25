@@ -22,7 +22,7 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
     parseInt(kpiData.value) === 0
       ? "green"
       : kpiData.title === "Detector Health Faults" || kpiData.title === "Analytics Alert"
-      ? "#FF9747"
+      ? "#FF9933"
       : "red";
 
   return (
@@ -78,7 +78,7 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
   );
 };
 
-const KPIContainer = ({ ricon, gicon, kpiData, rbell ,amberBell,greenBell}) => {
+const KPIContainer = ({ ricon, gicon, alertIcon, kpiData, rbell, amberBell, greenBell, aicon }) => {
   if (!kpiData || kpiData.length === 0) {
     return (
       <div style={{ textAlign: "center", marginTop: "2rem" }}>
@@ -89,7 +89,13 @@ const KPIContainer = ({ ricon, gicon, kpiData, rbell ,amberBell,greenBell}) => {
     );
   }
 
-  const isAlarmActive = kpiData.some((kpi) => parseInt(kpi.value) > 0);
+  const isAlarmActive = kpiData.length > 0 && parseInt(kpiData[0].value) > 0;
+  const isCritical =
+    (kpiData.length > 1 && parseInt(kpiData[1].value) > 0) ||
+    (kpiData.length > 2 && parseInt(kpiData[2].value) > 0);
+
+  // Prioritize ricon over aicon
+  const iconToShow = isAlarmActive ? ricon : isCritical ? aicon : gicon;
 
   return (
     <div
@@ -101,7 +107,7 @@ const KPIContainer = ({ ricon, gicon, kpiData, rbell ,amberBell,greenBell}) => {
       }}
     >
       <img
-        src={isAlarmActive ? ricon : gicon}
+        src={iconToShow}
         alt="Icon"
         style={{
           height: "8rem",
@@ -109,7 +115,7 @@ const KPIContainer = ({ ricon, gicon, kpiData, rbell ,amberBell,greenBell}) => {
         }}
       />
       {kpiData.map((kpi, index) => (
-        <IndividualKPI key={index} kpiData={kpi} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
+        <IndividualKPI key={index} kpiData={kpi} rbell={rbell} amberBell={amberBell} greenBell={greenBell} />
       ))}
     </div>
   );

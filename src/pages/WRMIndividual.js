@@ -23,6 +23,9 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import ToggleButtons from "../components/ToggleButtons";
 import ConfirmationModal from "../components/ConfirmationModal";
 import WRMadditionalParameters from "../components/WRMadditionalParameter";
+import amberBell  from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
+import aicon from "../assets/aBiological.svg";
 
 export const WRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -191,7 +194,7 @@ export const WRMIndividual = () => {
 
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} />
+          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell}  greenBell ={greenBell} aicon={aicon} />
           <Alertbar />
         </HvStack>
         <IndividualParameters paramsData={paramsData} />
@@ -199,6 +202,7 @@ export const WRMIndividual = () => {
           <PlotlyDataChart
             bioParamChartData={wrmParamChartData}
             onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
+            title={'Radiation Readings'} 
           />
         </Box>
 
@@ -207,12 +211,14 @@ export const WRMIndividual = () => {
             <AnomalyChart
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
+              title={'Anomaly Detection'}
             />
           </Box>
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
+              title={'Outlier Detection'}
             />
           </Box>
         </Box>

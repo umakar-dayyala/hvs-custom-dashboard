@@ -25,6 +25,7 @@ import dayjs from "dayjs";
 import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
+import aicon from "../assets/aRadiological.svg";
 
 export const AP4CIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -198,7 +199,7 @@ export const AP4CIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell}  amberBell={amberBell} greenBell={greenBell}/>
+            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell}  amberBell={amberBell} greenBell={greenBell} aicon={aicon}/>
             <Alertbar />
           </HvStack>
           <IndividualParameters paramsData={param}  notifications={notifications}/>
@@ -206,6 +207,7 @@ export const AP4CIndividual = () => {
             <PlotlyDataChart
               bioParamChartData={ap4cParamChartData}
               onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
+              title={'Chemical Readings'}
             />
           </Box>
         </Box>
@@ -215,12 +217,14 @@ export const AP4CIndividual = () => {
             <AnomalyChart
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
+              title={'Anomaly Detection'}
             />
           </Box>
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
+              title={'Outlier Detection'}
             />
           </Box>
         </Box>

@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
+import aicon from "../assets/aBiological.svg";
 
 
 export const MABIndividual = () => {
@@ -199,7 +200,7 @@ export const MABIndividual = () => {
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell}/>
+              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}/>
               <Alertbar />
             </HvStack>
             <IndividualParameters paramsData={param} notifications={notifications}/>
@@ -207,6 +208,7 @@ export const MABIndividual = () => {
               <PlotlyDataChart
                 bioParamChartData={mabParamChartData}
                 onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
+                title={'Biological Readings'}
               />
             </Box>
           </Box>
@@ -216,12 +218,14 @@ export const MABIndividual = () => {
               <AnomalyChart
                 anomalyChartData={anomalyChartData}
                 onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
+                title={'Anomaly Detection'}
               />
             </Box>
             <Box width={"50%"}>
               <OutlierChart
                 outlierChartData={outlierChartData}
                 onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
+                title={'Outlier Detection'}
               />
             </Box>
           </Box>
