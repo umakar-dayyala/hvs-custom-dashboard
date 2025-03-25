@@ -25,6 +25,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aBiological.svg";
+import greyBio from "../assets/greyBio.svg";
 
 
 export const MABIndividual = () => {
@@ -200,7 +201,7 @@ export const MABIndividual = () => {
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}/>
+              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyBio}/>
               <Alertbar />
             </HvStack>
             <IndividualParameters paramsData={param} notifications={notifications}/>

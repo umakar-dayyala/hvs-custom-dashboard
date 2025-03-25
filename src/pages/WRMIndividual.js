@@ -26,6 +26,8 @@ import WRMadditionalParameters from "../components/WRMadditionalParameter";
 import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aBiological.svg";
+import greyradio from "../assets/greyRadio.svg";
+
 
 export const WRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);

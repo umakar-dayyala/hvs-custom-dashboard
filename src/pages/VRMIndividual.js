@@ -22,6 +22,8 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
+import greyradio from "../assets/greyRadio.svg";
+
 
 export const VRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);

@@ -21,6 +21,8 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
+import greyradio from "../assets/greyRadio.svg";
+
 
 
 export const PRMIndividual = () => {
@@ -195,6 +197,7 @@ export const PRMIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
+            <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyradio}/>
             <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}
             dummyKpiData={[
               { title: "Radiological Alarms", value: "No Live Data" },

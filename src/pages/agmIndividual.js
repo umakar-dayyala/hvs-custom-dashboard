@@ -24,6 +24,7 @@ import greenBell from "../assets/greenBell.svg";
 import IntensityChart from '../components/IntensityChart';
 import PredictionChart from '../components/PredictionChart';
 import aicon from "../assets/aRadiological.svg";
+import greyradio from "../assets/greyRadio.svg";
 
 
 export const AgmIndividual = () => {

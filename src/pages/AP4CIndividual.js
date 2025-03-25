@@ -26,6 +26,8 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
+import greyChem from "../assets/greyChem.svg";
+
 
 export const AP4CIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
