@@ -21,18 +21,18 @@ import alertRadiation from "../assets/rRadiological.svg";
 const chartColors = ["#29991d", "RGB(128, 128,128)", "#ff9933", "red"];
 
 // Blinking animation for alarms
-const blinkAnimation = keyframes`
-  0% { opacity: 1; }
-  30% { opacity: 0.5; }
-  100% { opacity: 1; }
-`;
+// const blinkAnimation = keyframes`
+//   0% { opacity: 1; }
+//   30% { opacity: 0.5; }
+//   100% { opacity: 1; }
+// `;
 
 // Keyframes for zoom-out and blink effect on the floor icon
-const zoomBlinkAnimation = keyframes`
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(0.8); opacity: 0.5; }
-  100% { transform: scale(1); opacity: 1; }
-`;
+// const zoomBlinkAnimation = keyframes`
+//   0% { transform: scale(1); opacity: 1; }
+//   50% { transform: scale(0.8); opacity: 0.5; }
+//   100% { transform: scale(1); opacity: 1; }
+// `;
 
 const FloorCards = ({ floorData }) => {
   console.log("Floor Data: "+JSON.stringify(floorData));
@@ -175,7 +175,7 @@ const FloorCards = ({ floorData }) => {
                         filter: totalAlarms === 0
                           ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
                           : "none",
-                        animation: `${zoomBlinkAnimation} 1.5s infinite ease-in-out`,
+                        // animation: `${zoomBlinkAnimation} 1.5s infinite ease-in-out`,
                       }} />
                   </Box>
 
@@ -215,7 +215,7 @@ const FloorCards = ({ floorData }) => {
                       width: "100%",
                       display: "flex",
                       justifyContent: "space-between",
-                      animation: `${blinkAnimation} 1s infinite`,
+                      // animation: `${blinkAnimation} 1s infinite`,
                     }}
                   >
                     <span>Total Detected Alarms</span>
