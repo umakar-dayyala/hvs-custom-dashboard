@@ -4,17 +4,15 @@ import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 import DateTimeRangePicker from "./DateTimeRangePicker";
 import { Box } from "@mui/material";
 
-const PlotlyDataChart = ({ bioParamChartData, onRangeChange,title }) => {
-  // console.log("bioParamChartData:", JSON.stringify(bioParamChartData));
-
+const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title }) => {
   const [selectedRange, setSelectedRange] = useState([null, null]);
   const [rate, setRate] = useState(1);
-  const [visibleTraces, setVisibleTraces] = useState({}); // Track visibility of traces
+  const [visibleTraces, setVisibleTraces] = useState({});
 
   const parseDate = (timeString) => {
     if (typeof timeString !== "string") {
       console.error("Invalid time string:", timeString);
-      return new Date(); // Default to current date if invalid
+      return new Date();
     }
     return new Date(timeString.replace(/\//g, "-"));
   };
@@ -54,42 +52,40 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange,title }) => {
       }, {}),
     };
 
-    console.log("Filtered Data:", filteredData);
-
     const colors = ["blue", "green", "orange", "red", "purple", "brown", "cyan"];
 
     traces = keys.map((key, index) => ({
       x: filteredData.Time.filter((_, i) => i % rate === 0),
-      y: filteredData[key].filter((_, i) => i % rate === 0), // No scaling of y-axis values
+      y: filteredData[key].filter((_, i) => i % rate === 0),
       mode: "lines+markers",
       name: key,
       line: { color: colors[index % colors.length] },
       marker: { size: 6 },
-      visible: visibleTraces[key] !== false, // Use visibility state
+      visible: visibleTraces[key] ? "legendonly" : true, // Toggle using "legendonly"
     }));
   }
 
   const layout = {
     xaxis: {
-      showticklabels: false, // Hide tick labels
-      title: "", // Remove title
-      showgrid: false, // Remove grid lines
-      zeroline: false, // Remove zero line
+      showticklabels: false,
+      title: "",
+      showgrid: false,
+      zeroline: false,
     },
-   
     yaxis: { title: "Count" },
     legend: { orientation: "h", x: 0.4, y: -0.1, font: { size: 15 }, traceorder: "normal" },
     margin: { t: 50, b: 80, l: 50, r: 50 },
     plot_bgcolor: "#F5F6F6",
   };
 
-  // Handle legend toggle
-  const handleLegendClick = (data) => {
-    const clickedTraceName = data[0].name; // Name of the clicked trace
+  // Handle legend click event
+  const handleLegendClick = (event) => {
+    const clickedTraceName = event.data[event.curveNumber].name;
     setVisibleTraces((prev) => ({
       ...prev,
-      [clickedTraceName]: !prev[clickedTraceName], // Toggle visibility
+      [clickedTraceName]: !prev[clickedTraceName], // Toggle trace visibility
     }));
+    return false; // Prevents default Plotly behavior
   };
 
   return (
@@ -103,8 +99,8 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange,title }) => {
       }}
     >
       <Box display="flex" gap={2} ml={2} justifyContent="space-between" padding={2}>
-      <HvTypography variant="title2">{title}</HvTypography>
-      <DateTimeRangePicker onChange={handleRangeChange} />    
+        <HvTypography variant="title2">{title}</HvTypography>
+        <DateTimeRangePicker onChange={handleRangeChange} />
       </Box>
       <div style={{ width: "100%", height: "400px", display: "flex", justifyContent: "center", alignItems: "center" }}>
         {traces.length > 0 ? (
@@ -114,7 +110,7 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange,title }) => {
             layout={layout}
             useResizeHandler
             style={{ width: "100%", height: "100%" }}
-            onRestyle={handleLegendClick} // Handle legend click
+            onClick={handleLegendClick} // Handle legend click
           />
         ) : (
           <div style={{ padding: "1rem", textAlign: "center" }}>No Data To Display</div>
