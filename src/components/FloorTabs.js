@@ -56,7 +56,7 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
         }}
         onClick={() => goToAllAlarms()}
       >
-        View All Alarms
+        All Alarms & Alerts
       </Button>
     </Box>
   );

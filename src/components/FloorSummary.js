@@ -17,7 +17,7 @@ import inactiveSensorsIcon from "../assets/rWifiIcon.svg";
 
 // Sensor type to icon mapping
 const getSensorIcon = (type, count) => {
-   const icons = {
+  const icons = {
     radiological: count > 0 ? rRadiologicalIcon : gRadiologicalIcon,
     biological: count > 0 ? rBiologicalIcon : gBiologicalIcon,
     chemical: count > 0 ? rChemicalIcon : gChemicalIcon,
@@ -25,6 +25,7 @@ const getSensorIcon = (type, count) => {
   return icons[type] || null
 };
 
+const getSensorTextColor = (count) => (count > 0 ? "#FF0000" : "#000000")
 // Common inline style
 const boldText = {
   fontWeight: "bold",
@@ -65,7 +66,9 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
                 height={30}
               />
               <HvTypography variant="title3">
-                Chemical {floor.chemical_alarms}/{sensorCounts.Chemical || 0}
+                <span style={{ color: getSensorTextColor(floor.chemical_alarms) }}>
+                  Chemical {floor.chemical_alarms}/{sensorCounts.Chemical || 0}
+                </span>
               </HvTypography>
 
               <VerticalDivider />
@@ -78,7 +81,10 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
                 width={30}
                 height={30}
               />
-              <HvTypography variant="title3">Biological {floor.biological_alarms}/{sensorCounts.Biological || 0 }</HvTypography>
+              <HvTypography variant="title3">
+                <span style={{ color: getSensorTextColor(floor.biological_alarms) }}>
+                  Biological {floor.biological_alarms}/{sensorCounts.Biological || 0}
+                </span></HvTypography>
               <VerticalDivider />
             </Box>
 
@@ -89,7 +95,10 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
                 width={30}
                 height={30}
               />
-              <HvTypography variant="title3">Radiological {floor.radiological_alarms}/{sensorCounts.Radiation || 0}</HvTypography>
+              <HvTypography variant="title3">
+                <span style={{ color: getSensorTextColor(floor.radiological_alarms) }}>
+                  Radiological {floor.radiological_alarms}/{sensorCounts.Radiation || 0}
+                </span></HvTypography>
               <VerticalDivider />
             </Box>
 
