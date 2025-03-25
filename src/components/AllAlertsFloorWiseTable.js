@@ -124,6 +124,7 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                           <img
                             src={sensorTypeIcons(alert.alarm_columns, alert.fault_columns)[alert.sensor_type]}
                             alt={alert.sensor_type}
+                            style={{ width: "32px", height: "32px" }}
                           />
                         )}
 
