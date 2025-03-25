@@ -27,6 +27,7 @@ import ToggleButtons from "../components/ToggleButtons";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Corelation from "../components/Corelation";
 import aicon from "../assets/aBiological.svg";
+import greyBio from "../assets/greyBio.svg";
 
 export const IbacIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -258,7 +259,12 @@ export const IbacIndividual = () => {
 
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon}/>
+          <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyBio}
+           dummyKpiData={[
+            { title: "Biological Alarms", value: "No Data" },
+            { title: "Detector Health Faults", value: "No Data" },
+            { title: "Analytics Alert", value: "No Data" }
+          ]}/>
           <Alertbar />
         </HvStack>
         <IndividualParameters paramsData={param} notifications={notifications} />
