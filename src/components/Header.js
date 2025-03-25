@@ -8,7 +8,8 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 // import { HamburgerIcon } from '@chakra-ui/icons';
-import EcilLogo from "../assets/ecilIcon.svg";
+import EcilLogo from "../assets/ECIL_Logo.ico";
+import VerticalDivider from './VerticalDivider';
 
 const Header = ({ onMenuToggle }) => {
   //const currentTime = new Date().toLocaleString();
@@ -33,14 +34,15 @@ const Header = ({ onMenuToggle }) => {
           onClick={onMenuToggle}
           mr={2}
         />
-        <img src="/HVS_Hitachi_LOGO.png" alt="Logo" style={{ width: 'auto', height: '15px', marginRight: '10px' }} />
         {/* ECIL Logo */}
         <img
           src={EcilLogo}
           alt="ECIL Logo"
-          style={{ width: 'auto', height: '25px', marginRight: '20px' }}
+          style={{ width: 'auto', height: '40px', marginRight: '10px' }}
         />
-        <Text size="sm">Hitachi Visualization Suite</Text>
+
+        <img src="/HVS_Hitachi_LOGO.png" alt="Logo" style={{ width: 'auto', height: '20px', marginRight: '5px' }} />
+        <Text size="sm"> Hitachi Visualization Suite</Text>
       </Box>
 
       <HStack spacing={2}>

@@ -93,7 +93,7 @@ const SensorAlertTable = ({ sensorsData, title }) => {
                     <td
                       style={{
                         ...cellStyle,
-                        backgroundColor: sensor.alarmCount > 0 ? "red" : "#29991d",
+                        backgroundColor: sensor.alarm_status === "Alarm" ? "red" : "#29991d",
                         color: "#fff",
                         textAlign: "center",
                         fontWeight: "bold",
