@@ -131,11 +131,11 @@ const SensorStatusCards = (props) => {
         if (["Chemical Alarms", "Biological Alarms", "Radiological Alarms"].includes(card.title)) {
           // Split the faulty value using "/"
           const [alertValue] = card.value.split("/").map(Number);
-          alertBorder = alertValue > 1; // Alert if first value > 1
+          alertBorder = alertValue > 0; // Alert if first value > 1
           cardContentColor = alertBorder ? "red" : "green";
         }
         if (["Open Incident", "CBRN Alarms"].includes(card.title)) {
-          alertBorder = card.value > 1;
+          alertBorder = card.value > 0;
           cardContentColor = alertBorder ? "red" : "green";
 
         }
