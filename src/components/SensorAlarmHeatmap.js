@@ -2,6 +2,18 @@ import React from "react";
 import Chart from "react-apexcharts";
 import { useNavigate } from "react-router-dom";
 
+// Import your icons (replace these with actual paths)
+import bioIcon from "../assets/rBiological.svg";
+import chemIcon from "../assets/rChemical.svg";
+import radIcon from "../assets/rRadiological.svg";
+
+// Sensor type to icon mapping
+const sensorTypeIcons = {
+  Biological: bioIcon,
+  Chemical: chemIcon,
+  Radiation: radIcon,
+};
+
 const SensorAlarmHeatmap = ({ sensorsData = [], title = "" }) => {
   const navigate = useNavigate();
 
