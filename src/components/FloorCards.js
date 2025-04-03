@@ -16,6 +16,14 @@ import gRadiation from "../assets/gRadiological.svg";
 import alertChemical from "../assets/rChemical.svg";
 import alertBiological from "../assets/rBiological.svg";
 import alertRadiation from "../assets/rRadiological.svg";
+import greyBio from "../assets/greyBio.svg";
+import greyChemical from "../assets/greyChem.svg";
+import greyRadio from "../assets/greyRadio.svg";
+import greyFloorIcon from "../assets/greyJumpToFloor.svg";
+import unhealthyBio from "../assets/aBiological.svg";
+import unhealthyChemical from "../assets/aChemical.svg";
+import unhealthyRadio from "../assets/aRadiological.svg";
+
 
 // Fixed Chart Colors
 const chartColors = ["#29991d", "RGB(128, 128,128)", "#ff9933", "red"];
@@ -74,8 +82,44 @@ const FloorCards = ({ floorData }) => {
           : floor.inactiveSensors > 0 || floor.activeSensors === 0
           ? "RGB(128, 128,128)"  // Grey for inactive sensors
           : floor.totalSensors === 0
-          ? "RGB(128, 128,128)" // Black for no sensors
+          ? "RGB(128, 128,128)" 
           : "#29991d";
+
+          const bioIcon =
+          floor.totalSensors === 0
+            ? greyBio
+            : floor.biological_alarms > 0
+            ? alertBiological
+            : floor.unhealthySensors > 0
+            ? unhealthyBio
+            : floor.inactiveSensors > 0 || floor.activeSensors === 0
+            ? greyBio
+            : gBiological;
+        
+        const chemicalIcon =
+          floor.totalSensors === 0
+            ? greyChemical
+            : floor.chemical_alarms > 0
+            ? alertChemical
+            : floor.unhealthySensors > 0
+            ? unhealthyChemical
+            : floor.inactiveSensors > 0 || floor.activeSensors === 0
+            ? greyChemical
+            : gChemical;
+        
+        const radioIcon =
+          floor.totalSensors === 0
+            ? greyRadio
+            : floor.radiation_alarms > 0
+            ? alertRadiation
+            : floor.unhealthySensors > 0
+            ? unhealthyRadio
+            : floor.inactiveSensors > 0 || floor.activeSensors === 0
+            ? greyRadio
+            : gRadiation;  
+            console.log("Total Sensors:", floor.totalSensors);
+            console.log("Active Sensors:", floor.activeSensors);
+            console.log("Inactive Sensors:", floor.inactiveSensors);
 
           const totalSensors =
             (floor.activeSensors || 0) + (floor.inactiveSensors || 0) + (floor.unhealthySensors);
@@ -140,7 +184,7 @@ const FloorCards = ({ floorData }) => {
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                     <Box display="flex" gap={2} alignItems="center">
                       <Box display="flex" alignItems="center" gap={1.5}>
-                        <img src={floor.chemical_alarms > 0 ? alertChemical : gChemical} alt="Chemical Alert" width={24} height={24} />
+                        <img src={chemicalIcon} alt="Chemical Alert" width={24} height={24} />
                         <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
                           {floor.chemical_alarms || 0}
                         </HvTypography>
@@ -149,7 +193,7 @@ const FloorCards = ({ floorData }) => {
                       <HvTypography variant="caption" mx={1}>|</HvTypography>
 
                       <Box display="flex" alignItems="center" gap={1.5}>
-                        <img src={floor.biological_alarms > 0 ? alertBiological : gBiological} alt="Biological Alert" width={24} height={24} />
+                        <img src={bioIcon} alt="Biological Alert" width={24} height={24} />
                         <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
                           {floor.biological_alarms || 0}
                         </HvTypography>
@@ -158,25 +202,32 @@ const FloorCards = ({ floorData }) => {
                       <HvTypography variant="caption" mx={1}>|</HvTypography>
 
                       <Box display="flex" alignItems="center" gap={1.5}>
-                        <img src={floor.radiological_alarms > 0 ? alertRadiation : gRadiation} alt="Radiation Alert" width={24} height={24} />
+                        <img src={radioIcon} alt="Radiation Alert" width={24} height={24} />
                         <HvTypography variant="caption" fontWeight="bold" color="black" ml={1}>
                           {floor.radiological_alarms || 0}
                         </HvTypography>
                       </Box>
                     </Box>
 
-                    <Box component="img"
-                      src={floorIcon}
+                    <Box
+                      component="img"
+                      src={
+                        (floor.totalSensors ?? 0) === 0 || ((floor.activeSensors ?? 0) === 0 && (floor.inactiveSensors ?? 0) === 0)
+                          ? greyFloorIcon
+                          : floorIcon
+                      }
                       alt="Floor Icon"
                       width={30}
                       height={30}
                       sx={{
                         marginLeft: 1,
-                        filter: totalAlarms === 0
+                        filter: totalAlarms === 0 && ((floor.totalSensors ?? 0) !== 0 || (floor.activeSensors ?? 0) > 0 || (floor.inactiveSensors ?? 0) > 0)
                           ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
                           : "none",
-                          animation: totalAlarms > 0 ? `${zoomBlinkAnimation} 1.5s infinite ease-in-out` : "none",
-                      }} />
+                        animation: totalAlarms > 0 ? `${zoomBlinkAnimation} 1.5s infinite ease-in-out` : "none",
+                      }}
+                    />
+
                   </Box>
 
                   {/* Floor Name */}
