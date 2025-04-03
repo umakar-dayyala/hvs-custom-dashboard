@@ -39,55 +39,48 @@ export const WRMIndividual = () => {
   const [showModal, setShowModal] = useState(false);
   const [newState, setNewState] = useState(null);
   const [addParams, setAddParams] = useState([]);
+  const [param, setParam] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   
-  // Track initial mount
-  const initialMount = useRef(true);
-
-  // Initialize with default 5-minute ranges
-  const defaultRange = {
-    fromTime: dayjs().subtract(5, 'minute').toISOString(),
-    toTime: dayjs().toISOString()
-  };
-
-  // Time range states with default values
-  const [plotlyRange, setPlotlyRange] = useState(defaultRange);
-  const [anomalyRange, setAnomalyRange] = useState(defaultRange);
-  const [outlierRange, setOutlierRange] = useState(defaultRange);
-
+ const [lastFetchTimes, setLastFetchTimes] = useState({
+         plotly: null,
+         anomaly: null,
+         outlier: null
+       });
+       
+// Time range states initialized as null
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
+  
   const formatDateForApi = (isoDate) => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
-  useEffect(() => {
-    // Real-time data updates (WebSocket)
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
-
-    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-      if (err) {
-        console.error("Error receiving data:", err);
-      } else {
-        setKpiData(data.kpiData);
-        setParamsData(data.parametersData);
-        setAddParams(data.supervisor_data);
-      }
-    });
-
-    // Initial data fetch for all charts
-    if (initialMount.current) {
-      fetchData(defaultRange.fromTime, defaultRange.toTime, "PlotlyDataChart");
-      fetchData(defaultRange.fromTime, defaultRange.toTime, "AnomalyChart");
-      fetchData(defaultRange.fromTime, defaultRange.toTime, "OutlierChart");
-      initialMount.current = false;
-    }
-
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-        console.log("WebSocket closed");
-      }
-    };
-  }, []);
+   useEffect(() => {
+      // Real-time WebSocket data updates
+      const queryParams = new URLSearchParams(window.location.search);
+      const deviceId = queryParams.get("device_id");
+  
+      const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+        if (err) {
+          console.error("Error receiving data:", err);
+        } else {
+          setKpiData(data.kpiData);
+          setParamsData(data.parametersData);
+          setAddParams(data.supervisor_data);
+          setParam(data.parametersData);
+          setNotifications(data.Notifications);
+        }
+      });
+  
+      return () => {
+        if (eventSource) {
+          eventSource.close();
+          console.log("WebSocket closed");
+        }
+      };
+    }, []);
 
   const fetchData = async (fromTime, toTime, component) => {
     if (!fromTime || !toTime) return;
@@ -109,6 +102,11 @@ export const WRMIndividual = () => {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
         setOutlierChartData(outlier?.data || {});
       }
+       // Update last fetch time on success
+       setLastFetchTimes(prev => ({
+        ...prev,
+        [component.toLowerCase().replace('datachart', '').replace('chart', '')]: new Date().toLocaleString()
+      }));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -144,24 +142,24 @@ export const WRMIndividual = () => {
     }
   };
 
-  // Fetch data when ranges change (skipping initial mount)
-  useEffect(() => {
-    if (!initialMount.current) {
-      fetchData(plotlyRange.fromTime, plotlyRange.toTime, "PlotlyDataChart");
-    }
-  }, [plotlyRange]);
-
-  useEffect(() => {
-    if (!initialMount.current) {
-      fetchData(anomalyRange.fromTime, anomalyRange.toTime, "AnomalyChart");
-    }
-  }, [anomalyRange]);
-
-  useEffect(() => {
-    if (!initialMount.current) {
-      fetchData(outlierRange.fromTime, outlierRange.toTime, "OutlierChart");
-    }
-  }, [outlierRange]);
+  // Fetch data when ranges change
+   useEffect(() => {
+     if (plotlyRange.fromTime && plotlyRange.toTime) {
+       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
+     }
+   }, [plotlyRange]);
+ 
+   useEffect(() => {
+     if (anomalyRange.fromTime && anomalyRange.toTime) {
+       fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
+     }
+   }, [anomalyRange]);
+ 
+   useEffect(() => {
+     if (outlierRange.fromTime && outlierRange.toTime) {
+       fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
+     }
+   }, [outlierRange]);
 
   // Toggle state handling
   const handleToggleClick = (state) => {
@@ -210,6 +208,7 @@ export const WRMIndividual = () => {
             bioParamChartData={wrmParamChartData}
             onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
             title={'Radiation Readings'} 
+            lastFetchTime={lastFetchTimes.plotly}
           />
         </Box>
 
@@ -219,6 +218,7 @@ export const WRMIndividual = () => {
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
               title={'Anomaly Detection'}
+              lastFetchTime={lastFetchTimes.anomaly}
             />
           </Box>
           <Box width={"50%"}>
@@ -226,20 +226,19 @@ export const WRMIndividual = () => {
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
               title={'Outlier Detection'}
+              lastFetchTime={lastFetchTimes.outlier}
             />
           </Box>
         </Box>
 
         <Box display={"flex"} style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-          <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <Box width={toggleState === "Operator" ? "100%" : "50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <IntensityChart />
           </Box>
           {toggleState !== "Operator" && (
             <>
-              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                <WRMadditionalParameters addParams={addParams} />
-              </Box>
-              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              
+              <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <PredictionChart />
               </Box>
             </>

@@ -11,10 +11,9 @@ import bioicon from "../assets/rBiological.svg";
 import gbioicon from "../assets/gBiological.svg";
 import PlotlyDataChart from "../components/PlotlyDataChart";
 import rbell from "../assets/rbell.svg";
-import amberBell  from "../assets/amberBell.svg";
+import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
-import greyBio from "../assets/greyBio.svg"
-
+import greyBio from "../assets/greyBio.svg";
 
 import {
   fetchBioParamChartData,
@@ -42,21 +41,19 @@ export const IbacIndividual = () => {
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
 
- 
+  const [lastFetchTimes, setLastFetchTimes] = useState({
+    bioParam: null,
+    anomaly: null,
+    outlier: null
+  });
 
   // Track initial mount
   const initialMount = useRef(true);
 
-  // Initialize with default 5-minute ranges
-  const defaultRange = {
-    fromTime: dayjs().subtract(5, 'minute').toISOString(),
-    toTime: dayjs().toISOString()
-  };
-
-  // Time range states with default values
-  const [plotlyTimeRange, setPlotlyTimeRange] = useState(defaultRange);
-  const [anomalyTimeRange, setAnomalyTimeRange] = useState(defaultRange);
-  const [outlierTimeRange, setOutlierTimeRange] = useState(defaultRange);
+  // Time range states initialized as null
+  const [plotlyTimeRange, setPlotlyTimeRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyTimeRange, setAnomalyTimeRange] = useState({ fromTime: null, toTime: null });
+  const [outlierTimeRange, setOutlierTimeRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (date) => {
     if (!date) return null;
@@ -71,25 +68,12 @@ export const IbacIndividual = () => {
       if (err) {
         console.error("Error receiving data:", err);
       } else {
-        
-          setKpiData(data.kpiData);
-          setParamsData(data.parametersData);
-          setParam(data.parametersData);
-          setNotifications(data.Notifications);
-       
+        setKpiData(data.kpiData);
+        setParamsData(data.parametersData);
+        setParam(data.parametersData);
+        setNotifications(data.Notifications);
       }
     });
-
-    // Initial data fetch for all charts
-    if (initialMount.current) {
-      const deviceId = queryParams.get("device_id");
-      if (deviceId) {
-        fetchBioData(deviceId, plotlyTimeRange.fromTime, plotlyTimeRange.toTime);
-        fetchAnomalyData(deviceId, anomalyTimeRange.fromTime, anomalyTimeRange.toTime);
-        fetchOutlierData(deviceId, outlierTimeRange.fromTime, outlierTimeRange.toTime);
-      }
-      initialMount.current = false;
-    }
 
     return () => {
       if (eventSource) {
@@ -99,7 +83,6 @@ export const IbacIndividual = () => {
     };
   }, []);
 
-  // Separate fetch functions for better error handling
   const fetchBioData = async (deviceId, fromTime, toTime) => {
     if (!fromTime || !toTime) return;
     try {
@@ -109,11 +92,15 @@ export const IbacIndividual = () => {
         formatDateForApi(toTime)
       );
       setBioParamChartData(response?.data || {});
+      setLastFetchTimes(prev => ({
+        ...prev,
+        bioParam: new Date().toLocaleString()
+      }));
     } catch (error) {
       console.error("Error fetching bio data:", error);
     }
   };
-
+  
   const fetchAnomalyData = async (deviceId, fromTime, toTime) => {
     if (!fromTime || !toTime) return;
     try {
@@ -123,11 +110,15 @@ export const IbacIndividual = () => {
         formatDateForApi(toTime)
       );
       setAnomalyChartData(response?.data || {});
+      setLastFetchTimes(prev => ({
+        ...prev,
+        anomaly: new Date().toLocaleString()
+      }));
     } catch (error) {
       console.error("Error fetching anomaly data:", error);
     }
   };
-
+  
   const fetchOutlierData = async (deviceId, fromTime, toTime) => {
     if (!fromTime || !toTime) return;
     try {
@@ -137,6 +128,10 @@ export const IbacIndividual = () => {
         formatDateForApi(toTime)
       );
       setOutlierChartData(response?.data || {});
+      setLastFetchTimes(prev => ({
+        ...prev,
+        outlier: new Date().toLocaleString()
+      }));
     } catch (error) {
       console.error("Error fetching outlier data:", error);
     }
@@ -208,7 +203,7 @@ export const IbacIndividual = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-    if (deviceId && !initialMount.current) {
+    if (deviceId && plotlyTimeRange.fromTime && plotlyTimeRange.toTime) {
       fetchBioData(deviceId, plotlyTimeRange.fromTime, plotlyTimeRange.toTime);
     }
   }, [plotlyTimeRange]);
@@ -216,7 +211,7 @@ export const IbacIndividual = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-    if (deviceId && !initialMount.current) {
+    if (deviceId && anomalyTimeRange.fromTime && anomalyTimeRange.toTime) {
       fetchAnomalyData(deviceId, anomalyTimeRange.fromTime, anomalyTimeRange.toTime);
     }
   }, [anomalyTimeRange]);
@@ -224,11 +219,10 @@ export const IbacIndividual = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-    if (deviceId && !initialMount.current) {
+    if (deviceId && outlierTimeRange.fromTime && outlierTimeRange.toTime) {
       fetchOutlierData(deviceId, outlierTimeRange.fromTime, outlierTimeRange.toTime);
     }
   }, [outlierTimeRange]);
-
 
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
@@ -272,37 +266,37 @@ export const IbacIndividual = () => {
         </HvStack>
         <IndividualParameters paramsData={param} notifications={notifications} />
         <Box mt={2}>
-          <PlotlyDataChart bioParamChartData={bioParamChartData} onRangeChange={handlePlotlyRangeChange} title={'Biological Readings'} />
+          <PlotlyDataChart bioParamChartData={bioParamChartData} onRangeChange={handlePlotlyRangeChange} title={'Biological Readings'} lastFetchTime={lastFetchTimes.bioParam} />
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={"50%"}>
-            <AnomalyChart anomalyChartData={anomalyChartData} onRangeChange={handleAnomalyRangeChange} title={'Anomaly Detection'}/>
+            <AnomalyChart anomalyChartData={anomalyChartData} onRangeChange={handleAnomalyRangeChange} title={'Anomaly Detection'} lastFetchTime={lastFetchTimes.anomaly}/>
           </Box>
           <Box width={"50%"}>
-            <OutlierChart outlierChartData={outlierChartData} onRangeChange={handleOutlierRangeChange} title={'Outlier Detection'}/>
+            <OutlierChart outlierChartData={outlierChartData} onRangeChange={handleOutlierRangeChange} title={'Outlier Detection'} lastFetchTime={lastFetchTimes.outlier}/>
           </Box>
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-  {toggleState === "Operator" ? (
-    <Box width="100%">
-      <IntensityChart />
-    </Box>
-  ) : (
-    <>
-      <Box width="33.33%">
-        <IntensityChart />
-      </Box>
-      <Box width="33.33%">
-        <PredictionChart />
-      </Box>
-      <Box width="33.33%">
-        <Corelation /> {/* Add your third component here */}
-      </Box>
-    </>
-  )}
-</Box>
+          {toggleState === "Operator" ? (
+            <Box width="100%">
+              <IntensityChart />
+            </Box>
+          ) : (
+            <>
+              <Box width="33.33%">
+                <IntensityChart />
+              </Box>
+              <Box width="33.33%">
+                <PredictionChart />
+              </Box>
+              <Box width="33.33%">
+                <Corelation />
+              </Box>
+            </>
+          )}
+        </Box>
       </Box>
       {showModal && (
         <ConfirmationModal

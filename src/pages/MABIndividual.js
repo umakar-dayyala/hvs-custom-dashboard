@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
 import OutlierChart from '../components/OutlierChart';
 import AnomalyChart from '../components/AnomalyChart';
-import { Alert, Box } from '@mui/material';
+import { Box } from '@mui/material';
+import bioicon from "../assets/rBiological.svg";
+import gbioicon from "../assets/gBiological.svg";
 import PlotlyDataChart from '../components/PlotlyDataChart';
 import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
 import PredictionChart from '../components/PredictionChart';
 import IntensityChart from '../components/IntensityChart';
-import bioicon from "../assets/rBiological.svg";
-import gbioicon from "../assets/gBiological.svg";
 import Breadcrumbs from '../components/Breadcrumbs';
 import ToggleButtons from '../components/ToggleButtons';
 import {
@@ -22,12 +22,10 @@ import {
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
 import ConfirmationModal from '../components/ConfirmationModal';
-import amberBell  from "../assets/amberBell.svg";
+import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aBiological.svg";
 import greyBio from "../assets/greyBio.svg";
-
-
 
 export const MABIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -40,22 +38,19 @@ export const MABIndividual = () => {
   const [newState, setNewState] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
+  const [lastFetchTimes, setLastFetchTimes] = useState({
+    plotly: null,
+    anomaly: null,
+    outlier: null
+  });
 
-  // Track initial mount
-  const initialMount = useRef(true);
-
-  // Initialize with default 5-minute ranges
-  const defaultRange = {
-    fromTime: dayjs().subtract(5, 'minute').toISOString(),
-    toTime: dayjs().toISOString()
-  };
-
-  // Time range states with default values
-  const [plotlyRange, setPlotlyRange] = useState(defaultRange);
-  const [anomalyRange, setAnomalyRange] = useState(defaultRange);
-  const [outlierRange, setOutlierRange] = useState(defaultRange);
+  // Time range states initialized as null
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (isoDate) => {
+    if (!isoDate) return null;
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
@@ -74,14 +69,6 @@ export const MABIndividual = () => {
         setNotifications(data.Notifications);
       }
     });
-
-    // Initial data fetch for all charts
-    if (initialMount.current) {
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'PlotlyDataChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'AnomalyChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'OutlierChart');
-      initialMount.current = false;
-    }
 
     return () => {
       if (eventSource) {
@@ -111,6 +98,12 @@ export const MABIndividual = () => {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
         setOutlierChartData(outlier?.data || {});
       }
+
+      // Update last fetch time on success
+      setLastFetchTimes(prev => ({
+        ...prev,
+        [component.toLowerCase().replace('datachart', '').replace('chart', '')]: new Date().toLocaleString()
+      }));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -130,63 +123,55 @@ export const MABIndividual = () => {
       return;
     }
 
-    // Only update if range actually changed
+    // Update the appropriate range state
     if (component === 'PlotlyDataChart') {
-      if (fromTime !== plotlyRange.fromTime || toTime !== plotlyRange.toTime) {
-        setPlotlyRange({ fromTime, toTime });
-      }
+      setPlotlyRange({ fromTime, toTime });
     } else if (component === 'AnomalyChart') {
-      if (fromTime !== anomalyRange.fromTime || toTime !== anomalyRange.toTime) {
-        setAnomalyRange({ fromTime, toTime });
-      }
+      setAnomalyRange({ fromTime, toTime });
     } else if (component === 'OutlierChart') {
-      if (fromTime !== outlierRange.fromTime || toTime !== outlierRange.toTime) {
-        setOutlierRange({ fromTime, toTime });
-      }
+      setOutlierRange({ fromTime, toTime });
     }
   };
 
-  // Fetch data when ranges change (skipping initial mount)
+  // Fetch data when ranges change
   useEffect(() => {
-    if (!initialMount.current) {
+    if (plotlyRange.fromTime && plotlyRange.toTime) {
       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
     }
   }, [plotlyRange]);
 
   useEffect(() => {
-    if (!initialMount.current) {
+    if (anomalyRange.fromTime && anomalyRange.toTime) {
       fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
     }
   }, [anomalyRange]);
 
   useEffect(() => {
-    if (!initialMount.current) {
+    if (outlierRange.fromTime && outlierRange.toTime) {
       fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
     }
   }, [outlierRange]);
 
-
-
   // Toggle state handling
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state); // Store new state temporarily
-      setShowModal(true); // Show confirmation modal
+      setNewState(state);
+      setShowModal(true);
     } else {
-      setToggleState(state); // Directly update state if no confirmation needed
+      setToggleState(state);
     }
   };
 
   const handleConfirmChange = () => {
     if (newState) {
-      setToggleState(newState); // Apply only confirmed changes
+      setToggleState(newState);
     }
-    setShowModal(false); // Close modal
+    setShowModal(false);
   };
 
   const handleCancelChange = () => {
-    setNewState(null); // Reset temporary state
-    setShowModal(false); // Close modal without changing state
+    setNewState(null);
+    setShowModal(false);
   };
 
   return (
@@ -202,12 +187,21 @@ export const MABIndividual = () => {
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyBio}
-              dummyKpiData={[
-                { title: "Biological Alarms", value: "No Data" },
-                { title: "Detector Health Faults", value: "No Data" },
-                { title: "Analytics Alert", value: "No Data" }
-              ]}/>
+              <IndividualKPI 
+                kpiData={kpiData} 
+                ricon={bioicon} 
+                gicon={gbioicon} 
+                rbell={rbell} 
+                amberBell={amberBell} 
+                greenBell={greenBell} 
+                aicon={aicon} 
+                greyIcon={greyBio}
+                dummyKpiData={[
+                  { title: "Biological Alarms", value: "No Data" },
+                  { title: "Detector Health Faults", value: "No Data" },
+                  { title: "Analytics Alert", value: "No Data" }
+                ]}
+              />
               <Alertbar />
             </HvStack>
             <IndividualParameters paramsData={param} notifications={notifications}/>
@@ -216,6 +210,7 @@ export const MABIndividual = () => {
                 bioParamChartData={mabParamChartData}
                 onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
                 title={'Biological Readings'}
+                lastFetchTime={lastFetchTimes.plotly}
               />
             </Box>
           </Box>
@@ -226,6 +221,7 @@ export const MABIndividual = () => {
                 anomalyChartData={anomalyChartData}
                 onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
                 title={'Anomaly Detection'}
+                lastFetchTime={lastFetchTimes.anomaly}
               />
             </Box>
             <Box width={"50%"}>
@@ -233,11 +229,11 @@ export const MABIndividual = () => {
                 outlierChartData={outlierChartData}
                 onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
                 title={'Outlier Detection'}
+                lastFetchTime={lastFetchTimes.outlier}
               />
             </Box>
           </Box>
 
-          {/* Conditional Rendering for PredictionChart */}
           <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
             <Box width={toggleState === "Operator" ? "100%" : "50%"}>
               <IntensityChart />

@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
 import OutlierChart from '../components/OutlierChart';
 import AnomalyChart from '../components/AnomalyChart';
-import { Alert, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import PlotlyDataChart from '../components/PlotlyDataChart';
 import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
@@ -23,12 +23,10 @@ import {
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
 import ConfirmationModal from '../components/ConfirmationModal';
-import amberBell  from "../assets/amberBell.svg";
+import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyChem from "../assets/greyChem.svg";
-
-
 
 export const AP4CIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -41,20 +39,16 @@ export const AP4CIndividual = () => {
   const [newState, setNewState] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
+  const [lastFetchTimes, setLastFetchTimes] = useState({
+    plotly: null,
+    anomaly: null,
+    outlier: null
+  });
 
-  // Track initial mount
-  const initialMount = useRef(true);
-
-  // Initialize with default 5-minute ranges
-  const defaultRange = {
-    fromTime: dayjs().subtract(5, 'minute').toISOString(),
-    toTime: dayjs().toISOString()
-  };
-
-  // Time range states with default values
-  const [plotlyRange, setPlotlyRange] = useState(defaultRange);
-  const [anomalyRange, setAnomalyRange] = useState(defaultRange);
-  const [outlierRange, setOutlierRange] = useState(defaultRange);
+  // Time range states initialized as null
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (date) => {
     if (!date) return null;
@@ -76,14 +70,6 @@ export const AP4CIndividual = () => {
         setNotifications(data.Notifications);
       }
     });
-
-    // Initial data fetch for all charts
-    if (initialMount.current) {
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'PlotlyDataChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'AnomalyChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'OutlierChart');
-      initialMount.current = false;
-    }
 
     return () => {
       if (eventSource) {
@@ -113,8 +99,14 @@ export const AP4CIndividual = () => {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
         setOutlierChartData(outlier?.data || {});
       }
+
+      // Update last fetch time on success
+      setLastFetchTimes(prev => ({
+        ...prev,
+        [component.toLowerCase().replace('datachart', '').replace('chart', '')]: new Date().toLocaleString()
+      }));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error(`Error fetching ${component} data:`, error);
     }
   };
 
@@ -132,62 +124,55 @@ export const AP4CIndividual = () => {
       return;
     }
 
-    // Only update if range actually changed
+    // Update the appropriate range state
     if (component === 'PlotlyDataChart') {
-      if (fromTime !== plotlyRange.fromTime || toTime !== plotlyRange.toTime) {
-        setPlotlyRange({ fromTime, toTime });
-      }
+      setPlotlyRange({ fromTime, toTime });
     } else if (component === 'AnomalyChart') {
-      if (fromTime !== anomalyRange.fromTime || toTime !== anomalyRange.toTime) {
-        setAnomalyRange({ fromTime, toTime });
-      }
+      setAnomalyRange({ fromTime, toTime });
     } else if (component === 'OutlierChart') {
-      if (fromTime !== outlierRange.fromTime || toTime !== outlierRange.toTime) {
-        setOutlierRange({ fromTime, toTime });
-      }
+      setOutlierRange({ fromTime, toTime });
     }
   };
 
-  // Fetch data when ranges change (skipping initial mount)
+  // Fetch data when ranges change
   useEffect(() => {
-    if (!initialMount.current && plotlyRange.fromTime && plotlyRange.toTime) {
+    if (plotlyRange.fromTime && plotlyRange.toTime) {
       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
     }
   }, [plotlyRange]);
 
   useEffect(() => {
-    if (!initialMount.current && anomalyRange.fromTime && anomalyRange.toTime) {
+    if (anomalyRange.fromTime && anomalyRange.toTime) {
       fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
     }
   }, [anomalyRange]);
 
   useEffect(() => {
-    if (!initialMount.current && outlierRange.fromTime && outlierRange.toTime) {
+    if (outlierRange.fromTime && outlierRange.toTime) {
       fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
     }
   }, [outlierRange]);
 
-
   // Toggle state handling
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state); // Store new state temporarily
-      setShowModal(true); // Show confirmation modal
+      setNewState(state);
+      setShowModal(true);
     } else {
-      setToggleState(state); // Directly update state if no confirmation needed
+      setToggleState(state);
     }
   };
 
   const handleConfirmChange = () => {
     if (newState) {
-      setToggleState(newState); // Apply only confirmed changes
+      setToggleState(newState);
     }
-    setShowModal(false); // Close modal
+    setShowModal(false);
   };
 
   const handleCancelChange = () => {
-    setNewState(null); // Reset temporary state
-    setShowModal(false); // Close modal without changing state
+    setNewState(null);
+    setShowModal(false);
   };
 
   return (
@@ -202,20 +187,30 @@ export const AP4CIndividual = () => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI kpiData={kpiData} ricon={chemicon} gicon={gchemicon} rbell={rbell}  amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyChem}
-            dummyKpiData={[
-              { title: "Chemical Alarms", value: "No Data" },
-              { title: "Detector Health Faults", value: "No Data" },
-              { title: "Analytics Alert", value: "No Data" }
-            ]}/>
+            <IndividualKPI 
+              kpiData={kpiData} 
+              ricon={chemicon} 
+              gicon={gchemicon} 
+              rbell={rbell}  
+              amberBell={amberBell} 
+              greenBell={greenBell} 
+              aicon={aicon} 
+              greyIcon={greyChem}
+              dummyKpiData={[
+                { title: "Chemical Alarms", value: "No Data" },
+                { title: "Detector Health Faults", value: "No Data" },
+                { title: "Analytics Alert", value: "No Data" }
+              ]}
+            />
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={param}  notifications={notifications}/>
+          <IndividualParameters paramsData={param} notifications={notifications}/>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={ap4cParamChartData}
               onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
               title={'Chemical Readings'}
+              lastFetchTime={lastFetchTimes.plotly}
             />
           </Box>
         </Box>
@@ -226,6 +221,7 @@ export const AP4CIndividual = () => {
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
               title={'Anomaly Detection'}
+              lastFetchTime={lastFetchTimes.anomaly}
             />
           </Box>
           <Box width={"50%"}>
@@ -233,11 +229,11 @@ export const AP4CIndividual = () => {
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
               title={'Outlier Detection'}
+              lastFetchTime={lastFetchTimes.outlier}
             />
           </Box>
         </Box>
 
-        {/* Conditional Rendering for IntensityChart, Corelation, and PredictionChart */}
         <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} gap={2}>
           <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <IntensityChart />
