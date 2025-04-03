@@ -4,28 +4,33 @@ import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 import DateTimeRangePicker from "./DateTimeRangePicker";
 import { Box } from "@mui/material";
 
-const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title }) => {
+const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title ,lastFetchTime }) => {
   const [selectedRange, setSelectedRange] = useState([null, null]);
   const [rate, setRate] = useState(1);
   const [visibleTraces, setVisibleTraces] = useState({});
 
-  const parseDate = (timeString) => {
-    if (typeof timeString !== "string") {
-      console.error("Invalid time string:", timeString);
-      return new Date();
-    }
-    return new Date(timeString.replace(/\//g, "-"));
-  };
-
   useEffect(() => {
     if (bioParamChartData?.Time?.length > 0) {
-      const sortedTimes = bioParamChartData.Time.map(parseDate).sort((a, b) => a - b);
+      const sortedTimes = bioParamChartData.Time.map((time) => new Date(time)).sort((a, b) => a - b);
       setSelectedRange([sortedTimes[0], sortedTimes[sortedTimes.length - 1]]);
     }
   }, [bioParamChartData]);
 
+  useEffect(() => {
+    if (bioParamChartData) {
+      const newKeys = Object.keys(bioParamChartData).filter((key) => key !== "Time");
+      setVisibleTraces((prev) => {
+        const updated = { ...prev };
+        newKeys.forEach((key) => {
+          if (!(key in updated)) updated[key] = true; // Default to visible
+        });
+        return updated;
+      });
+    }
+  }, [bioParamChartData]);
+
   const handleRangeChange = (range, selectedRate) => {
-    setSelectedRange(range.map(parseDate));
+    setSelectedRange(range.map((time) => new Date(time)));
     setRate(selectedRate);
     if (onRangeChange) {
       onRangeChange(range);
@@ -37,7 +42,7 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title }) => {
 
   if (bioParamChartData?.Time?.length > 0) {
     const sortedIndices = bioParamChartData.Time
-      .map((time, index) => ({ index, time: parseDate(time) }))
+      .map((time, index) => ({ index, time: new Date(time) }))
       .sort((a, b) => a.time - b.time);
 
     const filteredIndices = sortedIndices.filter(
@@ -61,7 +66,7 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title }) => {
       name: key,
       line: { color: colors[index % colors.length] },
       marker: { size: 6 },
-      visible: visibleTraces[key] ? "legendonly" : true, // Toggle using "legendonly"
+      visible: visibleTraces[key] ? true : "legendonly",
     }));
   }
 
@@ -78,14 +83,13 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title }) => {
     plot_bgcolor: "#F5F6F6",
   };
 
-  // Handle legend click event
   const handleLegendClick = (event) => {
     const clickedTraceName = event.data[event.curveNumber].name;
     setVisibleTraces((prev) => ({
       ...prev,
       [clickedTraceName]: !prev[clickedTraceName], // Toggle trace visibility
     }));
-    return false; // Prevents default Plotly behavior
+    return false; // Prevent default legend click behavior
   };
 
   return (
@@ -98,6 +102,15 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title }) => {
         boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
       }}
     >
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center',paddingTop: '1rem',paddingRight: '1rem' }}>
+        
+        {lastFetchTime && (
+          <div style={{ fontSize: '0.8rem', color: '#666' }}>
+            Last updated: {lastFetchTime}
+          </div>
+        )}
+      </div>
+
       <Box display="flex" gap={2} ml={2} justifyContent="space-between" padding={2}>
         <HvTypography variant="title2">{title}</HvTypography>
         <DateTimeRangePicker onChange={handleRangeChange} />
@@ -110,7 +123,16 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title }) => {
             layout={layout}
             useResizeHandler
             style={{ width: "100%", height: "100%" }}
-            onClick={handleLegendClick} // Handle legend click
+            onLegendClick={handleLegendClick} // Handle legend click
+            onRestyle={(data) => {
+              if (data[1] && data[1].length > 0) {
+                const updatedVisibility = { ...visibleTraces };
+                data[1].forEach((traceIndex, i) => {
+                  updatedVisibility[keys[traceIndex]] = data[0].visible[i] !== "legendonly";
+                });
+                setVisibleTraces(updatedVisibility);
+              }
+            }}
           />
         ) : (
           <div style={{ padding: "1rem", textAlign: "center" }}>No Data To Display</div>

@@ -37,22 +37,19 @@ export const PRMIndividual = () => {
   const [newState, setNewState] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
+   const [lastFetchTimes, setLastFetchTimes] = useState({
+      plotly: null,
+      anomaly: null,
+      outlier: null
+    });
 
-  // Initialize with default 5-minute ranges
-  const defaultRange = {
-    fromTime: dayjs().subtract(5, 'minute').toISOString(),
-    toTime: dayjs().toISOString()
-  };
-
-  // Separate time ranges for each component with initial default values
-  const [plotlyRange, setPlotlyRange] = useState(defaultRange);
-  const [anomalyRange, setAnomalyRange] = useState(defaultRange);
-  const [outlierRange, setOutlierRange] = useState(defaultRange);
-
-  // Track initial mount
-  const initialMount = useRef(true);
+  // Time range states initialized as null
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (isoDate) => {
+    if (!isoDate) return null;
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
@@ -72,21 +69,13 @@ export const PRMIndividual = () => {
       }
     });
 
-    // Initial data fetch for all charts
-    if (initialMount.current) {
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'PlotlyDataChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'AnomalyChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'OutlierChart');
-      initialMount.current = false;
-    }
-
     return () => {
       if (eventSource) {
         eventSource.close();
         console.log("WebSocket closed");
       }
     };
-  }, []); // Run once on mount
+  }, []);
 
   // Fetch Data Function
   const fetchData = async (fromTime, toTime, component) => {
@@ -101,18 +90,26 @@ export const PRMIndividual = () => {
     try {
       if (component === 'PlotlyDataChart') {
         const chart = await fetchPRMParamChartData(deviceId, formattedFromTime, formattedToTime);
-        setPRMParamChartData(chart.data);
+        setPRMParamChartData(chart?.data || {});
       } else if (component === 'AnomalyChart') {
         const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-        setAnomalyChartData(anomaly.data);
+        setAnomalyChartData(anomaly?.data || {});
       } else if (component === 'OutlierChart') {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-        setOutlierChartData(outlier.data);
+        setOutlierChartData(outlier?.data || {});
       }
+
+       // Update last fetch time on success
+       setLastFetchTimes(prev => ({
+        ...prev,
+        [component.toLowerCase().replace('datachart', '').replace('chart', '')]: new Date().toLocaleString()
+      }));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
+  
 
   const handleRangeChange = (range, component) => {
     if (!Array.isArray(range) || range.length < 2) {
@@ -128,62 +125,55 @@ export const PRMIndividual = () => {
       return;
     }
 
-    // Only update state and fetch data if the range actually changed
+    // Update the appropriate range state
     if (component === 'PlotlyDataChart') {
-      if (fromTime !== plotlyRange.fromTime || toTime !== plotlyRange.toTime) {
-        setPlotlyRange({ fromTime, toTime });
-      }
+      setPlotlyRange({ fromTime, toTime });
     } else if (component === 'AnomalyChart') {
-      if (fromTime !== anomalyRange.fromTime || toTime !== anomalyRange.toTime) {
-        setAnomalyRange({ fromTime, toTime });
-      }
+      setAnomalyRange({ fromTime, toTime });
     } else if (component === 'OutlierChart') {
-      if (fromTime !== outlierRange.fromTime || toTime !== outlierRange.toTime) {
-        setOutlierRange({ fromTime, toTime });
-      }
+      setOutlierRange({ fromTime, toTime });
     }
   };
 
-  // Fetch data when the range changes for each component
+  // Fetch data when ranges change
   useEffect(() => {
-    if (!initialMount.current) {
+    if (plotlyRange.fromTime && plotlyRange.toTime) {
       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
     }
   }, [plotlyRange]);
 
   useEffect(() => {
-    if (!initialMount.current) {
+    if (anomalyRange.fromTime && anomalyRange.toTime) {
       fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
     }
   }, [anomalyRange]);
 
   useEffect(() => {
-    if (!initialMount.current) {
+    if (outlierRange.fromTime && outlierRange.toTime) {
       fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
     }
   }, [outlierRange]);
 
-
   // Toggle state handling
   const handleToggleClick = (state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state); // Store new state temporarily
-      setShowModal(true); // Show confirmation modal
+      setNewState(state);
+      setShowModal(true);
     } else {
-      setToggleState(state); // Directly update state if no confirmation needed
+      setToggleState(state);
     }
   };
 
   const handleConfirmChange = () => {
     if (newState) {
-      setToggleState(newState); // Apply only confirmed changes
+      setToggleState(newState);
     }
-    setShowModal(false); // Close modal
+    setShowModal(false);
   };
 
   const handleCancelChange = () => {
-    setNewState(null); // Reset temporary state
-    setShowModal(false); // Close modal without changing state
+    setNewState(null);
+    setShowModal(false);
   };
 
   return (
@@ -212,6 +202,7 @@ export const PRMIndividual = () => {
               bioParamChartData={prmParamChartData}
               onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
               title={'Radiation Readings'}
+              lastFetchTime={lastFetchTimes.plotly}
             />
           </Box>
         </Box>
@@ -222,6 +213,7 @@ export const PRMIndividual = () => {
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
               title={'Anomaly Detection'}
+              lastFetchTime={lastFetchTimes.anomaly}
             />
           </Box>
           <Box width={"50%"}>
@@ -229,11 +221,11 @@ export const PRMIndividual = () => {
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
               title={'Outlier Detection'}
+              lastFetchTime={lastFetchTimes.outlier}
             />
           </Box>
         </Box>
 
-        {/* Conditional Rendering for IntensityChart and PredictionChart */}
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={toggleState === "Operator" ? "100%" : "50%"}>
             <IntensityChart />

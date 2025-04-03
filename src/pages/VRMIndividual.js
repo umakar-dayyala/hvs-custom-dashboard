@@ -39,21 +39,19 @@ export const VRMIndividual = () => {
   const [param, setParam] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
-  // Track initial mount
-  const initialMount = useRef(true);
+   const [lastFetchTimes, setLastFetchTimes] = useState({
+        plotly: null,
+        anomaly: null,
+        outlier: null
+      });
 
-  // Initialize with default 5-minute ranges
-  const defaultRange = {
-    fromTime: dayjs().subtract(5, 'minute').toISOString(),
-    toTime: dayjs().toISOString()
-  };
-
-  // Time range states with default values
-  const [plotlyRange, setPlotlyRange] = useState(defaultRange);
-  const [anomalyRange, setAnomalyRange] = useState(defaultRange);
-  const [outlierRange, setOutlierRange] = useState(defaultRange);
+  // Time range states initialized as null
+  const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
+  const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
+  const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
   const formatDateForApi = (isoDate) => {
+    if (!isoDate) return null;
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
@@ -73,14 +71,6 @@ export const VRMIndividual = () => {
         setNotifications(data.Notifications);
       }
     });
-
-    // Initial data fetch for all charts
-    if (initialMount.current) {
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'PlotlyDataChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'AnomalyChart');
-      fetchData(defaultRange.fromTime, defaultRange.toTime, 'OutlierChart');
-      initialMount.current = false;
-    }
 
     return () => {
       if (eventSource) {
@@ -109,6 +99,11 @@ export const VRMIndividual = () => {
         const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
         setOutlierChartData(outlier?.data || {});
       }
+      // Update last fetch time on success
+      setLastFetchTimes(prev => ({
+        ...prev,
+        [component.toLowerCase().replace('datachart', '').replace('chart', '')]: new Date().toLocaleString()
+      }));
     } catch (error) {
       console.error(`Error fetching ${component} data:`, error);
     }
@@ -128,43 +123,34 @@ export const VRMIndividual = () => {
       return;
     }
 
-    // Only update if range actually changed
+    // Update the appropriate range state
     if (component === 'PlotlyDataChart') {
-      if (fromTime !== plotlyRange.fromTime || toTime !== plotlyRange.toTime) {
-        setPlotlyRange({ fromTime, toTime });
-      }
+      setPlotlyRange({ fromTime, toTime });
     } else if (component === 'AnomalyChart') {
-      if (fromTime !== anomalyRange.fromTime || toTime !== anomalyRange.toTime) {
-        setAnomalyRange({ fromTime, toTime });
-      }
+      setAnomalyRange({ fromTime, toTime });
     } else if (component === 'OutlierChart') {
-      if (fromTime !== outlierRange.fromTime || toTime !== outlierRange.toTime) {
-        setOutlierRange({ fromTime, toTime });
-      }
+      setOutlierRange({ fromTime, toTime });
     }
   };
 
-  // Fetch data when ranges change (skipping initial mount)
+  // Fetch data when ranges change
   useEffect(() => {
-    if (!initialMount.current) {
+    if (plotlyRange.fromTime && plotlyRange.toTime) {
       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
     }
   }, [plotlyRange]);
 
   useEffect(() => {
-    if (!initialMount.current) {
+    if (anomalyRange.fromTime && anomalyRange.toTime) {
       fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
     }
   }, [anomalyRange]);
 
   useEffect(() => {
-    if (!initialMount.current) {
+    if (outlierRange.fromTime && outlierRange.toTime) {
       fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
     }
   }, [outlierRange]);
-
-  
-  
 
   // Toggle state handling
   const handleToggleClick = (state) => {
@@ -199,7 +185,7 @@ export const VRMIndividual = () => {
 
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
-          <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell}  greenBell ={greenBell} aicon={aicon} greyIcon={greyradio}
+          <IndividualKPI kpiData={kpiData} ricon={radioicon} gicon={gradioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyradio}
           dummyKpiData={[
             { title: "Radiological Alarms", value: "No Data" },
             { title: "Detector Health Faults", value: "No Data" },
@@ -209,8 +195,12 @@ export const VRMIndividual = () => {
         </HvStack>
         <IndividualParameters paramsData={param} notifications={notifications} />
         <Box mt={2}>
-          <PlotlyDataChart bioParamChartData={vrmParamChartData} onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')} title={'Radiation Readings'}
-           />
+          <PlotlyDataChart 
+            bioParamChartData={vrmParamChartData} 
+            onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')} 
+            title={'Radiation Readings'}
+            lastFetchTime={lastFetchTimes.plotly}
+          />
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
@@ -219,6 +209,7 @@ export const VRMIndividual = () => {
               anomalyChartData={anomalyChartData}
               onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
               title={'Anomaly Detection'}
+              lastFetchTime={lastFetchTimes.anomaly}
             />
           </Box>
           <Box width={"50%"}>
@@ -226,11 +217,12 @@ export const VRMIndividual = () => {
               outlierChartData={outlierChartData}
               onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
               title={'Outlier Detection'}
+              lastFetchTime={lastFetchTimes.outlier}
             />
           </Box>
         </Box>
-{/* Conditional Rendering for IntensityChart and PredictionChart */}
-<Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={toggleState === "Operator" ? "100%" : "50%"}>
             <IntensityChart />
           </Box>
@@ -242,7 +234,15 @@ export const VRMIndividual = () => {
         </Box>
       </Box>
 
-      {showModal && <ConfirmationModal open={showModal} onClose={handleCancelChange} onConfirm={handleConfirmChange} title="Confirm Role Change" message="Are you sure you want to switch to Supervisor mode?" />}
+      {showModal && (
+        <ConfirmationModal 
+          open={showModal} 
+          onClose={handleCancelChange} 
+          onConfirm={handleConfirmChange} 
+          title="Confirm Role Change" 
+          message="Are you sure you want to switch to Supervisor mode?" 
+        />
+      )}
     </Box>
   );
 };
