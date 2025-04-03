@@ -33,7 +33,7 @@ const SensorAlertTable = ({ sensorsData, title }) => {
 
   // Group sensors by zone -> location -> sensors
   const groupedData = validSensorsData.reduce((acc, item) => {
-    const { zone, location, detector, alarms_and_alerts, detector_type, device_id } = item.s_no;
+    const { zone, location, detector, alarms_and_alerts, detector_type, device_id, alarm_status } = item.s_no;
 
     if (!acc[zone]) acc[zone] = {};
     if (!acc[zone][location]) acc[zone][location] = [];
@@ -43,6 +43,7 @@ const SensorAlertTable = ({ sensorsData, title }) => {
       alarmCount: alarms_and_alerts,
       sensorType: detector_type,
       deviceId: device_id,
+      alarm_status : alarm_status
     });
 
     return acc;
