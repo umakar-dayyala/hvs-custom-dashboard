@@ -6,7 +6,7 @@ import DateTimeRangePicker from "./DateTimeRangePicker";
 import dayjs from "dayjs";
 import "../css/Anomaly.css";
 
-const OutlierChart = ({ outlierChartData, onRangeChange,title }) => {
+const OutlierChart = ({ outlierChartData, onRangeChange,title,lastFetchTime }) => {
   const [selectedDataset, setSelectedDataset] = useState("");
   const [filteredData, setFilteredData] = useState(null);
   const [selectedRange, setSelectedRange] = useState();
@@ -18,12 +18,18 @@ const OutlierChart = ({ outlierChartData, onRangeChange,title }) => {
     outlierChartData.datasets.length > 0 &&
     Array.isArray(outlierChartData.labels);
 
+  // useEffect(() => {
+  //   if (isValidData) {
+  //     setSelectedDataset(outlierChartData.datasets[0].label);
+  //     setFilteredData(outlierChartData);
+  //   }
+  // }, [outlierChartData]);
+
   useEffect(() => {
-    if (isValidData) {
-      setSelectedDataset(outlierChartData.datasets[0].label);
-      setFilteredData(outlierChartData);
-    }
-  }, [outlierChartData]);
+        if (isValidData && !selectedDataset) {
+          setSelectedDataset(outlierChartData.datasets[0].label);
+        }
+      }, [outlierChartData, selectedDataset]);
 
   useEffect(() => {
     if (selectedRange && isValidData) {
@@ -104,6 +110,14 @@ const OutlierChart = ({ outlierChartData, onRangeChange,title }) => {
       }}
       statusColor="red"
     >
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center',paddingTop: '1rem',paddingRight: '1rem' }}>
+        
+        {lastFetchTime && (
+          <div style={{ fontSize: '0.8rem', color: '#666' }}>
+            Last updated: {lastFetchTime}
+          </div>
+        )}
+      </div>
         {/* Title, Select, and DateTimeRangePicker in a Single Row */}
     <div
       style={{

@@ -27,6 +27,8 @@ import { MABIndividual } from "./pages/MABIndividual";
 import { WRMIndividual } from "./pages/WRMIndividual";
 import ChartDemo from "./components/chartDemo";
 import Loader from "./components/Loader";
+import WeatherDashboard from "./pages/weatherDashboard";
+
 
 
 
@@ -72,6 +74,7 @@ const App = () => {
               <Route path="/agmindividual" element={<AgmIndividual/>}/>
               <Route path="/wrmIndividual" element={<WRMIndividual/>}/>
               {/* <Route path="/chartDemo" element={<ChartDemo/>} /> */}
+              <Route path="/weather" element={<WeatherDashboard />} />
              
             </Routes>
           </HvContainer>

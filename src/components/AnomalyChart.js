@@ -6,7 +6,7 @@ import DateTimeRangePicker from "./DateTimeRangePicker";
 import dayjs from "dayjs";
 import "../css/Anomaly.css";
 
-const AnomalyChart = ({ anomalyChartData, onRangeChange ,title}) => {
+const AnomalyChart = ({ anomalyChartData, onRangeChange ,title,lastFetchTime}) => {
   const [selectedDataset, setSelectedDataset] = useState("");
   const [filteredData, setFilteredData] = useState(null);
   const [selectedRange, setSelectedRange] = useState();
@@ -18,12 +18,12 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange ,title}) => {
     anomalyChartData.datasets.length > 0 &&
     Array.isArray(anomalyChartData.labels);
 
-  useEffect(() => {
-    if (isValidData) {
-      setSelectedDataset(anomalyChartData.datasets[0].label);
-      setFilteredData(anomalyChartData);
-    }
-  }, [anomalyChartData]);
+    useEffect(() => {
+      if (isValidData && !selectedDataset) {
+        setSelectedDataset(anomalyChartData.datasets[0].label);
+      }
+    }, [anomalyChartData, selectedDataset]);
+    
 
   useEffect(() => {
     if (selectedRange && isValidData) {
@@ -103,6 +103,14 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange ,title}) => {
     }}
     statusColor="red"
   >
+    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center',paddingTop: '1rem',paddingRight: '1rem' }}>
+        
+        {lastFetchTime && (
+          <div style={{ fontSize: '0.8rem', color: '#666' }}>
+            Last updated: {lastFetchTime}
+          </div>
+        )}
+      </div>
     {/* Title, Select, and DateTimeRangePicker in a Single Row */}
     <div
       style={{
