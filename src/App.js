@@ -28,6 +28,7 @@ import { WRMIndividual } from "./pages/WRMIndividual";
 import ChartDemo from "./components/chartDemo";
 import Loader from "./components/Loader";
 import WeatherDashboard from "./pages/weatherDashboard";
+import FloorWiseAlarms from "./pages/FloorWiseAlarms";
 
 
 
@@ -75,6 +76,7 @@ const App = () => {
               <Route path="/wrmIndividual" element={<WRMIndividual/>}/>
               {/* <Route path="/chartDemo" element={<ChartDemo/>} /> */}
               <Route path="/weather" element={<WeatherDashboard />} />
+              <Route path="/floorwisealarms" element={<FloorWiseAlarms />} />
              
             </Routes>
           </HvContainer>

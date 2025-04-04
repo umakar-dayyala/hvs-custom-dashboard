@@ -33,7 +33,19 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
               color: "#FFFFFF",
             },
           }}
-          onClick={() => onTabChange(floor.floor)}
+          onClick={() => {
+            const hasAlarm =
+              (floor.biological_alarms || 0) > 0 ||
+              (floor.chemical_alarms || 0) > 0 ||
+              (floor.radiological_alarms || 0) > 0;
+          
+            if (hasAlarm) {
+              navigate(`/floorwiseAlarms?floor=${encodeURIComponent(floor.floor)}`);
+            } else {
+              onTabChange(floor.floor);
+            }
+          }}
+          
         >
           {floor.floor === "First Floor" ? floor.floor : floor.floor.replace(" Floor", "")}
         </Button>
