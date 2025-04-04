@@ -73,7 +73,7 @@ const ScrollingText = () => {
           sx={{
             display: "inline-block",
             whiteSpace: "nowrap",
-            animation: `${scrollText} 20s linear infinite`,
+            animation: `${scrollText} 25s linear infinite`,
             fontWeight: "bold",
           }}
         >
