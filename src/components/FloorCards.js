@@ -235,9 +235,11 @@ const FloorCards = ({ floorData }) => {
                   <Box display="flex" justifyContent="center" mt={1} mb={1} sx={{ width: "100%", height: "200px" }}>
                     {/* Check if all values in chartSeries are 0, undefined, or null */}
                     {chartSeries.every((value) => value === 0 || value === undefined || value === null) ? (
-                      <HvTypography variant="body2" color="textSecondary">
-                        No sensors available to display
-                      </HvTypography>
+                      <Box mt={10}>
+                        <HvTypography variant="body2" color="textSecondary">
+                          No sensors available to display
+                        </HvTypography>
+                      </Box>
                     ) : (
                       <ReactApexChart
                         key={chartKey}
