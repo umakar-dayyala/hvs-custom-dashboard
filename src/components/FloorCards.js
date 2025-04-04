@@ -72,13 +72,15 @@ const FloorCards = ({ floorData }) => {
     <Box mt={2}>
       <Grid container spacing={8} justifyContent="center">
         {floorData.map((floor, index) => {
+          const inActiveSensor = floor.disconnected_sensors + floor.inactiveSensors;
+          // Calculate the total alarms for the current floor
           const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
           const borderColor =
           totalAlarms > 0
           ? "red"  // Red for alarms
           : floor.unhealthySensors > 0
           ? "#ff9933"  // Amber for unhealthy sensors
-          : floor.inactiveSensors > 0 || floor.activeSensors === 0
+          : inActiveSensor > 0 || floor.activeSensors === 0
           ? "RGB(128, 128,128)"  // Grey for inactive sensors
           : floor.totalSensors === 0
           ? "RGB(128, 128,128)" 
@@ -91,7 +93,7 @@ const FloorCards = ({ floorData }) => {
             ? alertBiological
             : floor.unhealthySensors > 0
             ? unhealthyBio
-            : floor.inactiveSensors > 0 || floor.activeSensors === 0
+            : inActiveSensor > 0 || floor.activeSensors === 0
             ? greyBio
             : gBiological;
         
@@ -102,7 +104,7 @@ const FloorCards = ({ floorData }) => {
             ? alertChemical
             : floor.unhealthySensors > 0
             ? unhealthyChemical
-            : floor.inactiveSensors > 0 || floor.activeSensors === 0
+            : inActiveSensor > 0 || floor.activeSensors === 0
             ? greyChemical
             : gChemical;
         
@@ -113,12 +115,12 @@ const FloorCards = ({ floorData }) => {
             ? alertRadiation
             : floor.unhealthySensors > 0
             ? unhealthyRadio
-            : floor.inactiveSensors > 0 || floor.activeSensors === 0
+            : inActiveSensor > 0 || floor.activeSensors === 0
             ? greyRadio
             : gRadiation;  
 
-          const totalSensors =
-            (floor.activeSensors || 0) + (floor.inactiveSensors || 0) + (floor.unhealthySensors);
+          const totalSensors = floor.totalSensors || 0;
+            //(floor.activeSensors || 0) + (inActiveSensor || 0) + (floor.unhealthySensors);
 
           const chartOptions = {
             chart: {
@@ -138,7 +140,7 @@ const FloorCards = ({ floorData }) => {
               formatter: (val, { seriesIndex }) => {
                 const sensorCounts = [
                   floor.activeSensors || 0,
-                  floor.inactiveSensors || 0,
+                  inActiveSensor || 0,
                   floor.unhealthySensors || 0,
                   totalAlarms || 0,
                 ];
@@ -166,7 +168,7 @@ const FloorCards = ({ floorData }) => {
 
           const chartSeries = [
             floor.activeSensors || 0,
-            floor.inactiveSensors || 0,
+            inActiveSensor || 0,
             floor.unhealthySensors || 0,
             totalAlarms || 0,
           ];
@@ -208,7 +210,7 @@ const FloorCards = ({ floorData }) => {
                     <Box
                       component="img"
                       src={
-                        (floor.totalSensors ?? 0) === 0 || ((floor.activeSensors ?? 0) === 0 && (floor.inactiveSensors ?? 0) === 0)
+                        (floor.totalSensors ?? 0) === 0 || ((floor.activeSensors ?? 0) === 0 && (inActiveSensor ?? 0) > 0)
                           ? greyFloorIcon
                           : floorIcon
                       }
@@ -217,7 +219,7 @@ const FloorCards = ({ floorData }) => {
                       height={30}
                       sx={{
                         marginLeft: 1,
-                        filter: totalAlarms === 0 && ((floor.totalSensors ?? 0) !== 0 || (floor.activeSensors ?? 0) > 0 || (floor.inactiveSensors ?? 0) > 0)
+                        filter: totalAlarms === 0 && ((floor.totalSensors ?? 0) !== 0 && (floor.activeSensors ?? 0) > 0 )
                           ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
                           : "none",
                         animation: totalAlarms > 0 ? `${zoomBlinkAnimation} 1.5s infinite ease-in-out` : "none",
