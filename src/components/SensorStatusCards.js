@@ -36,54 +36,41 @@ const SensorStatusCards = (props) => {
     };
 
     fetchData(); // Initial call
-
     interval = setInterval(fetchData, 5000); // Fetch every 5 seconds
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
-  // Extract values for the summary card
-  const sensorSummary = {
-    active: "00",
-    inactive: "00",
-    faulty: "00/00",
-    alert: false,
-  };
+  // Extract values for calculations
+  let activeSensors = 0,
+    inactiveSensors = 0,
+    disconnectedSensors = 0,
+    faultySensors = "0/0",
+    cbrnAlarms = 0;
 
-  let openIncidentCardIndex = -1;
-
-  cards.forEach((card, index) => {
-    if (card.title === "Open Incident") openIncidentCardIndex = index;
-    if (card.title === "Active Sensor") sensorSummary.active = card.value.padStart(2, "0");
-    if (card.title === "Inactive Sensor") sensorSummary.inactive = card.value.padStart(2, "0");
-    if (card.title === "Faulty Sensors") {
-      sensorSummary.faulty = card.value;
-      const [unhealthy] = card.value.split("/").map(Number);
-      sensorSummary.alert = unhealthy > 0;
-    }
+  cards.forEach((card) => {
+    if (card.title === "Active Sensor") activeSensors = Number(card.value);
+    if (card.title === "Inactive Sensor") inactiveSensors = Number(card.value);
+    if (card.title === "Disconnected Sensor") disconnectedSensors = Number(card.value);
+    if (card.title === "Faulty Sensors") faultySensors = card.value;
+    if (card.title === "CBRN Alarms") cbrnAlarms = Number(card.value);
   });
 
-  // Stacked Progress Bar Configuration with Legend
+  // Extract Unhealthy Sensors count
+  const unhealthySensors = Number(faultySensors.split("/")[0]) || 0;
+
+  // Calculate Live Sensors
+  const liveSensors = activeSensors + unhealthySensors;
+
+
+  const totalInactive = inactiveSensors + disconnectedSensors;
+
+  // Stacked Progress Bar Configuration
   const chartOptions = {
-    chart: {
-      type: "bar",
-      height: "100%", // Ensures chart height takes the full space
-      stacked: true, // Keep the stacked structure for counts
-      toolbar: { show: false },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        barHeight: "90%",
-      },
-    },
+    chart: { type: "bar", height: "100%", stacked: true, toolbar: { show: false } },
+    plotOptions: { bar: { horizontal: true, barHeight: "90%" } },
     stroke: { width: 1, colors: ["#fff"] },
-    xaxis: {
-      categories: [""],
-      labels: { show: false }, // Hide x-axis labels to focus on the count
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-    },
+    xaxis: { categories: [""], labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
     yaxis: { labels: { show: false } },
     grid: { show: false },
     tooltip: {
@@ -96,95 +83,62 @@ const SensorStatusCards = (props) => {
       },
     },
     fill: { opacity: 1 },
-    legend: {
-      show: true,
-      position: "top", // Position of the legend
-      horizontalAlign: "center", // Align the legend horizontally
-      labels: {
-        colors: ["#000"], // Set text color of the legend
-      },
-    },
-    colors: ["#29991d", " RGB(128, 128,128)", "#ff9933"], // Green, Amber, Red
+    legend: { show: true, position: "top", horizontalAlign: "center", labels: { colors: ["#000"] } },
+    colors: ["#29991d", "RGB(128, 128,128)", "#ff9933"], // Green, Gray, Orange
   };
 
-  // Actual count series for the chart (showing counts, not percentages)
+  // Data for Summary Chart
   const chartSeries = [
-    { name: "Active", data: [Number(sensorSummary.active)] },
-    { name: "Inactive", data: [Number(sensorSummary.inactive)] },
-    { name: "Unhealthy Sensors", data: [Number(sensorSummary.faulty.split("/")[0] || 0)] },
+    { name: "Active", data: [activeSensors] },
+    { name: "Inactive", data: [totalInactive] }, // Inactive now includes Disconnected Sensors
+    { name: "Unhealthy Sensors", data: [unhealthySensors] },
   ];
 
   return (
     <div className="sensor-status-container">
       {cards.map((card, index) => {
-        if (card.title === "Total Sensor" || card.title === "Inactive Sensor" || card.title === "Active Sensor" || card.title === "Faulty Sensors" || card.title === 'Disconnected Sensor') {
-          return null; // Skip rendering these since they'll be in the summary
+        if (["Total Sensor", "Inactive Sensor", "Active Sensor", "Faulty Sensors", "Disconnected Sensor", "Open Incident"].includes(card.title)) {
+          return null; // Skip unnecessary cards
         }
 
         let sensorValue = card.value;
-
         let alertBorder = false;
         let cardContentColor = "green"; // Default color
         let textColor = "white"; // Always white text for the sensor value
 
-        // Check if the card title is one of the alarm types
         if (["Chemical Alarms", "Biological Alarms", "Radiological Alarms"].includes(card.title)) {
-          // Split the faulty value using "/"
           const [alertValue] = card.value.split("/").map(Number);
-          alertBorder = alertValue > 0; // Alert if first value > 1
+          alertBorder = alertValue > 0;
           cardContentColor = alertBorder ? "red" : "green";
         }
-        if (["Open Incident", "CBRN Alarms"].includes(card.title)) {
+
+        if (card.title === "CBRN Alarms") {
           alertBorder = card.value > 0;
           cardContentColor = alertBorder ? "red" : "green";
-
+          sensorValue = `${card.value}/${liveSensors}`; // Show CBRN Alarms / Live Sensors
         }
 
-        const currentImage =
-          sensorImages[card.title]?.[alertBorder ? "alert" : "normal"] || null;
+        const currentImage = sensorImages[card.title]?.[alertBorder ? "alert" : "normal"] || null;
 
         return (
-          <React.Fragment key={index}>
-            <HvCard
-              statusColor={alertBorder ? "red" : "green"}
-              className={`sensor-card ${alertBorder ? "alert-border" : ""}`}
-              {...props}
-            >
-              <HvCardHeader title={<HvTypography variant="title2">{card.title}</HvTypography>} />
-
-              {currentImage && <img src={currentImage} alt={card.title} className="sensor-icon" />}
-
-              <HvCardContent style={{ backgroundColor: cardContentColor }}>
-                <div className="sensor-card-content">
-                  <HvTypography variant="title1" style={{ color: textColor }}>
-                    {card.value}
-                  </HvTypography>
-                </div>
-              </HvCardContent>
-            </HvCard>
-
-            {index === openIncidentCardIndex && (
-              <HvCard
-                statusColor="green" // Fixed color for the Sensor Summary card border
-                className="sensor-card"
-                {...props}
-              >
-                <HvCardContent style={{ padding: "5px 0 0 0" }}>
-                  <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-                    <ReactApexChart
-                      options={chartOptions}
-                      series={chartSeries}
-                      type="bar"
-                      width="100%"
-                      height="110"
-                    />
-                  </div>
-                </HvCardContent>
-              </HvCard>
-            )}
-          </React.Fragment>
+          <HvCard key={index} statusColor={alertBorder ? "red" : "green"} className={`sensor-card ${alertBorder ? "alert-border" : ""}`} {...props}>
+            <HvCardHeader title={<HvTypography variant="title2">{card.title}</HvTypography>} />
+            {currentImage && <img src={currentImage} alt={card.title} className="sensor-icon" />}
+            <HvCardContent style={{ backgroundColor: cardContentColor }}>
+              <HvTypography variant="title1" style={{ color: textColor }}>{sensorValue}</HvTypography>
+            </HvCardContent>
+          </HvCard>
         );
       })}
+
+      {/* Sensor Summary Card - Now at the end */}
+      <HvCard statusColor="green" className="sensor-card" {...props}>
+        <HvCardContent style={{ padding: "5px 0 0 0" }}>
+          <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+            <ReactApexChart options={chartOptions} series={chartSeries} type="bar" width="100%" height="110" />
+          </div>
+        </HvCardContent>
+      </HvCard>
     </div>
   );
 };
