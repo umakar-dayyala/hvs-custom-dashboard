@@ -56,7 +56,7 @@ const ScrollingText = () => {
         borderRadius: "5px",
         color: "white", // Text is always white
         textAlign: "center",
-        animation: `${blinkAnimation} 1s infinite`, // Blinking applies to both states
+        animation: hasAlarm ? `${blinkAnimation} 1s infinite` : "none", // Only blink on alarm
         // marginTop: "10px",
       }}
     >
@@ -73,7 +73,7 @@ const ScrollingText = () => {
           sx={{
             display: "inline-block",
             whiteSpace: "nowrap",
-            animation: `${scrollText} 10s linear infinite`,
+            animation: `${scrollText} 20s linear infinite`,
             fontWeight: "bold",
           }}
         >
