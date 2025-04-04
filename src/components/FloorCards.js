@@ -43,7 +43,6 @@ const zoomBlinkAnimation = keyframes`
 `;
 
 const FloorCards = ({ floorData }) => {
-  console.log("Floor Data: "+JSON.stringify(floorData));
   const { value, setValue } = useContext(MyContext);
   const navigate = useNavigate();
   const [chartKey, setChartKey] = useState(0);
@@ -117,9 +116,6 @@ const FloorCards = ({ floorData }) => {
             : floor.inactiveSensors > 0 || floor.activeSensors === 0
             ? greyRadio
             : gRadiation;  
-            console.log("Total Sensors:", floor.totalSensors);
-            console.log("Active Sensors:", floor.activeSensors);
-            console.log("Inactive Sensors:", floor.inactiveSensors);
 
           const totalSensors =
             (floor.activeSensors || 0) + (floor.inactiveSensors || 0) + (floor.unhealthySensors);
