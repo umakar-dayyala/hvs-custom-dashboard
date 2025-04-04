@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import { HvTypography } from "@hitachivantara/uikit-react-core";
+import { useNavigate } from "react-router-dom";
 import FloorTabs from "../components/FloorTabs";
 import FloorCards from "../components/FloorCards";
 import SensorStatusCards from "../components/SensorStatusCards";
@@ -46,30 +47,48 @@ const scrollContainer = css`
 const OperatorDashboard = () => {
   const [floorData, setFloorData] = useState([]);
   const [loading, setLoading] = useState(true);  // adding the load state 
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = () => {
-      setLoading(true); // shows the loader before fetching the data
-      floorList()
-        .then((response) => {
+    let isMounted = true;
+    let timeout;
+    let isFirstLoad = true;
+  
+    const fetchData = async () => {
+      if (isFirstLoad) {
+        setLoading(true);
+      }
+  
+      try {
+        const response = await floorList();
+        if (isMounted && JSON.stringify(response) !== JSON.stringify(floorData)) {
           setFloorData(response);
-          setLoading(false); // hidding the loader after the data fetch
-        })
-        .catch((error) => {
-          console.error("Error fetching floor data:", error);
-          setLoading(false); //Hidding the loader even there is error 
-        });
+        }
+      } catch (error) {
+        console.error("Error fetching floor data:", error);
+      } finally {
+        if (isFirstLoad) {
+          setLoading(false);
+          isFirstLoad = false;
+        }
+        if (isMounted) {
+          timeout = setTimeout(fetchData, 5000); // next fetch after 0.5 sec
+        }
+      }
     };
-
+  
     fetchData(); // Initial fetch
-    const interval = setInterval(fetchData, 500000000000); // Fetch every 500ms, need to change later
-
-    return () => clearInterval(interval); // Cleanup on unmount
+  
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
+   
 
     // Function to handle tab click
   const handleTabClick = (floorName) => {
-    window.location.href = `floorwise?floor=${floorName}`;
+     navigate(`floorwise?floor=${floorName}`);
   };
 
 
