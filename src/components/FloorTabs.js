@@ -3,9 +3,11 @@ import { Box, Button } from "@mui/material";
 import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
 
-const FloorTabs = ({ floorData, onTabChange  }) => {
+const FloorTabs = ({ floorData, onTabChange }) => {
   const { value } = useContext(MyContext);
   const navigate = useNavigate();
+  //Using for changing the color of all alerts tabs
+  const hasAnyAlarm = value.includes("#E30613");
 
   const goToFloor = (floor) => {
     window.location.href = `floorwise?floor=${floor}`;
@@ -38,14 +40,14 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
               (floor.biological_alarms || 0) > 0 ||
               (floor.chemical_alarms || 0) > 0 ||
               (floor.radiological_alarms || 0) > 0;
-          
+
             if (hasAlarm) {
               navigate(`/floorwiseAlarms?floor=${encodeURIComponent(floor.floor)}`);
             } else {
               onTabChange(floor.floor);
             }
           }}
-          
+
         >
           {floor.floor === "First Floor" ? floor.floor : floor.floor.replace(" Floor", "")}
         </Button>
@@ -56,13 +58,13 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
         variant="outlined"
         sx={{
           flex: 1,
-          color: value[1] || "green",
-          borderColor: value[1] || "green",
+          color: hasAnyAlarm ? "#E30613" : "#28A745",
+          borderColor: hasAnyAlarm ? "#E30613" : "#28A745",
           textTransform: "none",
           margin: "2px",
           fontWeight: "bold",
           "&:hover": {
-            backgroundColor: value[1] || "green",
+            backgroundColor: hasAnyAlarm ? "#E30613" : "#28A745",
             color: "#FFFFFF",
           },
         }}
@@ -70,6 +72,7 @@ const FloorTabs = ({ floorData, onTabChange  }) => {
       >
         All Alarms & Alerts
       </Button>
+
     </Box>
   );
 };
