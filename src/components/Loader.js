@@ -1,20 +1,14 @@
 import React from "react";
-import '../css/Loader.css'; // Import the updated CSS
+import { HvLoading } from "@hitachivantara/uikit-react-core";
+import "../css/Loader.css"; // Import external CSS
 
-const Loader = () => {
+const Loader = ({ label = "Loading..." }) => {
   return (
     <div className="loader-container">
-      <div className="loader">
-        <div className="circle circle1"></div>
-        <div className="circle circle2"></div>
-        <div className="circle circle3"></div>
-      </div>
-      <div className="loader-text">Loading...</div>
-      <div className="dots">
-        <div className="dot dot1"></div>
-        <div className="dot dot2"></div>
-        <div className="dot dot3"></div>
-      </div>
+      <HvLoading className="large-thick-loader" />
+
+      {/* Loading text with reduced gap */}
+      <span className="loader-text">{label}</span>
     </div>
   );
 };
