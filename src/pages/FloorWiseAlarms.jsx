@@ -21,7 +21,8 @@ const FloorWiseAlarms = () => {
   const [floor, setFloor] = useState(initialFloor);
   const [floorData, setFloorData] = useState([]);
   const [floorWiseAlertsData, setFloorWiseAlertsData] = useState([]);
-  
+
+  // Fetch list of floors
   const fetchFloorList = async () => {
     try {
       const response = await floorList();
@@ -31,37 +32,41 @@ const FloorWiseAlarms = () => {
     }
   };
 
-  const fetchFloorAlertList = async (initialFloor) => {
+  // Fetch alerts based on selected floor
+  const fetchFloorAlertList = async (selectedFloor) => {
     try {
       const response = await getFloorAlartList(); // API call
       const floorData = response.data;
-  
-      // Match the floor by trimming off the prefix
+
       const filtered = floorData.find((item) => {
-        const cleanFloor = item.floorName.split("|").pop().trim(); // Gets "First Floor"
-        return cleanFloor === floor;
+        const cleanFloor = item.floorName.split("|").pop().trim(); 
+        return cleanFloor === selectedFloor;
       });
-  
-      console.log("Filtered Floor Alerts:", filtered);
+        // Check if filtered data is empty or undefined
       setFloorWiseAlertsData(filtered ? [filtered] : []);
     } catch (error) {
       console.error("Error fetching floor alerts:", error);
     }
   };
-  
 
+  // Handle floor tab click
   const handleTabClick = (floorName) => {
     setFloor(floorName);
     // Navigate to the "floorwise" route with the floor parameter
     navigate(`/floorwise?floor=${encodeURIComponent(floorName)}`, { replace: true });
   };
-  
+
+  useEffect(() => {
+    setFloor(initialFloor);
+  }, [initialFloor]);
+
+  // Initial + floor change effect
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Start loading
       await fetchFloorList();
-      await fetchFloorAlertList();
-      setLoading(false); // Stop loading after both API calls are done
+      await fetchFloorAlertList(floor); // pass current floor to fetch data
+      setLoading(false);
     };
 
     fetchData();
@@ -70,17 +75,21 @@ const FloorWiseAlarms = () => {
   return (
     <Box>
       {loading ? (
-        <Loader /> // Display loader while fetching data
+        <Loader />
       ) : (
         <>
+          {/* Top Header with Breadcrumbs & Legend */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Breadcrumbs />
             <div style={{ display: "flex", gap: "10px" }}>
               <SensorLegend />
             </div>
           </div>
+
           {/* Sensor Status Cards */}
           <SensorStatusCards />
+
+          {/* Divider */}
           <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
 
           {/* Floor Tabs */}
@@ -88,6 +97,7 @@ const FloorWiseAlarms = () => {
             <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
           </Box>
 
+          {/* Alerts Table */}
           <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} />
         </>
       )}
