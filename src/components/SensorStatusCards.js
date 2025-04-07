@@ -24,23 +24,32 @@ const SensorStatusCards = (props) => {
   const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    let interval;
-
+    let isMounted = true;
+    let timeout;
+  
     const fetchData = async () => {
       try {
         const data = await getSensorData();
-        setCards((prev) => (JSON.stringify(prev) === JSON.stringify(data) ? prev : data));
+        if (isMounted) {
+          setCards((prev) => (JSON.stringify(prev) === JSON.stringify(data) ? prev : data));
+        }
       } catch (error) {
         console.error("Error fetching sensor data:", error);
+      } finally {
+        if (isMounted) {
+          timeout = setTimeout(fetchData, 5000); // Wait 5 seconds after current call completes
+        }
       }
     };
-
-    fetchData(); // Initial call
-
-    interval = setInterval(fetchData, 5000); // Fetch every 5 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
+  
+    fetchData(); // Initial fetch
+  
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout); // Clean up on unmount
+    };
   }, []);
+  
 
   // Extract values for the summary card
   const sensorSummary = {
