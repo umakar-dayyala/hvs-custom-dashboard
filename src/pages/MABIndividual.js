@@ -43,6 +43,7 @@ export const MABIndividual = () => {
     anomaly: null,
     outlier: null
   });
+  const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 
   // Time range states initialized as null
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
@@ -67,6 +68,7 @@ export const MABIndividual = () => {
         setParamsData(data.parametersData);
         setParam(data.parametersData);
         setNotifications(data.Notifications);
+        setLastFetchLiveData(data.lastfetched.time); 
       }
     });
 
@@ -179,7 +181,12 @@ export const MABIndividual = () => {
       <Box>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Breadcrumbs />
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px",alignItems:"center" }}>
+            <Box style={{ whiteSpace: "nowrap" }}>
+              {LastFetchLiveData && (
+                <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+              )}
+            </Box>
             <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
           </div>
         </div>
