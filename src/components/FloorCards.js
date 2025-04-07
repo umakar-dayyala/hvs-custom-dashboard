@@ -48,11 +48,28 @@ const FloorCards = ({ floorData }) => {
   const [chartKey, setChartKey] = useState(0);
 
   useEffect(() => {
+    // const updatedColors = floorData.map((floor) => {
+    //   const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
+    //   const hasAlert = (totalAlarms && totalAlarms > 0);
+    //   return hasAlert ? "#E30613" : "#28A745";
+    // });
     const updatedColors = floorData.map((floor) => {
-      const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
-      const hasAlert = (totalAlarms && totalAlarms > 0);
-      return hasAlert ? "#E30613" : "#28A745";
+      const totalAlarms = (floor.biological_alarms ?? 0) + (floor.chemical_alarms ?? 0) + (floor.radiological_alarms ?? 0);
+      const activeSensors = floor.activeSensors ?? 0;
+      const totalSensors = floor.totalSensors ?? 0;
+      const hasAlert = (floor.unhealthySensors ?? 0) > 0; // Replace with your actual alert logic
+    
+      if (totalAlarms > 0) {
+        return "#E30613"; // Red
+      } else if (hasAlert) {
+        return "#ff9933"; // Amber
+      } else if (totalSensors === 0 || activeSensors === 0) {
+        return "RGB(128, 128,128)"; // Grey
+      } else {
+        return "#28A745"; // Green
+      }
     });
+    
 
     setValue(updatedColors);
 
