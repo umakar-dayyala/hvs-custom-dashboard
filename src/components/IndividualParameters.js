@@ -1,5 +1,9 @@
 import React from "react";
-import { HvCard, HvCardContent, HvTypography } from "@hitachivantara/uikit-react-core";
+import {
+  HvCard,
+  HvCardContent,
+  HvTypography,
+} from "@hitachivantara/uikit-react-core";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -48,9 +52,12 @@ const defaultCards = [
   { title: "Notifications", value: "No Data" },
 ];
 
-const IndividualParameters = ({ paramsData, notifications = [] }) => {
+const IndividualParameters = ({ paramsData, notifications = [], toggleState  }) => {
+ 
   const noData = !paramsData || !paramsData.length;
   const displayData = noData ? defaultCards : paramsData[0];
+  const isVRM = window.location.href.includes("vrm") || window.location.href.includes("VRM");
+  const isPRM= window.location.href.includes("prm") || window.location.href.includes("PRM");
 
   return (
     <div className="parameter-container">
@@ -63,7 +70,8 @@ const IndividualParameters = ({ paramsData, notifications = [] }) => {
               statusColor="grey"
               style={{
                 borderRadius: "0px",
-                boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+                boxShadow:
+                  "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
               }}
             >
               <HvCardContent className="parameter-content">
@@ -77,7 +85,16 @@ const IndividualParameters = ({ paramsData, notifications = [] }) => {
             </HvCard>
           ))
         : Object.keys(displayData).map((sectionTitle) => {
-            const parameters = displayData[sectionTitle];
+            let parameters = displayData[sectionTitle];
+
+            // If toggleState is "Operator" and sectionTitle is "System Settings", limit to top 3 values
+            if (toggleState === "Operator" && sectionTitle === "System Settings" && isVRM) {
+              parameters = Object.fromEntries(Object.entries(parameters).slice(0, 3));
+            }
+
+            if (toggleState === "Operator" && sectionTitle === "System Settings" && isPRM) {
+              parameters = Object.fromEntries(Object.entries(parameters).slice(0, 2));
+            }
 
             return (
               <HvCard
@@ -87,17 +104,26 @@ const IndividualParameters = ({ paramsData, notifications = [] }) => {
                 statusColor="red"
                 style={{
                   borderRadius: "0px",
-                  boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+                  boxShadow:
+                    "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
                 }}
               >
+                <div>
+    
+      {/* Other KPI content */}
+    </div>
                 <HvCardContent className="parameter-content">
                   <HvTypography variant="title2" className="section-title">
                     {capitalize(sectionTitle)}
                   </HvTypography>
-                  {`${sectionTitle}` === "Radiation Readings" && (
+                  {sectionTitle === "Radiation Readings" && (
                     <HvTypography variant="title2"> Radiation Alarm</HvTypography>
                   )}
-                  <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
+                  <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    style={{ width: "100%", overflowX: "auto" }}
+                  >
                     <Table sx={{ minWidth: "100%" }} aria-label="customized table">
                       <TableBody>
                         {Object.keys(parameters).map((key) => {
@@ -138,14 +164,19 @@ const IndividualParameters = ({ paramsData, notifications = [] }) => {
           statusColor="red"
           style={{
             borderRadius: "0px",
-            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+            boxShadow:
+              "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
           }}
         >
           <HvCardContent className="parameter-content">
             <HvTypography variant="title2" className="section-title">
               Notifications
             </HvTypography>
-            <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              style={{ width: "100%", overflowX: "auto" }}
+            >
               <Table sx={{ minWidth: "100%" }} aria-label="customized table">
                 <TableBody>
                   {notifications.length > 0 ? (
@@ -157,7 +188,9 @@ const IndividualParameters = ({ paramsData, notifications = [] }) => {
                           <StyledTableCell component="th" scope="row">
                             {notification.label}
                           </StyledTableCell>
-                          <StyledTableCell align="right">{notification.value}</StyledTableCell>
+                          <StyledTableCell align="right">
+                            {notification.value}
+                          </StyledTableCell>
                         </StyledTableRow>
                       ))
                   ) : (

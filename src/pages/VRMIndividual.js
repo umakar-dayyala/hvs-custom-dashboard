@@ -38,11 +38,12 @@ export const VRMIndividual = () => {
   const [addParams, setAddParams] = useState([]);
   const [param, setParam] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 
    const [lastFetchTimes, setLastFetchTimes] = useState({
         plotly: null,
         anomaly: null,
-        outlier: null
+        outlier: null,
       });
 
   // Time range states initialized as null
@@ -56,29 +57,29 @@ export const VRMIndividual = () => {
   };
 
   useEffect(() => {
-    // Real-time WebSocket data updates
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
-
-    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-      if (err) {
-        console.error("Error receiving data:", err);
-      } else {
-        setKpiData(data.kpiData);
-        setParamsData(data.parametersData);
-        setAddParams(data.supervisor_data);
-        setParam(data.parametersData);
-        setNotifications(data.Notifications);
-      }
-    });
-
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-        console.log("WebSocket closed");
-      }
-    };
-  }, []);
+      const queryParams = new URLSearchParams(window.location.search);
+      const deviceId = queryParams.get("device_id");
+    
+      const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+        if (err) {
+          console.error("Error receiving data:", err);
+        } else {
+          setKpiData(data.kpiData);
+          setParamsData(data.parametersData);
+          setParam(data.parametersData);
+          setNotifications(data.Notifications);
+          setLastFetchLiveData(data.lastfetched.time); 
+          
+        }
+      });
+    
+      return () => {
+        if (eventSource) {
+          eventSource.close();
+          console.log("WebSocket closed");
+        }
+      };
+    }, []);
 
   const fetchData = async (fromTime, toTime, component) => {
     if (!fromTime || !toTime) return;
@@ -178,8 +179,15 @@ export const VRMIndividual = () => {
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Breadcrumbs />
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px" ,alignItems:"center"}}>
+        <Box style={{ whiteSpace: "nowrap" }}>
+  {LastFetchLiveData && (
+    <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+  )}
+</Box>
+
           <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+         
         </div>
       </div>
 
@@ -193,7 +201,12 @@ export const VRMIndividual = () => {
           ]}/>
           <Alertbar />
         </HvStack>
-        <IndividualParameters paramsData={param} notifications={notifications} />
+        {/* <Box mt={2} style={{ display: "flex", flexDirection: "row" ,justifyContent:"flex-end"}}>
+          {LastFetchLiveData && (
+            <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+          )}
+        </Box> */}
+        <IndividualParameters paramsData={param} notifications={notifications} toggleState ={toggleState} />
         <Box mt={2}>
           <PlotlyDataChart 
             bioParamChartData={vrmParamChartData} 

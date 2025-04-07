@@ -40,9 +40,9 @@ export const PRMIndividual = () => {
    const [lastFetchTimes, setLastFetchTimes] = useState({
       plotly: null,
       anomaly: null,
-      outlier: null
+      outlier: null,
     });
-
+const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
   // Time range states initialized as null
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
@@ -54,10 +54,9 @@ export const PRMIndividual = () => {
   };
 
   useEffect(() => {
-    // Real-time data updates (WebSocket)
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-
+  
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
         console.error("Error receiving data:", err);
@@ -65,10 +64,11 @@ export const PRMIndividual = () => {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
         setParam(data.parametersData);
-        setNotifications(data.Notifications);
+        setNotifications(data.Notifications);    
+        setLastFetchLiveData(data.lastfetched.time); 
       }
     });
-
+  
     return () => {
       if (eventSource) {
         eventSource.close();
@@ -76,6 +76,7 @@ export const PRMIndividual = () => {
       }
     };
   }, []);
+  
 
   // Fetch Data Function
   const fetchData = async (fromTime, toTime, component) => {
@@ -180,11 +181,18 @@ export const PRMIndividual = () => {
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Breadcrumbs />
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px" ,alignItems:"center"}}>
+        <Box style={{ whiteSpace: "nowrap" }}>
+  {LastFetchLiveData && (
+    <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+  )}
+</Box>
+
           <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+         
         </div>
       </div>
-
+     
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
@@ -196,7 +204,12 @@ export const PRMIndividual = () => {
             ]}/>
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={param} notifications={notifications} />
+          {/* <Box mt={2} style={{ display: "flex", flexDirection: "row" ,justifyContent:"flex-end"}}>
+  {LastFetchLiveData && (
+    <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+  )}
+</Box> */}
+          <IndividualParameters paramsData={param} notifications={notifications} toggleState ={toggleState}/>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={prmParamChartData}

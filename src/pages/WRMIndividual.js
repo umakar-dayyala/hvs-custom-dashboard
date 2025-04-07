@@ -41,6 +41,7 @@ export const WRMIndividual = () => {
   const [addParams, setAddParams] = useState([]);
   const [param, setParam] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
   
  const [lastFetchTimes, setLastFetchTimes] = useState({
          plotly: null,
@@ -71,6 +72,7 @@ export const WRMIndividual = () => {
           setAddParams(data.supervisor_data);
           setParam(data.parametersData);
           setNotifications(data.Notifications);
+          setLastFetchLiveData(data.lastfetched.time);
         }
       });
   
@@ -187,7 +189,12 @@ export const WRMIndividual = () => {
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Breadcrumbs />
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px" ,alignItems:"center"}}>
+          <Box style={{ whiteSpace: "nowrap" }}>
+            {LastFetchLiveData && (
+              <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+            )}
+          </Box>
           <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
         </div>
       </div>
@@ -202,7 +209,7 @@ export const WRMIndividual = () => {
           ]}/>
           <Alertbar />
         </HvStack>
-        <IndividualParameters paramsData={paramsData} />
+        <IndividualParameters paramsData={paramsData} notifications={notifications} />
         <Box mt={2}>
           <PlotlyDataChart
             bioParamChartData={wrmParamChartData}

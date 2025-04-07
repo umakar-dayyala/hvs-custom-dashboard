@@ -40,7 +40,7 @@ export const IbacIndividual = () => {
   const [newState, setNewState] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
-
+  const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
   const [lastFetchTimes, setLastFetchTimes] = useState({
     bioParam: null,
     anomaly: null,
@@ -72,6 +72,7 @@ export const IbacIndividual = () => {
         setParamsData(data.parametersData);
         setParam(data.parametersData);
         setNotifications(data.Notifications);
+        setLastFetchLiveData(data.lastfetched.time);
       }
     });
 
@@ -249,7 +250,12 @@ export const IbacIndividual = () => {
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Breadcrumbs />
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px" ,alignItems:"center"}}>
+          <Box style={{ whiteSpace: "nowrap" }}>
+            {LastFetchLiveData && (
+              <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+            )}
+          </Box>
           <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
         </div>
       </div>

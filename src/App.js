@@ -28,6 +28,7 @@ import { WRMIndividual } from "./pages/WRMIndividual";
 import ChartDemo from "./components/chartDemo";
 import Loader from "./components/Loader";
 import WeatherDashboard from "./pages/weatherDashboard";
+import Weatherv2 from "./pages/Weatherv2";
 
 
 
@@ -75,6 +76,7 @@ const App = () => {
               <Route path="/wrmIndividual" element={<WRMIndividual/>}/>
               {/* <Route path="/chartDemo" element={<ChartDemo/>} /> */}
               <Route path="/weather" element={<WeatherDashboard />} />
+              <Route path="/Weaterv2" element={<Weatherv2 />} />
              
             </Routes>
           </HvContainer>
