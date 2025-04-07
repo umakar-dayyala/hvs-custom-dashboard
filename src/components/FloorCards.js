@@ -268,6 +268,18 @@ const FloorCards = ({ floorData }) => {
                       justifyContent: "space-between",
                       animation: totalAlarms > 0 ? `${blinkAnimation} 1s infinite` : "none",
                     }}
+                    onClick={() => {
+                      const hasAlarm =
+                        (floor.biological_alarms || 0) > 0 ||
+                        (floor.chemical_alarms || 0) > 0 ||
+                        (floor.radiological_alarms || 0) > 0;
+          
+                      if (hasAlarm) {
+                        navigate(`/floorwiseAlarms?floor=${encodeURIComponent(floor.floor)}`);
+                      } else {
+                        goToFloor(floor.floor);
+                      }
+                    }}
                   >
                     <span>Total Detected Alarms</span>
                     <span>{totalAlarms|| "00"}</span>
