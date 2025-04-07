@@ -108,8 +108,8 @@ const FloorCards = ({ floorData }) => {
             ? greyBio
             : floor.biological_alarms > 0
             ? alertBiological
-            : floor.unhealthySensors > 0
-            ? unhealthyBio
+            // : floor.unhealthySensors > 0
+            // ? unhealthyBio
             : inActiveSensor > 0 || floor.activeSensors === 0
             ? greyBio
             : gBiological;
@@ -119,8 +119,8 @@ const FloorCards = ({ floorData }) => {
             ? greyChemical
             : floor.chemical_alarms > 0
             ? alertChemical
-            : floor.unhealthySensors > 0
-            ? unhealthyChemical
+            // : floor.unhealthySensors > 0
+            // ? unhealthyChemical
             : inActiveSensor > 0 || floor.activeSensors === 0
             ? greyChemical
             : gChemical;
@@ -128,10 +128,10 @@ const FloorCards = ({ floorData }) => {
         const radioIcon =
           floor.totalSensors === 0
             ? greyRadio
-            : floor.radiation_alarms > 0
+            : floor.radiological_alarms > 0
             ? alertRadiation
-            : floor.unhealthySensors > 0
-            ? unhealthyRadio
+            // : floor.unhealthySensors > 0
+            // ? unhealthyRadio
             : inActiveSensor > 0 || floor.activeSensors === 0
             ? greyRadio
             : gRadiation;  
