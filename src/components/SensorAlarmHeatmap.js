@@ -61,7 +61,7 @@ const SensorAlarmHeatmap = ({ sensorsData = [], title = "" }) => {
       deviceId,
     })),
   }));
-console.log("Series: "+JSON.stringify(series));
+
   // Chart Options
   const options = {
     chart: {
