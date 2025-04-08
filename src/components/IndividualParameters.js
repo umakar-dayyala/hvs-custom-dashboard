@@ -86,6 +86,7 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState  }) 
           ))
         : Object.keys(displayData).map((sectionTitle) => {
             let parameters = displayData[sectionTitle];
+            console.log("Parameters:", sectionTitle);
 
             // If toggleState is "Operator" and sectionTitle is "System Settings", limit to top 3 values
             if (toggleState === "Operator" && sectionTitle === "System Settings" && isVRM) {
@@ -116,9 +117,33 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState  }) 
                   <HvTypography variant="title2" className="section-title">
                     {capitalize(sectionTitle)}
                   </HvTypography>
-                  {sectionTitle === "Radiation Readings" && (
-                    <HvTypography variant="title2"> Radiation Alarm</HvTypography>
-                  )}
+                  {sectionTitle === "Radiation_Parameters" || sectionTitle === "Radiation_Readings" || sectionTitle === "Biological_Parameters" || sectionTitle === "Chemical Alarms" || sectionTitle === "Radiation Alarm" ? (
+  <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
+    {Object.entries(parameters).map(([groupTitle, subParams]) => (
+      <div
+        key={groupTitle}
+        style={{
+          backgroundColor: "#f5f5f5",
+          padding: "14px",
+          borderRadius: "8px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        }}
+      >
+        <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
+          {groupTitle}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
+          {Object.entries(subParams).map(([label, value]) => (
+            <div key={label} style={{ fontSize: "18px" }}>
+              {label}: {value}
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+)  :(
                   <TableContainer
                     component={Paper}
                     elevation={0}
@@ -151,6 +176,7 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState  }) 
                       </TableBody>
                     </Table>
                   </TableContainer>
+                  )}
                 </HvCardContent>
               </HvCard>
             );

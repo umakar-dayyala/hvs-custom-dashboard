@@ -77,7 +77,7 @@ const App = () => {
               <Route path="/wrmIndividual" element={<WRMIndividual/>}/>
               {/* <Route path="/chartDemo" element={<ChartDemo/>} /> */}
               <Route path="/weather" element={<WeatherDashboard />} />
-              <Route path="/Weaterv2" element={<Weatherv2 />} />
+              <Route path="/Weatherv2" element={<Weatherv2 />} />
               <Route path="/floorwisealarms" element={<FloorWiseAlarms />} />
              
             </Routes>
