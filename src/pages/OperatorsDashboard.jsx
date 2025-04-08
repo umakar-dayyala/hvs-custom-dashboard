@@ -12,6 +12,7 @@ import HorizontalDivider from "../components/HorizontalDivider";
 import { css } from "@emotion/react";
 import Loader from "../components/Loader"; // importing the loader from the component 
 import ScrollingText from "../components/ScrollingText";
+import { isEqual } from "lodash";
 
 const scrollContainer = css`
   height: 100vh;
@@ -61,18 +62,21 @@ const OperatorDashboard = () => {
   
       try {
         const response = await floorList();
-        if (isMounted && JSON.stringify(response) !== JSON.stringify(floorData)) {
+        const isChanged = !isEqual(response, floorData);  
+        if (isChanged) {
           setFloorData(response);
         }
       } catch (error) {
         console.error("Error fetching floor data:", error);
       } finally {
-        if (isFirstLoad) {
-          setLoading(false);
-          isFirstLoad = false;
-        }
         if (isMounted) {
-          timeout = setTimeout(fetchData, 5000); // next fetch after 0.5 sec
+          if (isFirstLoad) {
+            setLoading(false);
+            isFirstLoad = false;
+          }
+  
+          // Wait 500ms AFTER the response finishes before next call
+          timeout = setTimeout(fetchData, 500);
         }
       }
     };
@@ -84,6 +88,7 @@ const OperatorDashboard = () => {
       clearTimeout(timeout);
     };
   }, []);
+  
    
 
     // Function to handle tab click

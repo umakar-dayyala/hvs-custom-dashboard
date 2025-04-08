@@ -133,7 +133,7 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
               <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={30} height={30} />
               <HvTypography variant="title3">
-                Inactive Sensors <HvTypography variant="label1">{floor.inactive_sensors}</HvTypography>
+                Inactive Sensors <HvTypography variant="label1">{floor.inactive_sensors + floor.disconnected_sensors}</HvTypography>
               </HvTypography>
             </Box>
           </Box>
