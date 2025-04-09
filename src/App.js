@@ -30,11 +30,7 @@ import Loader from "./components/Loader";
 import WeatherDashboard from "./pages/weatherDashboard";
 import Weatherv2 from "./pages/Weatherv2";
 import FloorWiseAlarms from "./pages/FloorWiseAlarms";
-
-
-
-
-
+import InventoryDashboard from "./pages/InventoryDashboard";
 
 
 const App = () => {
@@ -79,6 +75,7 @@ const App = () => {
               <Route path="/weather" element={<WeatherDashboard />} />
               <Route path="/Weatherv2" element={<Weatherv2 />} />
               <Route path="/floorwisealarms" element={<FloorWiseAlarms />} />
+              <Route path="/inventory" element={<InventoryDashboard />} />
              
             </Routes>
           </HvContainer>
