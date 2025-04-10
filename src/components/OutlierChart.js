@@ -45,7 +45,7 @@ const OutlierChart = ({ outlierChartData, onRangeChange,title,lastFetchTime }) =
     setSelectedRange(range);
     if (onRangeChange) {
       onRangeChange(range);
-      console.log("onRangeChange:", range);
+      // console.log("onRangeChange:", range);
     }
   };
 
