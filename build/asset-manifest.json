@@ -1,7 +1,8 @@
 {
   "files": {
     "main.css": "/static/css/main.086d72e9.css",
-    "main.js": "/static/js/main.22cb8d0b.js",
+    "main.js": "/static/js/main.f976181a.js",
+    "static/media/centralvista.png": "/static/media/centralvista.d8d26fa2a3be8ab2cb3e.png",
     "static/media/ECIL_Logo.ico": "/static/media/ECIL_Logo.9af2c8f1522b005f9f0e.ico",
     "static/media/aBiological.svg": "/static/media/aBiological.44f72e432156b5cba49cabf49933502a.svg",
     "static/media/greyBio.svg": "/static/media/greyBio.f801ac71ab1d3485c053b62235a1ddd5.svg",
@@ -28,10 +29,10 @@
     "static/media/rbell.svg": "/static/media/rbell.23b182fc116b2c399063a975bdae2bb4.svg",
     "static/media/greenBell.svg": "/static/media/greenBell.4d8fa01a38c83d046c874f2440f4d818.svg",
     "main.086d72e9.css.map": "/static/css/main.086d72e9.css.map",
-    "main.22cb8d0b.js.map": "/static/js/main.22cb8d0b.js.map"
+    "main.f976181a.js.map": "/static/js/main.f976181a.js.map"
   },
   "entrypoints": [
     "static/css/main.086d72e9.css",
-    "static/js/main.22cb8d0b.js"
+    "static/js/main.f976181a.js"
   ]
 }
