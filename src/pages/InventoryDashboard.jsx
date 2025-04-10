@@ -5,7 +5,7 @@ import {
 import { Add, Remove, Upload, Download } from "@mui/icons-material";
 import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
-// import AssetDialog from "../components/AssetDialog";
+import AssetDialog from "../components/AssetDialog";
 
 const InventoryDashboard = () => {
   const [allRows, setAllRows] = useState([]);
@@ -200,7 +200,7 @@ const InventoryDashboard = () => {
         assetTypes={assetTypes}
         assetLocations={assetLocations}
         assetStatuses={assetStatuses}
-      /> */}
+      /> 
     </Box>
   );
 };
