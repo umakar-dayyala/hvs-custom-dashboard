@@ -4,7 +4,7 @@ import {
 } from "@mui/material";
 import { Add, Remove, Upload, Download } from "@mui/icons-material";
 import InventoryTable from "../components/InventoryTable";
-import AssetDialog from "../components/AssetDialog";
+// import AssetDialog from "../components/AssetDialog";
 
 const InventoryDashboard = () => {
   const [openRow, setOpenRow] = useState(null);
@@ -183,7 +183,7 @@ const InventoryDashboard = () => {
         onSelectRow={handleSelectRow}
       />
 
-      <AssetDialog
+      {/* <AssetDialog
         open={dialog.open}
         type={dialog.type}
         onClose={handleDialogClose}
@@ -194,7 +194,7 @@ const InventoryDashboard = () => {
         assetTypes={assetTypes}
         assetLocations={assetLocations}
         assetStatuses={assetStatuses}
-      />
+      /> */}
     </Box>
   );
 };
