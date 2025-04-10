@@ -43,7 +43,7 @@ const Weatherv2 = () => {
 
   const apiData = [
     { label: 'Air Temperature', value: '32°C' },
-    { label: 'Relative Humidity (%)', value: '60%' },
+    { label: 'Relative Humidity (%)', value: '10%' },
     { label: 'Cumulative Rain (mm)', value: '12.5 mm' },
     { label: 'Pressure', value: '1013 hPa' },
     { label: 'Solar radiation', value: '450 Wm' },
@@ -81,7 +81,7 @@ const Weatherv2 = () => {
                 style={{
                   borderRadius: '0px',
                   boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                  padding: '10px',
+                 
                 }}
               >
                 {/* Header */}
@@ -135,20 +135,26 @@ const Weatherv2 = () => {
                  
                        {/* Gauge for Air Temp and Humidity */}
                        {(stat.label === 'Air Temperature' || stat.label === 'Relative Humidity (%)') && (
-                         <Box sx={{ width: '200px', height: '80px' }}>
-                           <GaugeChart
-                             id={`gauge-${index}-${idx}`}
-                             nrOfLevels={20}
-                             percent={stat.numeric / stat.max}
-                             colors={['#FF5F6D', '#FFC371', '#00C851']}
-                             arcWidth={0.3}
-                             textColor="#000000"
-                             animate={true}
-                             needleColor="#345243"
-                             formatTextValue={() => ''}
-                           />
-                         </Box>
-                       )}
+  <Box sx={{ width: '200px', height: '80px' }}>
+    <GaugeChart
+      id={`gauge-${index}-${idx}`}
+      nrOfLevels={3}
+      percent={stat.numeric / stat.max}
+      colors={
+        stat.label === 'Air Temperature'
+          ? ['#87CEEB', '#ff9300', '#FF0000'] // Solid sky blue, blue, red
+          : ['#87CEEB', '#00a6ff', '#1b00ff'] // For humidity
+      }
+      arcWidth={0.3}
+      textColor="#000000"
+      animate={true}
+      needleColor="#345243"
+      formatTextValue={() => ''}
+    />
+  </Box>
+)}
+
+
                      </Box>
                    </Box>
                  </HvCard>
