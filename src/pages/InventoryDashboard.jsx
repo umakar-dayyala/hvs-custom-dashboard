@@ -6,6 +6,7 @@ import { Add, Remove, Upload, Download } from "@mui/icons-material";
 import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
 import AssetDialog from "../components/AssetDialog";
+import { getInventoryData } from "../service/InventoryService";
 
 const InventoryDashboard = () => {
   const [allRows, setAllRows] = useState([]);
@@ -44,7 +45,7 @@ const InventoryDashboard = () => {
   // 🔸 Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getAssets();
+      const data = await getInventoryData ();
       setAllRows(data);
     };
     fetchData();
@@ -180,7 +181,7 @@ const InventoryDashboard = () => {
 
       {/* 🔹 Table */}
       <InventoryTable
-        rows={filteredRows}
+        data={filteredRows}
         openRow={openRow}
         onExpand={handleExpand}
         onDialogOpen={handleDialogOpen}
