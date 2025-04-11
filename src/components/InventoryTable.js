@@ -12,6 +12,8 @@ import {
 import { IconButton } from "@mui/material";
 import { Add, Remove, Edit } from "@mui/icons-material";
 
+const headerStyle = { backgroundColor: "grey", color: "white" };
+
 const InventoryTable = ({
   data,
   selectedIds = [],
@@ -47,7 +49,7 @@ const InventoryTable = ({
       <HvTable>
         <HvTableHead>
           <HvTableRow>
-            <HvTableHeader>
+            <HvTableHeader style={headerStyle}>
               <HvCheckBox
                 checked={
                   data.length > 0 &&
@@ -60,12 +62,12 @@ const InventoryTable = ({
                 onChange={handleSelectAll}
               />
             </HvTableHeader>
-            <HvTableHeader>Unique Asset Type Code</HvTableHeader>
-            <HvTableHeader>Asset Type</HvTableHeader>
-            <HvTableHeader>Quantity</HvTableHeader>
-            <HvTableHeader>Logged By</HvTableHeader>
-            <HvTableHeader>Log Date</HvTableHeader>
-            <HvTableHeader>Action</HvTableHeader>
+            <HvTableHeader style={headerStyle}>Unique Asset Type Code</HvTableHeader>
+            <HvTableHeader style={headerStyle}>Asset Type</HvTableHeader>
+            <HvTableHeader style={headerStyle}>Quantity</HvTableHeader>
+            <HvTableHeader style={headerStyle}>Logged By</HvTableHeader>
+            <HvTableHeader style={headerStyle}>Log Date</HvTableHeader>
+            <HvTableHeader style={headerStyle}>Action</HvTableHeader>
           </HvTableRow>
         </HvTableHead>
 
@@ -108,17 +110,17 @@ const InventoryTable = ({
                       <HvTable>
                         <HvTableHead>
                           <HvTableRow>
-                            <HvTableHeader>Unique Asset ID</HvTableHeader>
-                            <HvTableHeader>Asset Type</HvTableHeader>
-                            <HvTableHeader>Asset Manufacture</HvTableHeader>
-                            <HvTableHeader>Asset Serial Number</HvTableHeader>
-                            <HvTableHeader>Logged By</HvTableHeader>
-                            <HvTableHeader>Log Date</HvTableHeader>
-                            <HvTableHeader>Location</HvTableHeader>
-                            <HvTableHeader>Status</HvTableHeader>
-                            <HvTableHeader>Comments</HvTableHeader>
-                            <HvTableHeader>Attachments</HvTableHeader>
-                            <HvTableHeader>Action</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Unique Asset ID</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Asset Type</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Asset Manufacture</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Asset Serial Number</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Logged By</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Log Date</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Location</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Status</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Comments</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Attachments</HvTableHeader>
+                            <HvTableHeader style={headerStyle}>Action</HvTableHeader>
                           </HvTableRow>
                         </HvTableHead>
                         <HvTableBody>
