@@ -23,6 +23,9 @@ import greyFloorIcon from "../assets/greyJumpToFloor.svg";
 import unhealthyBio from "../assets/aBiological.svg";
 import unhealthyChemical from "../assets/aChemical.svg";
 import unhealthyRadio from "../assets/aRadiological.svg";
+import qrtIcon from "../assets/greyQRTvechicle.svg";
+import labIcon from "../assets/greyLAB.svg";
+
 
 
 // Fixed Chart Colors
@@ -58,7 +61,7 @@ const FloorCards = ({ floorData }) => {
       const activeSensors = floor.activeSensors ?? 0;
       const totalSensors = floor.totalSensors ?? 0;
       const hasAlert = (floor.unhealthySensors ?? 0) > 0; // Replace with your actual alert logic
-    
+
       if (totalAlarms > 0) {
         return "#E30613"; // Red
       } else if (hasAlert) {
@@ -69,7 +72,7 @@ const FloorCards = ({ floorData }) => {
         return "#28A745"; // Green
       }
     });
-    
+
 
     setValue(updatedColors);
 
@@ -93,51 +96,51 @@ const FloorCards = ({ floorData }) => {
           // Calculate the total alarms for the current floor
           const totalAlarms = floor.biological_alarms + floor.chemical_alarms + floor.radiological_alarms;
           const borderColor =
-          totalAlarms > 0
-          ? "red"  // Red for alarms
-          : floor.unhealthySensors > 0
-          ? "#ff9933"  // Amber for unhealthy sensors
-          : inActiveSensor > 0 || floor.activeSensors === 0
-          ? "RGB(128, 128,128)"  // Grey for inactive sensors
-          : floor.totalSensors === 0
-          ? "RGB(128, 128,128)" 
-          : "#29991d";
+            totalAlarms > 0
+              ? "red"  // Red for alarms
+              : floor.unhealthySensors > 0
+                ? "#ff9933"  // Amber for unhealthy sensors
+                : inActiveSensor > 0 || floor.activeSensors === 0
+                  ? "RGB(128, 128,128)"  // Grey for inactive sensors
+                  : floor.totalSensors === 0
+                    ? "RGB(128, 128,128)"
+                    : "#29991d";
 
           const bioIcon =
-          floor.totalSensors === 0
-            ? greyBio
-            : floor.biological_alarms > 0
-            ? alertBiological
-            // : floor.unhealthySensors > 0
-            // ? unhealthyBio
-            : inActiveSensor > 0 || floor.activeSensors === 0
-            ? greyBio
-            : gBiological;
-        
-        const chemicalIcon =
-          floor.totalSensors === 0
-            ? greyChemical
-            : floor.chemical_alarms > 0
-            ? alertChemical
-            // : floor.unhealthySensors > 0
-            // ? unhealthyChemical
-            : inActiveSensor > 0 || floor.activeSensors === 0
-            ? greyChemical
-            : gChemical;
-        
-        const radioIcon =
-          floor.totalSensors === 0
-            ? greyRadio
-            : floor.radiological_alarms > 0
-            ? alertRadiation
-            // : floor.unhealthySensors > 0
-            // ? unhealthyRadio
-            : inActiveSensor > 0 || floor.activeSensors === 0
-            ? greyRadio
-            : gRadiation;  
+            floor.totalSensors === 0
+              ? greyBio
+              : floor.biological_alarms > 0
+                ? alertBiological
+                // : floor.unhealthySensors > 0
+                // ? unhealthyBio
+                : inActiveSensor > 0 || floor.activeSensors === 0
+                  ? greyBio
+                  : gBiological;
+
+          const chemicalIcon =
+            floor.totalSensors === 0
+              ? greyChemical
+              : floor.chemical_alarms > 0
+                ? alertChemical
+                // : floor.unhealthySensors > 0
+                // ? unhealthyChemical
+                : inActiveSensor > 0 || floor.activeSensors === 0
+                  ? greyChemical
+                  : gChemical;
+
+          const radioIcon =
+            floor.totalSensors === 0
+              ? greyRadio
+              : floor.radiological_alarms > 0
+                ? alertRadiation
+                // : floor.unhealthySensors > 0
+                // ? unhealthyRadio
+                : inActiveSensor > 0 || floor.activeSensors === 0
+                  ? greyRadio
+                  : gRadiation;
 
           const totalSensors = floor.totalSensors || 0;
-            //(floor.activeSensors || 0) + (inActiveSensor || 0) + (floor.unhealthySensors);
+          //(floor.activeSensors || 0) + (inActiveSensor || 0) + (floor.unhealthySensors);
 
           const chartOptions = {
             chart: {
@@ -189,6 +192,23 @@ const FloorCards = ({ floorData }) => {
             floor.unhealthySensors || 0,
             totalAlarms || 0,
           ];
+          const floorName = floor.floor?.toUpperCase() ?? "";
+
+          // Pick base icon
+          let baseIcon;
+          if (floorName.includes("QRT")) {
+            baseIcon = qrtIcon;
+          } else if (floorName.includes("LAB")) {
+            baseIcon = labIcon;
+          } else {
+            baseIcon = floorIcon;
+          }
+          
+          // Determine if it should appear "greyed out"
+          const isGrey =
+            (floor.totalSensors ?? 0) === 0 ||
+            ((floor.activeSensors ?? 0) === 0 && (inActiveSensor ?? 0) > 0);
+          
 
           return (
             <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={index}>
@@ -226,22 +246,26 @@ const FloorCards = ({ floorData }) => {
 
                     <Box
                       component="img"
-                      src={
-                        (floor.totalSensors ?? 0) === 0 || ((floor.activeSensors ?? 0) === 0 && (inActiveSensor ?? 0) > 0)
-                          ? greyFloorIcon
-                          : floorIcon
-                      }
+                      src={baseIcon}
                       alt="Floor Icon"
                       width={30}
                       height={30}
                       sx={{
                         marginLeft: 1,
-                        filter: totalAlarms === 0 && ((floor.totalSensors ?? 0) !== 0 && (floor.activeSensors ?? 0) > 0 )
-                          ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
-                          : "none",
-                        animation: totalAlarms > 0 ? `${zoomBlinkAnimation} 1.5s infinite ease-in-out` : "none",
+                        filter: isGrey
+                          ? "grayscale(100%) brightness(80%)"
+                          : totalAlarms === 0 &&
+                            (floor.totalSensors ?? 0) !== 0 &&
+                            (floor.activeSensors ?? 0) > 0
+                            ? "brightness(0) saturate(100%) invert(38%) sepia(75%) saturate(498%) hue-rotate(92deg) brightness(90%) contrast(95%)"
+                            : "none",
+                        animation:
+                          totalAlarms > 0
+                            ? `${zoomBlinkAnimation} 1.5s infinite ease-in-out`
+                            : "none",
                       }}
                     />
+
 
                   </Box>
 
@@ -290,7 +314,7 @@ const FloorCards = ({ floorData }) => {
                         (floor.biological_alarms || 0) > 0 ||
                         (floor.chemical_alarms || 0) > 0 ||
                         (floor.radiological_alarms || 0) > 0;
-          
+
                       if (hasAlarm) {
                         navigate(`/floorwiseAlarms?floor=${encodeURIComponent(floor.floor)}`);
                       } else {
@@ -299,7 +323,7 @@ const FloorCards = ({ floorData }) => {
                     }}
                   >
                     <span>Total Detected Alarms</span>
-                    <span>{totalAlarms|| "00"}</span>
+                    <span>{totalAlarms || "00"}</span>
                   </Button>
 
                   {/* Divider */}
