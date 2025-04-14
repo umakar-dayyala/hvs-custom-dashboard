@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box, Button, MenuItem, TextField, Stack, IconButton
 } from "@mui/material";
 import { Add, Remove, Upload, Download } from "@mui/icons-material";
+import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
-// import AssetDialog from "../components/AssetDialog";
+import AssetDialog from "../components/AssetDialog";
+import { getInventoryData } from "../service/InventoryService";
 
 const InventoryDashboard = () => {
+  const [allRows, setAllRows] = useState([]);
   const [openRow, setOpenRow] = useState(null);
   const [dialog, setDialog] = useState({ type: '', open: false });
   const [selectedAsset, setSelectedAsset] = useState(null);
@@ -33,22 +36,20 @@ const InventoryDashboard = () => {
     status: ''
   });
 
-  const [allRows, setAllRows] = useState([
-    {
-      id: '1', title: 'Asset-001', type: 'Sensor', status: 'Active',
-      probability: 'John Doe', severity: '2024-12-20', priority: 'Storeroom',
-    },
-    {
-      id: '2', title: 'Asset-002', type: 'System', status: 'Removed',
-      probability: 'Alice', severity: '2025-01-10', priority: 'Upper Ground',
-    },
-  ]);
-
   const filteredRows = allRows.filter(row =>
     (!filters.type || row.type === filters.type) &&
     (!filters.location || row.priority === filters.location) &&
     (!filters.status || row.status === filters.status)
   );
+
+  // 🔸 Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getInventoryData ();
+      setAllRows(data);
+    };
+    fetchData();
+  }, []);
 
   const handleExpand = (id) => {
     setOpenRow(openRow === id ? null : id);
@@ -108,7 +109,7 @@ const InventoryDashboard = () => {
   };
 
   const handleDialogSubmit = () => {
-    console.log(dialog.type === 'remove' ? 'Removing:' : 'Submitting:', dialog.type === 'remove' ? selectedAsset : formData);
+    console.log(JSON.stringify(dialog.type === 'remove' ? selectedAsset : formData, null, 2));
     handleDialogClose();
   };
 
@@ -125,11 +126,15 @@ const InventoryDashboard = () => {
   };
 
   const handleDownload = () => {
-    console.log("Downloading data...");
+    saveAs(
+      process.env.PUBLIC_URL + "/templates/Inventory-Template.xlsx",
+      "Inventory-Template.xlsx"
+    );
   };
 
   return (
     <Box p={2} mt={5}>
+      {/* 🔹 Action buttons and filters */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
         <Stack direction="row" spacing={2}>
           <IconButton onClick={() => handleDialogOpen("add")}>
@@ -174,8 +179,9 @@ const InventoryDashboard = () => {
         </Stack>
       </Stack>
 
+      {/* 🔹 Table */}
       <InventoryTable
-        rows={filteredRows}
+        data={filteredRows}
         openRow={openRow}
         onExpand={handleExpand}
         onDialogOpen={handleDialogOpen}
@@ -183,7 +189,8 @@ const InventoryDashboard = () => {
         onSelectRow={handleSelectRow}
       />
 
-      {/* <AssetDialog
+      {/* 🔹 Dialog */}
+      <AssetDialog
         open={dialog.open}
         type={dialog.type}
         onClose={handleDialogClose}
@@ -194,7 +201,7 @@ const InventoryDashboard = () => {
         assetTypes={assetTypes}
         assetLocations={assetLocations}
         assetStatuses={assetStatuses}
-      /> */}
+      /> 
     </Box>
   );
 };

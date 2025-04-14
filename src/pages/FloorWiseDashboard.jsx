@@ -19,7 +19,6 @@ import {
 import Breadcrumbs from "../components/Breadcrumbs";
 import SensorLegend from "../components/SensorLegend";
 import FloorWiseChart from "../components/FloorWiseChart";
-import SensorHeatMap from "../components/SensorHeatMap";
 import SensorAlarmHeatmap from "../components/SensorAlarmHeatmap";
 import SensorAlertTable from "../components/SensorAlertMapTable";
 import Loader from "../components/Loader";  // Import the Loader component
