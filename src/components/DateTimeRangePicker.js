@@ -92,8 +92,8 @@ const DateTimeRangePicker = ({ onChange, onOptionChange }) => {
           <MenuItem value="1hour">Last 1 hour</MenuItem>
           <MenuItem value="2hours">Last 2 hours</MenuItem>
           <MenuItem value="24hours">Last 24 hours</MenuItem>
-          <MenuItem value="48hours">Last 48 hours</MenuItem>
-          <MenuItem value="7days">Last 7 days</MenuItem>
+          {/* <MenuItem value="48hours">Last 48 hours</MenuItem>
+          <MenuItem value="7days">Last 7 days</MenuItem> */}
           {/* <MenuItem value="lastMonth">Last Month</MenuItem> */}
         </Select>
       </FormControl>
