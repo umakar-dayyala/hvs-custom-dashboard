@@ -150,6 +150,7 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState }) =
                 {sectionTitle === "Radiation_Parameters" || sectionTitle === "Radiation_Readings" || sectionTitle === "Biological_Parameters" || sectionTitle === "Chemical Alarms" || sectionTitle === "Radiation Alarm" ? (
                   <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
                     {Object.entries(parameters).map(([groupTitle, subParams]) => (
+
                       <div
                         key={groupTitle}
                         style={{
@@ -162,14 +163,39 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState }) =
                         <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
                           {groupTitle}
                         </div>
+                        {groupTitle === "Chemical Alarms" ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingLeft: "10px" }}>
+                            {["CH", "As", "CN", "G", "Hd"].map((chem) => {
+                              const alarmKey = `Alarm ${chem}`;
+                              const isAlarm = subParams[alarmKey] > 0;
+                              const color = isAlarm ? "red" : "green";
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
-                          {Object.entries(subParams).map(([label, value]) => (
-                            <div key={label} style={{ fontSize: "18px" }}>
-                              {label}: {value}
-                            </div>
-                          ))}
-                        </div>
+                              return (
+                                <div key={chem} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                  <div
+                                    style={{
+                                      width: "24px",
+                                      height: "24px",
+                                      backgroundColor: color,
+                                      borderRadius: "50%",
+                                    }}
+                                  ></div>
+                                  <span style={{ fontSize:"24px"}}>{chem}</span>
+                                  <span style={{ fontSize:"24px"}}>|</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
+                            {Object.entries(subParams).map(([label, value]) => (
+                              <div key={label} style={{ fontSize: "18px" }}>
+                                {label}: {value}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                       </div>
                     ))}
                   </div>
@@ -214,55 +240,55 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState }) =
 
       {/* Notifications - Show Only Latest 3 */}
       {!noData && (
-  <HvCard
-    className="parameter-card"
-    elevation={0}
-    statusColor="red"
-    style={{
-      borderRadius: "0px",
-      boxShadow:
-        "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-    }}
-  >
-    <HvCardContent className="parameter-content">
-      <HvTypography variant="title2" className="section-title">
-        Notifications
-      </HvTypography>
-      <TableContainer
-        component={Paper}
-        elevation={0}
-        style={{
-          width: "100%",
-          maxHeight: "400px", // adjust as needed
-          overflowY: "auto",
-        }}
-      >
-        <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-          <TableBody>
-            {recentNotifications.length > 0 ? (
-              recentNotifications.map((notification, index) => (
-                <StyledTableRow key={index}>
-                  <StyledTableCell component="th" scope="row">
-                    {notification.label}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    {notification.value}
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))
-            ) : (
-              <StyledTableRow>
-                <StyledTableCell colSpan={2} align="center">
-                  No notifications available
-                </StyledTableCell>
-              </StyledTableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </HvCardContent>
-  </HvCard>
-)}
+        <HvCard
+          className="parameter-card"
+          elevation={0}
+          statusColor="red"
+          style={{
+            borderRadius: "0px",
+            boxShadow:
+              "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+          }}
+        >
+          <HvCardContent className="parameter-content">
+            <HvTypography variant="title2" className="section-title">
+              Notifications
+            </HvTypography>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              style={{
+                width: "100%",
+                maxHeight: "400px", // adjust as needed
+                overflowY: "auto",
+              }}
+            >
+              <Table sx={{ minWidth: "100%" }} aria-label="customized table">
+                <TableBody>
+                  {recentNotifications.length > 0 ? (
+                    recentNotifications.map((notification, index) => (
+                      <StyledTableRow key={index}>
+                        <StyledTableCell component="th" scope="row">
+                          {notification.label}
+                        </StyledTableCell>
+                        <StyledTableCell align="right">
+                          {notification.value}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))
+                  ) : (
+                    <StyledTableRow>
+                      <StyledTableCell colSpan={2} align="center">
+                        No notifications available
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </HvCardContent>
+        </HvCard>
+      )}
 
     </div>
   );
