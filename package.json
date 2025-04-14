@@ -5,6 +5,7 @@
   "dependencies": {
     "@chakra-ui/react": "^2.10.6",
     "@date-io/date-fns": "^3.2.1",
+    "@emotion/css": "^11.13.5",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@hitachivantara/uikit-react-core": "^5.89.0",

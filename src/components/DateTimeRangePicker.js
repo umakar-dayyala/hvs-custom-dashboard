@@ -13,25 +13,35 @@ const DateTimeRangePicker = ({ onChange, onOptionChange }) => {
     let newStartDate = dayjs();
     switch (selectedRange) {
       case "5min":
-        newStartDate = dayjs().subtract(5, "minute");
-        break;
-      case "7min":
-        newStartDate = dayjs().subtract(7, "minute");
-        break;
-      case "10min":
-        newStartDate = dayjs().subtract(10, "minute");
-        break;
-      case "15min":
-        newStartDate = dayjs().subtract(15, "minute");
-        break;
-      case "7days":
-        newStartDate = dayjs().subtract(7, "day");
-        break;
-      case "lastMonth":
-        newStartDate = dayjs().subtract(1, "month");
-        break;
-      default:
-        newStartDate = dayjs().subtract(5, "minute");
+      newStartDate = dayjs().subtract(5, "minute");
+      break;
+    case "7min":
+      newStartDate = dayjs().subtract(7, "minute");
+      break;
+    case "10min":
+      newStartDate = dayjs().subtract(10, "minute");
+      break;
+    case "15min":
+      newStartDate = dayjs().subtract(15, "minute");
+      break;
+    case "1hour":
+      newStartDate = dayjs().subtract(1, "hour");
+      break;
+    case "2hours":
+      newStartDate = dayjs().subtract(2, "hour");
+      break;
+    case "24hours":
+      newStartDate = dayjs().subtract(24, "hour");
+      break;
+    case "48hours":
+      newStartDate = dayjs().subtract(48, "hour");
+      break;
+    case "7days":
+      newStartDate = dayjs().subtract(7, "day");
+      break;
+    
+    default:
+      newStartDate = dayjs().subtract(5, "minute");
     }
 
     setStartDate(newStartDate);
@@ -79,8 +89,12 @@ const DateTimeRangePicker = ({ onChange, onOptionChange }) => {
           <MenuItem value="7min">Last 7 mins</MenuItem>
           <MenuItem value="10min">Last 10 mins</MenuItem>
           <MenuItem value="15min">Last 15 mins</MenuItem>
+          <MenuItem value="1hour">Last 1 hour</MenuItem>
+          <MenuItem value="2hours">Last 2 hours</MenuItem>
+          <MenuItem value="24hours">Last 24 hours</MenuItem>
+          <MenuItem value="48hours">Last 48 hours</MenuItem>
           <MenuItem value="7days">Last 7 days</MenuItem>
-          <MenuItem value="lastMonth">Last Month</MenuItem>
+          {/* <MenuItem value="lastMonth">Last Month</MenuItem> */}
         </Select>
       </FormControl>
     </Box>
