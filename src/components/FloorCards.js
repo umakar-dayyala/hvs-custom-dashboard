@@ -139,8 +139,8 @@ const FloorCards = ({ floorData }) => {
                   ? greyRadio
                   : gRadiation;
 
-          const totalSensors = floor.totalSensors || 0;
-          //(floor.activeSensors || 0) + (inActiveSensor || 0) + (floor.unhealthySensors);
+          const totalSensors = 
+          (floor.activeSensors || 0) + (inActiveSensor || 0) + (floor.unhealthySensors);
 
           const chartOptions = {
             chart: {
