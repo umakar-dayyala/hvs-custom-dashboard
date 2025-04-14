@@ -61,7 +61,7 @@ const DateTimeRangePicker = ({ onChange, onOptionChange }) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       updateTimeRange(timeRange);
-    }, 10000); // Updates every 10 seconds
+    }, 15000); // Updates every 15 seconds
 
     return () => clearInterval(intervalId);
   }, [timeRange]);
