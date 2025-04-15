@@ -52,7 +52,7 @@ const SensorAlertTable = ({ sensorsData, title }) => {
   const handleSensorClick = (sensor, deviceId) => {
     const route = routeName(sensor);
     if (route) {
-      navigate(`/${route}?device_d=${deviceId}`);
+      navigate(`/${route}?device_id=${deviceId}`);
     }
   };
 
