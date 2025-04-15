@@ -194,16 +194,69 @@ const FloorWiseDashboard = () => {
     fetchSensorStatusData(floor, updatedFilters.zone, updatedFilters.location, updatedFilters.sensorType, updatedFilters.sensor);
   };
 
+  // useEffect(() => {
+  //   fetchFloorSummary(floor, filters);
+  //   fetchSensorSummary(floor);
+  //   fetchFloorList();
+  //   fetchZoneData(floor);
+  //   fetchLocationData("ALL", floor);
+  //   fetchSensorTypeData(floor, "ALL", "ALL");
+  //   fetchSensorNameData(floor, "ALL", "ALL", []);
+  //   fetchSensorStatusData(floor, "ALL", "ALL", [], []);
+  // }, [floor]);
   useEffect(() => {
-    fetchFloorSummary(floor, filters);
-    fetchSensorSummary(floor);
-    fetchFloorList();
-    fetchZoneData(floor);
-    fetchLocationData("ALL", floor);
-    fetchSensorTypeData(floor, "ALL", "ALL");
-    fetchSensorNameData(floor, "ALL", "ALL", []);
-    fetchSensorStatusData(floor, "ALL", "ALL", [], []);
-  }, [floor]);
+    let isMounted = true;
+    let timeoutId;
+    let isFirstLoad = true;
+  
+    const fetchAllData = async () => {
+      if (isFirstLoad) {
+        setLoading(true);
+      }
+  
+      try {
+        const floorSummaryRes = await getFloorSummary(
+          `param_floor=${floor}&param_zone=${formatFilter(filters.zone)}&param_location=${formatFilter(filters.location)}&param_sensor_type=${formatFilter(filters.sensorType)}&param_sensor_name=${formatFilter(filters.sensor)}&param_sensor_status=${formatFilter(filters.sensorStatus)}`
+        );
+        const sensorSummaryRes = await GetSensorSummary(`param_floor=${floor}`);
+        const floorListRes = await floorList();
+        // const zoneDataRes = await getFloorZoneSelector(`param_floor=${floor}`);
+        // const locationRes = await getLocationSelector(`param_floor=${floor}&param_zone=ALL`);
+        // const sensorTypeRes = await getSensorTypeSelector(`param_floor=${floor}&param_zone=ALL&param_location=ALL`);
+        // const sensorNameRes = await getSensorNameSelector(`param_floor=${floor}&param_zone=ALL&param_location=ALL&param_sensor_type=ALL`);
+        // const sensorStatusRes = await getSensorStatusSelector(`param_floor=${floor}&param_zone=ALL&param_location=ALL&param_sensor_type=ALL&param_sensor_name=ALL`);
+  
+        if (isMounted) {
+          setFloorSummaryData(floorSummaryRes);
+          setSensorSummary(sensorSummaryRes.data);
+          setFloorData(floorListRes);
+          // setZoneData(zoneDataRes.data);
+          // setLocationData(locationRes.data);
+          // setSensorTypeData(sensorTypeRes.data);
+          // setSensorNameData(sensorNameRes.data);
+          // setSensorStatusData(sensorStatusRes.data);
+        }
+      } catch (err) {
+        console.error("Error in polling:", err);
+      } finally {
+        if (isMounted) {
+          if (isFirstLoad) {
+            setLoading(false);
+            isFirstLoad = false;
+          }
+          timeoutId = setTimeout(fetchAllData, 500);
+        }
+      }
+    };
+  
+    fetchAllData();
+  
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [floor, filters]);
+  
 
   const countDetectorTypes = (data) => {
     return data.reduce((acc, item) => {
