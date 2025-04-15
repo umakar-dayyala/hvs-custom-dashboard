@@ -153,7 +153,7 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                       )}
                     </TableCell>
 
-                    {/* Time Stamp of Alarm */}
+                      
                     <TableCell className="table-cell">
                       <HvTypography>{alert.correlated_alarms}</HvTypography>
                     </TableCell>
@@ -184,43 +184,6 @@ const AllAlertsFloorWiseTable = ({ floorWiseAlertsData }) => {
                         <HvTypography>N/A</HvTypography>
                       )}
                     </TableCell>
-                    {/* Alarm Type with Icon */}
-                    {/* <TableCell className="table-cell">
-                      <Box style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.25rem", padding: "0.5rem" }}>
-                        {sensorTypeIcons[alert.sensor_type] && (
-                          <img
-                            src={sensorTypeIcons[alert.sensor_type]}
-                            alt={alert.sensor_type}
-                          />
-
-                        )}
-                        <HvTypography color="negative">{alert.alarm_type}</HvTypography>
-                      </Box>
-                    </TableCell> */}
-
-                    {/* Correlated Alarm */}
-                    {/* <TableCell className="table-cell">
-                      <img
-                        src={alert.correlated_alarms === "No" ? CancelIcon : CheckCircleIcon}
-                        alt={alert.correlated_alarms === "No" ? "No" : "Yes"}
-                        className="status-icon"
-                      />
-                    </TableCell> */}
-
-                    {/* Correlated Alarm
-                    <TableCell className="table-cell">
-                      {alert.correlated_alarms && alert.correlated_alarms !== "No" ? (
-                        <HvTypography>{alert.correlated_alarms}</HvTypography>
-                      ) : (
-                        <HvTypography>N/A</HvTypography>
-                      )}
-                    </TableCell> */}
-
-
-                    {/* Incident Status
-                    <TableCell className="table-cell">
-                      <HvTypography>{alert.incident_status}</HvTypography>
-                    </TableCell> */}
 
                     {/* Action */}
                     <TableCell className="table-cell">
