@@ -23,7 +23,7 @@ const AGMlabels = [
 const DetectorParams = (sensor) => {
   return (
     <div className="param-container">
-      <div className="header-row">
+      <div className="header-row-config">
         <div></div>
         <div>Current Value</div>
         <div>New Value</div>

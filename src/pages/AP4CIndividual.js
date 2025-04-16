@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -25,10 +25,17 @@ import dayjs from "dayjs";
 import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
-import aicon from "../assets/aRadiological.svg";
+import aicon from "../assets/aChemical.svg";
 import greyChem from "../assets/greyChem.svg";
 
-export const AP4CIndividual = () => {
+// Constants
+const DUMMY_KPI_DATA = [
+  { title: "Chemical Alarms", value: "No Data" },
+  { title: "Detector Health Faults", value: "No Data" },
+  { title: "Analytics Alert", value: "No Data" }
+];
+
+export const AP4CIndividual = React.memo(() => {
   const [paramsData, setParamsData] = useState([]);
   const [ap4cParamChartData, setap4cParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -46,21 +53,26 @@ export const AP4CIndividual = () => {
   });
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
   
-
   // Time range states initialized as null
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
-  const formatDateForApi = (date) => {
+  // Memoized device ID
+  const deviceId = useMemo(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    return queryParams.get("device_id");
+  }, []);
+
+  // Memoized date formatter
+  const formatDateForApi = useCallback((date) => {
     if (!date) return null;
     return `'${dayjs(date).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
-  };
+  }, []);
 
+  // WebSocket connection
   useEffect(() => {
-    // Real-time data updates (WebSocket)
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
+    if (!deviceId) return;
 
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
@@ -71,7 +83,6 @@ export const AP4CIndividual = () => {
         setParam(data.parametersData);
         setNotifications(data.Notifications);
         setLastFetchLiveData(data.lastfetched.time); 
-
       }
     });
 
@@ -81,27 +92,30 @@ export const AP4CIndividual = () => {
         console.log("WebSocket closed");
       }
     };
-  }, []);
+  }, [deviceId]);
 
-  const fetchData = async (fromTime, toTime, component) => {
-    if (!fromTime || !toTime) return;
+  // Memoized fetch data function
+  const fetchData = useCallback(async (fromTime, toTime, component) => {
+    if (!fromTime || !toTime || !deviceId) return;
 
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
 
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
-
     try {
-      if (component === 'PlotlyDataChart') {
-        const chart = await fetchAP4CParamChartData(deviceId, formattedFromTime, formattedToTime);
-        setap4cParamChartData(chart?.data || {});
-      } else if (component === 'AnomalyChart') {
-        const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-        setAnomalyChartData(anomaly?.data || {});
-      } else if (component === 'OutlierChart') {
-        const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-        setOutlierChartData(outlier?.data || {});
+      let response;
+      switch (component) {
+        case 'PlotlyDataChart':
+          response = await fetchAP4CParamChartData(deviceId, formattedFromTime, formattedToTime);
+          setap4cParamChartData(response?.data || {});
+          break;
+        case 'AnomalyChart':
+          response = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
+          setAnomalyChartData(response?.data || {});
+          break;
+        case 'OutlierChart':
+          response = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
+          setOutlierChartData(response?.data || {});
+          break;
       }
 
       // Update last fetch time on success
@@ -112,9 +126,23 @@ export const AP4CIndividual = () => {
     } catch (error) {
       console.error(`Error fetching ${component} data:`, error);
     }
-  };
+  }, [deviceId, formatDateForApi]);
 
-  const handleRangeChange = (range, component) => {
+  // Range change handlers
+  const handlePlotlyRangeChange = useCallback((range) => {
+    handleRangeChange(range, 'PlotlyDataChart', setPlotlyRange);
+  }, []);
+
+  const handleAnomalyRangeChange = useCallback((range) => {
+    handleRangeChange(range, 'AnomalyChart', setAnomalyRange);
+  }, []);
+
+  const handleOutlierRangeChange = useCallback((range) => {
+    handleRangeChange(range, 'OutlierChart', setOutlierRange);
+  }, []);
+
+  // Generic range change handler
+  const handleRangeChange = useCallback((range, component, setRange) => {
     if (!Array.isArray(range) || range.length < 2) {
       console.error("Invalid range format:", range);
       return;
@@ -128,62 +156,60 @@ export const AP4CIndividual = () => {
       return;
     }
 
-    // Update the appropriate range state
-    if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime, toTime });
-    } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime, toTime });
-    } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime, toTime });
-    }
-  };
+    setRange({ fromTime, toTime });
+  }, []);
 
   // Fetch data when ranges change
   useEffect(() => {
     if (plotlyRange.fromTime && plotlyRange.toTime) {
       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
     }
-  }, [plotlyRange]);
+  }, [plotlyRange, fetchData]);
 
   useEffect(() => {
     if (anomalyRange.fromTime && anomalyRange.toTime) {
       fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
     }
-  }, [anomalyRange]);
+  }, [anomalyRange, fetchData]);
 
   useEffect(() => {
     if (outlierRange.fromTime && outlierRange.toTime) {
       fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
     }
-  }, [outlierRange]);
+  }, [outlierRange, fetchData]);
 
   // Toggle state handling
-  const handleToggleClick = (state) => {
+  const handleToggleClick = useCallback((state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
       setNewState(state);
       setShowModal(true);
     } else {
       setToggleState(state);
     }
-  };
+  }, [toggleState]);
 
-  const handleConfirmChange = () => {
+  const handleConfirmChange = useCallback(() => {
     if (newState) {
       setToggleState(newState);
     }
     setShowModal(false);
-  };
+  }, [newState]);
 
-  const handleCancelChange = () => {
+  const handleCancelChange = useCallback(() => {
     setNewState(null);
     setShowModal(false);
-  };
+  }, []);
+
+  // Memoized layout values based on toggle state
+  const chartLayout = useMemo(() => {
+    return toggleState === "Operator" ? "100%" : "33.33%";
+  }, [toggleState]);
 
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Breadcrumbs />
-        <div style={{ display: "flex", gap: "10px",alignItems:"center" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Box style={{ whiteSpace: "nowrap" }}>
             {LastFetchLiveData && (
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
@@ -205,19 +231,15 @@ export const AP4CIndividual = () => {
               greenBell={greenBell} 
               aicon={aicon} 
               greyIcon={greyChem}
-              dummyKpiData={[
-                { title: "Chemical Alarms", value: "No Data" },
-                { title: "Detector Health Faults", value: "No Data" },
-                { title: "Analytics Alert", value: "No Data" }
-              ]}
+              dummyKpiData={DUMMY_KPI_DATA}
             />
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={param} notifications={notifications}/>
+          <IndividualParameters paramsData={param} notifications={notifications} toggleState={toggleState}/>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={ap4cParamChartData}
-              onRangeChange={(range) => handleRangeChange(range, "PlotlyDataChart")}
+              onRangeChange={handlePlotlyRangeChange}
               title={'Chemical Readings'}
               lastFetchTime={lastFetchTimes.plotly}
             />
@@ -228,7 +250,7 @@ export const AP4CIndividual = () => {
           <Box width={"50%"}>
             <AnomalyChart
               anomalyChartData={anomalyChartData}
-              onRangeChange={(range) => handleRangeChange(range, "AnomalyChart")}
+              onRangeChange={handleAnomalyRangeChange}
               title={'Anomaly Detection'}
               lastFetchTime={lastFetchTimes.anomaly}
             />
@@ -236,7 +258,7 @@ export const AP4CIndividual = () => {
           <Box width={"50%"}>
             <OutlierChart
               outlierChartData={outlierChartData}
-              onRangeChange={(range) => handleRangeChange(range, "OutlierChart")}
+              onRangeChange={handleOutlierRangeChange}
               title={'Outlier Detection'}
               lastFetchTime={lastFetchTimes.outlier}
             />
@@ -244,15 +266,15 @@ export const AP4CIndividual = () => {
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} gap={2}>
-          <Box width={toggleState === "Operator" ? "100%" : "33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <IntensityChart />
           </Box>
           {toggleState !== "Operator" && (
             <>
-              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <Corelation />
               </Box>
-              <Box width={"33.33%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <PredictionChart />
               </Box>
             </>
@@ -270,4 +292,4 @@ export const AP4CIndividual = () => {
       )}
     </Box>
   );
-};
+});

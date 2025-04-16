@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useMemo, useCallback, memo } from "react";
 import {
   HvCard,
   HvCardContent,
@@ -12,9 +12,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import "../css/IndividualParameters.css";
-import { useEffect, useState } from "react";
+import { FixedSizeList as List } from 'react-window';
+import LivePlot from "./LivePlot";
 
-// Styled table components
+// Styled components defined outside the component to prevent recreation
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#000",
@@ -39,11 +40,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const capitalize = (str) =>
-  str
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+// Memoized components
+const MemoizedLivePlot = memo(LivePlot);
+// const MemoizedPlot = memo(Plot);
 
 // Default Cards when no data is available
 const defaultCards = [
@@ -53,32 +52,72 @@ const defaultCards = [
   { title: "Notifications", value: "No Data" },
 ];
 
-const IndividualParameters = ({ paramsData, notifications = [], toggleState }) => {
+
+
+const parameterGroupStyle = {
+  backgroundColor: "#f5f5f5",
+  padding: "14px",
+  borderRadius: "8px",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+};
+
+const notificationContainerStyle = {
+  width: "100%",
+  maxHeight: "600px",
+  overflowY: "auto",
+};
+
+const IndividualParameters = memo(({ paramsData, notifications = [], toggleState }) => {
+  const memoizedCapitalize = useCallback((str) => {
+    if (!str) return '';
+    return str
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }, []);
+
   const [recentNotifications, setRecentNotifications] = useState([]);
 
-  const noData = !paramsData || !paramsData.length;
-  const displayData = noData ? defaultCards : paramsData[0];
-  const isVRM = window.location.href.includes("vrm") || window.location.href.includes("VRM");
-  const isPRM = window.location.href.includes("prm") || window.location.href.includes("PRM");
+  // Memoized derived values
+  const noData = useMemo(() => !paramsData || !paramsData.length, [paramsData]);
+  const displayData = useMemo(() => noData ? defaultCards : paramsData[0], [noData, paramsData]);
+  const isVRM = useMemo(() => window.location.href.includes("vrm") || window.location.href.includes("VRM"), []);
+  const isPRM = useMemo(() => window.location.href.includes("prm") || window.location.href.includes("PRM"), []);
 
+  // Memoized functions
+  const normalizeTimestamp = useCallback((timestamp) => {
+    if (timestamp && typeof timestamp === "string" && timestamp.includes(" ")) {
+      return new Date(timestamp.replace(" ", "T"));
+    }
+    return new Date(timestamp);
+  }, []);
+
+  const getFilteredParameters = useCallback((parameters) => {
+    if (toggleState === "Operator" && parameters) {
+      if (isVRM) return Object.fromEntries(Object.entries(parameters).slice(0, 3));
+      if (isPRM) return Object.fromEntries(Object.entries(parameters).slice(0, 2));
+    }
+    return parameters;
+  }, [toggleState, isVRM, isPRM]);
+
+  // Effects
   useEffect(() => {
     if (notifications.length === 0) return;
 
     const existing = JSON.parse(localStorage.getItem("notifications")) || [];
     const now = new Date();
 
-    const normalizeTimestamp = (timestamp) => {
-      // Replace space with 'T' for ISO compliance
-      if (timestamp && typeof timestamp === "string" && timestamp.includes(" ")) {
-        return new Date(timestamp.replace(" ", "T"));
-      }
-      return new Date(timestamp);
-    };
-
     const updated = [...existing, ...notifications].filter((notif) => {
       const notifTime = normalizeTimestamp(notif.value);
       const hoursDiff = (now - notifTime) / (1000 * 60 * 60);
-      return hoursDiff <= 24;
+      return hoursDiff <= 12; // Keep notifications from the last 12 hours
+    });
+
+    // Sort notifications by timestamp in descending order (newest first)
+    updated.sort((a, b) => {
+      const timeA = normalizeTimestamp(a.value).getTime();
+      const timeB = normalizeTimestamp(b.value).getTime();
+      return timeB - timeA; // Descending order
     });
 
     const unique = Array.from(
@@ -87,22 +126,96 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState }) =
 
     localStorage.setItem("notifications", JSON.stringify(unique));
     setRecentNotifications(unique);
-  }, [notifications]);
+  }, [notifications, normalizeTimestamp]);
+
+
+  // Render functions
+  const renderNotificationRow = useCallback(({ index, style }) => {
+   
+    
+    const notification = recentNotifications[index];
+    return (
+      <StyledTableRow style={style}>
+        <StyledTableCell component="th" scope="row">
+          {notification.label}
+        </StyledTableCell>
+        <StyledTableCell align="right">
+          {notification.value}
+        </StyledTableCell>
+      </StyledTableRow>
+    );
+  }, [recentNotifications]);
+
+  const renderParameterGroup = useCallback((groupTitle, subParams) => (
+    <div key={groupTitle} style={parameterGroupStyle}>
+      <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
+        {groupTitle}
+      </div>
+      {groupTitle === "Chemical Alarms" ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingLeft: "10px" }}>
+          {Object.keys(subParams).map((paramKey) => {
+            const isAlarm = subParams[paramKey] > 0;
+            const color = isAlarm ? "red" : "green";
+            return (
+              <div key={paramKey} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <div style={{ width: "24px", height: "24px", backgroundColor: color, borderRadius: "50%" }} />
+                <span style={{ fontSize: "16px" }}>{paramKey}</span>
+                <span style={{ fontSize: "16px" }}>|</span>
+              </div>
+            );
+          })}
+        </div>
+      ) : groupTitle === "Chemical Parameters" ? (
+        <MemoizedLivePlot data={subParams} />
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
+          {Object.entries(subParams).map(([label, value]) => (
+            <div key={label} style={{ fontSize: "18px" }}>
+              {label}: {value}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ), []);
+
+  const renderTableRow = useCallback((key, value) => (
+    <StyledTableRow key={key}>
+      <StyledTableCell component="th" scope="row">
+        {memoizedCapitalize(key)}
+      </StyledTableCell>
+      <StyledTableCell align="right">
+        {typeof value === "object" ? (
+          Object.keys(value).map((subKey) => (
+            <div key={subKey}>
+              <strong>{memoizedCapitalize(subKey)}:</strong> {value[subKey]}
+            </div>
+          ))
+        ) : (
+          value
+        )}
+      </StyledTableCell>
+    </StyledTableRow>
+  ), [memoizedCapitalize]);
+
+  // Update the section title rendering
+  const renderSectionTitle = useCallback((title) => memoizedCapitalize(title), [memoizedCapitalize]);
+
+  const cardStyle = {
+    borderRadius: "0px",
+    boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+  };
 
   return (
     <div className="parameter-container">
-      {noData
-        ? defaultCards.map((card, index) => (
+      {noData ? (
+        defaultCards.map((card, index) => (
           <HvCard
             key={index}
             className="parameter-card"
             elevation={0}
             statusColor="grey"
-            style={{
-              borderRadius: "0px",
-              boxShadow:
-                "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-            }}
+            style={cardStyle}
           >
             <HvCardContent className="parameter-content">
               <HvTypography variant="title2" className="section-title">
@@ -114,184 +227,98 @@ const IndividualParameters = ({ paramsData, notifications = [], toggleState }) =
             </HvCardContent>
           </HvCard>
         ))
-        : Object.keys(displayData).map((sectionTitle) => {
-          let parameters = displayData[sectionTitle];
-          // console.log("Parameters:", sectionTitle);
+      ) : (
+        <>
+          {Object.keys(displayData).map((sectionTitle) => {
+            let parameters = displayData[sectionTitle];
+            parameters = getFilteredParameters(parameters);
 
-          // If toggleState is "Operator" and sectionTitle is "System Settings", limit to top 3 values
-          if (toggleState === "Operator" && sectionTitle === "System Settings" && isVRM) {
-            parameters = Object.fromEntries(Object.entries(parameters).slice(0, 3));
-          }
-
-          if (toggleState === "Operator" && sectionTitle === "System Settings" && isPRM) {
-            parameters = Object.fromEntries(Object.entries(parameters).slice(0, 2));
-          }
-
-          return (
-            <HvCard
-              key={sectionTitle}
-              className="parameter-card"
-              elevation={0}
-              statusColor="red"
-              style={{
-                borderRadius: "0px",
-                boxShadow:
-                  "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-              }}
-            >
-              <div>
-
-                {/* Other KPI content */}
-              </div>
-              <HvCardContent className="parameter-content">
-                <HvTypography variant="title2" className="section-title">
-                  {capitalize(sectionTitle)}
-                </HvTypography>
-                {sectionTitle === "Radiation_Parameters" || sectionTitle === "Radiation_Readings" || sectionTitle === "Biological_Parameters" || sectionTitle === "Chemical Alarms" || sectionTitle === "Radiation Alarm" ? (
-                  <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {Object.entries(parameters).map(([groupTitle, subParams]) => (
-
-                      <div
-                        key={groupTitle}
-                        style={{
-                          backgroundColor: "#f5f5f5",
-                          padding: "14px",
-                          borderRadius: "8px",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                        }}
-                      >
-                        <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
-                          {groupTitle}
-                        </div>
-                        {groupTitle === "Chemical Alarms" ? (
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingLeft: "10px" }}>
-                            {["CH", "As", "CN", "G", "Hd"].map((chem) => {
-                              const alarmKey = `Alarm ${chem}`;
-                              const isAlarm = subParams[alarmKey] > 0;
-                              const color = isAlarm ? "red" : "green";
-
-                              return (
-                                <div key={chem} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                  <div
-                                    style={{
-                                      width: "24px",
-                                      height: "24px",
-                                      backgroundColor: color,
-                                      borderRadius: "50%",
-                                    }}
-                                  ></div>
-                                  <span style={{ fontSize:"24px"}}>{chem}</span>
-                                  <span style={{ fontSize:"24px"}}>|</span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
-                            {Object.entries(subParams).map(([label, value]) => (
-                              <div key={label} style={{ fontSize: "18px" }}>
-                                {label}: {value}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <TableContainer
-                    component={Paper}
-                    elevation={0}
-                    style={{ width: "100%", overflowX: "auto" }}
-                  >
-                    <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                      <TableBody>
-                        {Object.keys(parameters).map((key) => {
-                          const value = parameters[key];
-
-                          return (
-                            <StyledTableRow key={key}>
-                              <StyledTableCell component="th" scope="row">
-                                {capitalize(key)}
-                              </StyledTableCell>
-                              <StyledTableCell align="right">
-                                {typeof value === "object" ? (
-                                  Object.keys(value).map((subKey) => (
-                                    <div key={subKey}>
-                                      <strong>{capitalize(subKey)}:</strong> {value[subKey]}
-                                    </div>
-                                  ))
-                                ) : (
-                                  value
-                                )}
-                              </StyledTableCell>
-                            </StyledTableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-              </HvCardContent>
-            </HvCard>
-          );
-        })}
-
-      {/* Notifications - Show Only Latest 3 */}
-      {!noData && (
-        <HvCard
-          className="parameter-card"
-          elevation={0}
-          statusColor="red"
-          style={{
-            borderRadius: "0px",
-            boxShadow:
-              "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-          }}
-        >
-          <HvCardContent className="parameter-content">
-            <HvTypography variant="title2" className="section-title">
-              Notifications
-            </HvTypography>
-            <TableContainer
-              component={Paper}
-              elevation={0}
-              style={{
-                width: "100%",
-                maxHeight: "400px", // adjust as needed
-                overflowY: "auto",
-              }}
-            >
-              <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                <TableBody>
-                  {recentNotifications.length > 0 ? (
-                    recentNotifications.map((notification, index) => (
-                      <StyledTableRow key={index}>
-                        <StyledTableCell component="th" scope="row">
-                          {notification.label}
-                        </StyledTableCell>
-                        <StyledTableCell align="right">
-                          {notification.value}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    ))
+            return (
+              <HvCard
+                key={sectionTitle}
+                className="parameter-card"
+                elevation={0}
+                statusColor="red"
+                style={cardStyle}
+              >
+                <HvCardContent className="parameter-content">
+                  <HvTypography variant="title2" className="section-title">
+                    {renderSectionTitle(sectionTitle)}
+                  </HvTypography>
+                  {["Radiation_Parameters", "Radiation_Readings", "Biological_Parameters", "Chemical Alarms", "Radiation Alarm"].includes(sectionTitle) ? (
+                    <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {Object.entries(parameters).map(([groupTitle, subParams]) => 
+                        renderParameterGroup(groupTitle, subParams)
+                      )}
+                    </div>
                   ) : (
-                    <StyledTableRow>
-                      <StyledTableCell colSpan={2} align="center">
-                        No notifications available
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </HvCardContent>
-        </HvCard>
-      )}
+                    <TableContainer
+                      component={Paper}
+                      elevation={0}
+                      style={{ width: "100%", overflowX: "auto" }}
+                    >
+                      <Table sx={{ minWidth: "100%" }} aria-label="customized table">
+  <TableBody>
+    {Object.entries(parameters).map(([key, value]) => (
+      renderTableRow(key, value)
+    ))}
+  </TableBody>
+</Table>
 
+                    </TableContainer>
+                  )}
+                </HvCardContent>
+              </HvCard>
+            );
+          })}
+          
+          <HvCard
+            className="parameter-card"
+            elevation={0}
+            statusColor="red"
+            style={cardStyle}
+          >
+            <HvCardContent className="parameter-content">
+              <HvTypography variant="title2" className="section-title">
+                Notifications
+              </HvTypography>
+              <TableContainer
+                component={Paper}
+                elevation={0}
+                style={notificationContainerStyle}
+              >
+               <Table sx={{ minWidth: "100%" }} aria-label="customized table">
+  <TableBody>
+    {recentNotifications.length > 0 ? (
+      <TableRow>
+        <TableCell colSpan={4}>
+          <List
+            height={500}
+            itemCount={recentNotifications.length}
+            itemSize={100}
+            width="100%"
+          >
+            {renderNotificationRow}
+          </List>
+        </TableCell>
+      </TableRow>
+    ) : (
+      <StyledTableRow>
+        <StyledTableCell colSpan={2} align="center">
+          No notifications available
+        </StyledTableCell>
+      </StyledTableRow>
+    )}
+  </TableBody>
+</Table>
+
+              </TableContainer>
+            </HvCardContent>
+          </HvCard>
+        </>
+      )}
     </div>
   );
-};
+});
 
 export default IndividualParameters;
