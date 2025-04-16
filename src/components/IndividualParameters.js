@@ -293,7 +293,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
       <TableRow>
         <TableCell colSpan={4}>
           <List
-            height={500}
+            height={550}
             itemCount={recentNotifications.length}
             itemSize={100}
             width="100%"

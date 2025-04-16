@@ -52,24 +52,30 @@ const LivePlot = ({ data }) => {
   
 
   return (
-    <div >
+    <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
       {traces.length > 0 ? (
         <Plot
         data={traces}
         layout={{
-          width: 550,
-          height: 400,
+          width: 560,
+          height: 450,
           title: "Chemical Parameters Live",
-          xaxis: { title: "Time" },
-          yaxis: { title: "Value" },
+          xaxis: { title: "Time",
+            showticklabels: false // hides x-axis labels
+           },
+          yaxis: {
+            title: "Value",
+            
+          },
           legend: {
             orientation: "h",
             x: 0,
             y: 2,
-            itemwidth: 10, // width allocated for each legend item
+            itemwidth: 10,
             traceorder: "normal"
           }
         }}
+        
         config={{
           responsive: true,
           displayModeBar: false
