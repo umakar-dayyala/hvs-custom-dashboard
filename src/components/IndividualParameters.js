@@ -68,6 +68,7 @@ const notificationContainerStyle = {
 };
 
 const IndividualParameters = memo(({ paramsData, notifications = [], toggleState }) => {
+  console.log("AGMDATA:", paramsData);
   const memoizedCapitalize = useCallback((str) => {
     if (!str) return '';
     return str
@@ -83,6 +84,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
   const displayData = useMemo(() => noData ? defaultCards : paramsData[0], [noData, paramsData]);
   const isVRM = useMemo(() => window.location.href.includes("vrm") || window.location.href.includes("VRM"), []);
   const isPRM = useMemo(() => window.location.href.includes("prm") || window.location.href.includes("PRM"), []);
+  const isAGM = useMemo(() => window.location.href.includes("agm") || window.location.href.includes("AGM"), []);
 
   // Memoized functions
   const normalizeTimestamp = useCallback((timestamp) => {
@@ -92,13 +94,15 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     return new Date(timestamp);
   }, []);
 
-  const getFilteredParameters = useCallback((parameters) => {
-    if (toggleState === "Operator" && parameters) {
+  const getFilteredParameters = useCallback((parameters,sectionTitle) => {
+    if (toggleState === "Operator" && parameters && sectionTitle === "System Settings") {
       if (isVRM) return Object.fromEntries(Object.entries(parameters).slice(0, 3));
       if (isPRM) return Object.fromEntries(Object.entries(parameters).slice(0, 2));
+      if (isAGM) return Object.fromEntries(Object.entries(parameters).slice(0, 4));
     }
+
     return parameters;
-  }, [toggleState, isVRM, isPRM]);
+  }, [toggleState, isVRM, isPRM,isAGM]);
 
   // Effects
   useEffect(() => {
@@ -151,7 +155,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
       <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
         {groupTitle}
       </div>
-      {groupTitle === "Chemical Alarms" ? (
+      {groupTitle === "Chemical Alarms" || groupTitle === "Radiation Alarms" || groupTitle === "Radiation Alarm"|| groupTitle === "Biological Alarm"  ? (
         <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingLeft: "10px" }}>
           {Object.keys(subParams).map((paramKey) => {
             const isAlarm = subParams[paramKey] > 0;
@@ -165,7 +169,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
             );
           })}
         </div>
-      ) : groupTitle === "Chemical Parameters" ? (
+      ) : groupTitle === "Chemical Parameters" || groupTitle === "Radiation Parameter"|| groupTitle === "Radiation Parameters" || groupTitle === "Biological Parameters"? (
         <MemoizedLivePlot data={subParams} />
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
@@ -231,7 +235,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
         <>
           {Object.keys(displayData).map((sectionTitle) => {
             let parameters = displayData[sectionTitle];
-            parameters = getFilteredParameters(parameters);
+            parameters = getFilteredParameters(parameters,sectionTitle,toggleState);
 
             return (
               <HvCard

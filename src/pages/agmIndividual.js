@@ -206,7 +206,7 @@ export const AgmIndividual = () => {
             />
             <Alertbar />
           </HvStack>
-          <IndividualParameters paramsData={param} notifications={notifications}/>
+          <IndividualParameters paramsData={param} notifications={notifications} toggleState ={toggleState}/>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={agmParamChartData}

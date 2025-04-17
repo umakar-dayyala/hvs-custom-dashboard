@@ -78,6 +78,7 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title ,lastFetchTim
       zeroline: false,
     },
     yaxis: { title: "Count" },
+    showlegend: true,
     legend: { orientation: "h", x: 0.3, y: -0.1, font: { size: 15 }, traceorder: "normal" },
     margin: { t: 50, b: 80, l: 50, r: 50 },
     plot_bgcolor: "#F5F6F6",

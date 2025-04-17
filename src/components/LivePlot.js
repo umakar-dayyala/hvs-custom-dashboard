@@ -3,12 +3,15 @@ import Plot from "react-plotly.js";
 
 const LivePlot = ({ data }) => {
   const [plotData, setPlotData] = useState({});
-  const dataRef = useRef(data); // to always access latest data
+  const [visibilityMap, setVisibilityMap] = useState({});
+  const dataRef = useRef(data);
 
+  // Update ref when data changes
   useEffect(() => {
     dataRef.current = data;
   }, [data]);
 
+  // Periodically update the plot data
   useEffect(() => {
     const interval = setInterval(() => {
       const timestamp = new Date().toLocaleTimeString("en-GB", {
@@ -16,73 +19,82 @@ const LivePlot = ({ data }) => {
         minute: "2-digit",
         second: "2-digit",
       });
-      
 
       setPlotData((prevData) => {
-        const updatedData = { ...prevData };
+        const updated = { ...prevData };
 
-        Object.entries(dataRef.current).forEach(([label, value]) => {
-          const numericValue = parseFloat(value);
-          if (!isNaN(numericValue)) {
-            if (!updatedData[label]) updatedData[label] = [];
-            updatedData[label] = [
-              ...updatedData[label].slice(-20),
-              { x: timestamp, y: numericValue },
-            ];
+        for (const [label, value] of Object.entries(dataRef.current)) {
+          const y = parseFloat(value);
+          if (!isNaN(y)) {
+            const series = updated[label] || [];
+            updated[label] = [...series.slice(-19), { x: timestamp, y }];
           }
-        });
+        }
 
-        return updatedData;
+        return updated;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []); // only runs once
+  }, []);
+
+  // Sanitize label for uid (no spaces, parentheses, etc.)
+  const sanitizeLabel = (label) => label.replace(/[^\w-]/g, "_");
 
   const traces = Object.entries(plotData).map(([label, points]) => {
-    const latestValue = points.length > 0 ? points[points.length - 1].y : "";
+    const latestY = points.at(-1)?.y ?? "";
+    const sanitizedUid = sanitizeLabel(label);
+    const isVisible = visibilityMap[label];
     return {
       x: points.map((p) => p.x),
       y: points.map((p) => p.y),
       type: "scatter",
       mode: "lines+markers",
-      name: `${label} (${latestValue})`, // append latest value to label
+      name: `${label} (${latestY})`,
+      uid: sanitizedUid,
+      visible: isVisible === false ? "legendonly" : true,
     };
   });
-  
 
   return (
-    <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-      {traces.length > 0 ? (
+    <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      {traces.length ? (
         <Plot
-        data={traces}
-        layout={{
-          width: 560,
-          height: 450,
-          title: "Chemical Parameters Live",
-          xaxis: { title: "Time",
-            showticklabels: false // hides x-axis labels
-           },
-          yaxis: {
-            title: "Value",
+          data={traces}
+          layout={{
             
-          },
-          legend: {
-            orientation: "h",
-            x: 0,
-            y: 2,
-            itemwidth: 10,
-            traceorder: "normal"
-          }
-        }}
-        
-        config={{
-          responsive: true,
-          displayModeBar: false
-        }}
-      />
-      
-      
+            xaxis: { title: "Time", showticklabels: false },
+            yaxis: { title: "Value" },
+            showlegend: true, // <-- Add this line
+            legend: {
+              orientation: "v",
+              x: 0.2,
+              y: 1.5,
+              itemwidth: 10,
+              traceorder: "normal",
+            },
+            autosize: true,
+            margin: { t: 50, r: 30, b: 40, l: 50 },
+          }}
+          
+          config={{
+            displayModeBar: false,
+            useResizeHandler: true,
+          }}
+          style={{ width: "100%", height: "100%" }}
+          onLegendClick={(event) => {
+            const index = event.curveNumber;
+            const label = traces[index].name.split(" (")[0];
+            const newVisibility = traces[index].visible === true ? "legendonly" : true;
+
+            setVisibilityMap((prev) => ({
+              ...prev,
+              [label]: newVisibility !== "legendonly",
+            }));
+
+            return false; // Prevent default toggle behavior
+          }}
+        />
       ) : (
         <p>No data to plot yet...</p>
       )}
