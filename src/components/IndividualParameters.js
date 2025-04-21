@@ -68,7 +68,6 @@ const notificationContainerStyle = {
 };
 
 const IndividualParameters = memo(({ paramsData, notifications = [], toggleState }) => {
-  console.log("AGMDATA:", paramsData);
   const memoizedCapitalize = useCallback((str) => {
     if (!str) return '';
     return str

@@ -28,6 +28,7 @@ import ToggleButtons from "../components/ToggleButtons";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Corelation from "../components/Corelation";
 import aicon from "../assets/aBiological.svg";
+import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 
 export const IbacIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -48,12 +49,19 @@ export const IbacIndividual = () => {
   });
 
   // Track initial mount
-  const initialMount = useRef(true);
+  // const initialMount = useRef(true);
 
   // Time range states initialized as null
   const [plotlyTimeRange, setPlotlyTimeRange] = useState({ fromTime: null, toTime: null });
   const [anomalyTimeRange, setAnomalyTimeRange] = useState({ fromTime: null, toTime: null });
   const [outlierTimeRange, setOutlierTimeRange] = useState({ fromTime: null, toTime: null });
+
+   const [locationDetails, setUdatedLocationDetails] = useState({
+      floor: 'default',
+      zone: 'default',
+      location: 'default',
+      sensorType: 'default'
+    });
 
   const formatDateForApi = (date) => {
     if (!date) return null;
@@ -246,10 +254,21 @@ export const IbacIndividual = () => {
     setShowModal(false);
   };
 
+  const setLocationDetails=(floor,zone,location,sensorType) => {
+    setUdatedLocationDetails({
+      floor: floor || locationDetails.floor,
+      zone: zone || locationDetails.zone,
+      location: location || locationDetails.location,
+      sensorType: sensorType || locationDetails.sensorType
+    });
+    
+  }
+
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Breadcrumbs />
+        {/* <Breadcrumbs /> */}
+        <BreadCrumbsIndividual locationDetails={locationDetails}/>
         <div style={{ display: "flex", gap: "10px" ,alignItems:"center"}}>
           <Box style={{ whiteSpace: "nowrap" }}>
             {LastFetchLiveData && (
@@ -268,7 +287,7 @@ export const IbacIndividual = () => {
             { title: "Detector Health Faults", value: "No Data" },
             { title: "Analytics Alert", value: "No Data" }
           ]}/>
-          <Alertbar />
+          <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
         </HvStack>
         <IndividualParameters paramsData={param} notifications={notifications} />
         <Box mt={2}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -26,8 +26,16 @@ import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aBiological.svg";
 import greyBio from "../assets/greyBio.svg";
+import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 
-export const MABIndividual = () => {
+// Constants
+const DUMMY_KPI_DATA = [
+  { title: "Biological Alarms", value: "No Data" },
+  { title: "Detector Health Faults", value: "No Data" },
+  { title: "Analytics Alert", value: "No Data" }
+];
+
+export const MABIndividual = React.memo(() => {
   const [paramsData, setParamsData] = useState([]);
   const [mabParamChartData, setMabParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -49,16 +57,27 @@ export const MABIndividual = () => {
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
-
-  const formatDateForApi = (isoDate) => {
-    if (!isoDate) return null;
-    return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
-  };
-
-  useEffect(() => {
-    // Real-time data updates (WebSocket)
+  const [locationDetails, setUdatedLocationDetails] = useState({
+    floor: 'default',
+    zone: 'default',
+    location: 'default',
+    sensorType: 'default'
+  });
+  // Memoized device ID
+  const deviceId = useMemo(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id") || "1149";
+    return queryParams.get("device_id");
+  }, []);
+
+  // Memoized date formatter
+  const formatDateForApi = useCallback((date) => {
+    if (!date) return null;
+    return `'${dayjs(date).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
+  }, []);
+
+  // WebSocket connection
+  useEffect(() => {
+    if (!deviceId) return;
 
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
@@ -68,7 +87,7 @@ export const MABIndividual = () => {
         setParamsData(data.parametersData);
         setParam(data.parametersData);
         setNotifications(data.Notifications);
-        setLastFetchLiveData(data.lastfetched.time); 
+        setLastFetchLiveData(data.lastfetched.time);
       }
     });
 
@@ -78,27 +97,30 @@ export const MABIndividual = () => {
         console.log("WebSocket closed");
       }
     };
-  }, []);
+  }, [deviceId]);
 
-  const fetchData = async (fromTime, toTime, component) => {
-    if (!fromTime || !toTime) return;
+  // Memoized fetch data function
+  const fetchData = useCallback(async (fromTime, toTime, component) => {
+    if (!fromTime || !toTime || !deviceId) return;
 
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
 
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
-
     try {
-      if (component === 'PlotlyDataChart') {
-        const chart = await fetchMABParamChartData(deviceId, formattedFromTime, formattedToTime);
-        setMabParamChartData(chart?.data || {});
-      } else if (component === 'AnomalyChart') {
-        const anomaly = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
-        setAnomalyChartData(anomaly?.data || {});
-      } else if (component === 'OutlierChart') {
-        const outlier = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
-        setOutlierChartData(outlier?.data || {});
+      let response;
+      switch (component) {
+        case 'PlotlyDataChart':
+          response = await fetchMABParamChartData(deviceId, formattedFromTime, formattedToTime);
+          setMabParamChartData(response?.data || {});
+          break;
+        case 'AnomalyChart':
+          response = await fetchAnomalyChartData(deviceId, formattedFromTime, formattedToTime);
+          setAnomalyChartData(response?.data || {});
+          break;
+        case 'OutlierChart':
+          response = await fetchOutlierChartData(deviceId, formattedFromTime, formattedToTime);
+          setOutlierChartData(response?.data || {});
+          break;
       }
 
       // Update last fetch time on success
@@ -107,11 +129,25 @@ export const MABIndividual = () => {
         [component.toLowerCase().replace('datachart', '').replace('chart', '')]: new Date().toLocaleString()
       }));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error(`Error fetching ${component} data:`, error);
     }
-  };
+  }, [deviceId, formatDateForApi]);
 
-  const handleRangeChange = (range, component) => {
+  // Range change handlers
+  const handlePlotlyRangeChange = useCallback((range) => {
+    handleRangeChange(range, 'PlotlyDataChart', setPlotlyRange);
+  }, []);
+
+  const handleAnomalyRangeChange = useCallback((range) => {
+    handleRangeChange(range, 'AnomalyChart', setAnomalyRange);
+  }, []);
+
+  const handleOutlierRangeChange = useCallback((range) => {
+    handleRangeChange(range, 'OutlierChart', setOutlierRange);
+  }, []);
+
+  // Generic range change handler
+  const handleRangeChange = useCallback((range, component, setRange) => {
     if (!Array.isArray(range) || range.length < 2) {
       console.error("Invalid range format:", range);
       return;
@@ -125,63 +161,72 @@ export const MABIndividual = () => {
       return;
     }
 
-    // Update the appropriate range state
-    if (component === 'PlotlyDataChart') {
-      setPlotlyRange({ fromTime, toTime });
-    } else if (component === 'AnomalyChart') {
-      setAnomalyRange({ fromTime, toTime });
-    } else if (component === 'OutlierChart') {
-      setOutlierRange({ fromTime, toTime });
-    }
-  };
+    setRange({ fromTime, toTime });
+  }, []);
 
   // Fetch data when ranges change
   useEffect(() => {
     if (plotlyRange.fromTime && plotlyRange.toTime) {
       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
     }
-  }, [plotlyRange]);
+  }, [plotlyRange, fetchData]);
 
   useEffect(() => {
     if (anomalyRange.fromTime && anomalyRange.toTime) {
       fetchData(anomalyRange.fromTime, anomalyRange.toTime, 'AnomalyChart');
     }
-  }, [anomalyRange]);
+  }, [anomalyRange, fetchData]);
 
   useEffect(() => {
     if (outlierRange.fromTime && outlierRange.toTime) {
       fetchData(outlierRange.fromTime, outlierRange.toTime, 'OutlierChart');
     }
-  }, [outlierRange]);
+  }, [outlierRange, fetchData]);
 
   // Toggle state handling
-  const handleToggleClick = (state) => {
+  const handleToggleClick = useCallback((state) => {
     if (toggleState === "Operator" && state === "Supervisor") {
       setNewState(state);
       setShowModal(true);
     } else {
       setToggleState(state);
     }
-  };
+  }, [toggleState]);
 
-  const handleConfirmChange = () => {
+  const handleConfirmChange = useCallback(() => {
     if (newState) {
       setToggleState(newState);
     }
     setShowModal(false);
-  };
+  }, [newState]);
 
-  const handleCancelChange = () => {
+  const handleCancelChange = useCallback(() => {
     setNewState(null);
     setShowModal(false);
-  };
+  }, []);
+
+  // Memoized layout values based on toggle state
+  const chartLayout = useMemo(() => {
+    return toggleState === "Operator" ? "100%" : "33.33%";
+  }, [toggleState]);
+
+  const setLocationDetails = (floor, zone, location, sensorType) => {
+    setUdatedLocationDetails({
+      floor: floor || locationDetails.floor,
+      zone: zone || locationDetails.zone,
+      location: location || locationDetails.location,
+      sensorType: sensorType || locationDetails.sensorType
+    });
+
+  }
 
   return (
     <Box>
       <Box>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Breadcrumbs />
-          <div style={{ display: "flex", gap: "10px",alignItems:"center" }}>
+          {/* <Breadcrumbs /> */}
+          <BreadCrumbsIndividual locationDetails={locationDetails} />
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             <Box style={{ whiteSpace: "nowrap" }}>
               {LastFetchLiveData && (
                 <span>Last Live Data fetched time: {LastFetchLiveData}</span>
@@ -194,14 +239,14 @@ export const MABIndividual = () => {
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <HvStack direction="column" divider spacing="sm">
-              <IndividualKPI 
-                kpiData={kpiData} 
-                ricon={bioicon} 
-                gicon={gbioicon} 
-                rbell={rbell} 
-                amberBell={amberBell} 
-                greenBell={greenBell} 
-                aicon={aicon} 
+              <IndividualKPI
+                kpiData={kpiData}
+                ricon={bioicon}
+                gicon={gbioicon}
+                rbell={rbell}
+                amberBell={amberBell}
+                greenBell={greenBell}
+                aicon={aicon}
                 greyIcon={greyBio}
                 dummyKpiData={[
                   { title: "Biological Alarms", value: "No Data" },
@@ -209,13 +254,13 @@ export const MABIndividual = () => {
                   { title: "Analytics Alert", value: "No Data" }
                 ]}
               />
-              <Alertbar />
+              <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
             </HvStack>
-            <IndividualParameters paramsData={param} notifications={notifications}/>
+            <IndividualParameters paramsData={param} notifications={notifications} />
             <Box mt={2}>
               <PlotlyDataChart
                 bioParamChartData={mabParamChartData}
-                onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
+                onRangeChange={handlePlotlyRangeChange}
                 title={'Biological Readings'}
                 lastFetchTime={lastFetchTimes.plotly}
               />
@@ -226,7 +271,7 @@ export const MABIndividual = () => {
             <Box width={"50%"}>
               <AnomalyChart
                 anomalyChartData={anomalyChartData}
-                onRangeChange={(range) => handleRangeChange(range, 'AnomalyChart')}
+                onRangeChange={handleAnomalyRangeChange}
                 title={'Anomaly Detection'}
                 lastFetchTime={lastFetchTimes.anomaly}
               />
@@ -234,7 +279,7 @@ export const MABIndividual = () => {
             <Box width={"50%"}>
               <OutlierChart
                 outlierChartData={outlierChartData}
-                onRangeChange={(range) => handleRangeChange(range, 'OutlierChart')}
+                onRangeChange={handleOutlierRangeChange}
                 title={'Outlier Detection'}
                 lastFetchTime={lastFetchTimes.outlier}
               />
@@ -264,4 +309,4 @@ export const MABIndividual = () => {
       )}
     </Box>
   );
-};
+});

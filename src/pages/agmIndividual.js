@@ -23,6 +23,7 @@ import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
+import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 
 export const AgmIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -46,6 +47,13 @@ export const AgmIndividual = () => {
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
+
+   const [locationDetails, setUdatedLocationDetails] = useState({
+      floor: 'default',
+      zone: 'default',
+      location: 'default',
+      sensorType: 'default'
+    });
 
   const formatDateForApi = (isoDate) => {
     if (!isoDate) return null;
@@ -173,10 +181,22 @@ export const AgmIndividual = () => {
     setShowModal(false);
   };
 
+  const setLocationDetails=(floor,zone,location,sensorType) => {
+    setUdatedLocationDetails({
+      floor: floor || locationDetails.floor,
+      zone: zone || locationDetails.zone,
+      location: location || locationDetails.location,
+      sensorType: sensorType || locationDetails.sensorType
+    });
+    
+  }
+  
+
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Breadcrumbs />
+        {/* <Breadcrumbs /> */}
+        <BreadCrumbsIndividual locationDetails={locationDetails}/>
         <div style={{ display: "flex", gap: "10px",alignItems:"center" }}>
           <Box style={{ whiteSpace: "nowrap" }}>
             {LastFetchLiveData && (
@@ -204,7 +224,7 @@ export const AgmIndividual = () => {
                 { title: "Analytics Alert", value: "No Data" }
               ]}
             />
-            <Alertbar />
+            <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
           </HvStack>
           <IndividualParameters paramsData={param} notifications={notifications} toggleState ={toggleState}/>
           <Box mt={2}>

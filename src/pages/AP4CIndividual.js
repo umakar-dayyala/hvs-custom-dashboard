@@ -27,6 +27,8 @@ import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aChemical.svg";
 import greyChem from "../assets/greyChem.svg";
+import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import { floor, set } from 'lodash';
 
 // Constants
 const DUMMY_KPI_DATA = [
@@ -57,7 +59,12 @@ export const AP4CIndividual = React.memo(() => {
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
-
+  const [locationDetails, setUdatedLocationDetails] = useState({
+    floor: 'default',
+    zone: 'default',
+    location: 'default',
+    sensorType: 'default'
+  });
   // Memoized device ID
   const deviceId = useMemo(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -205,10 +212,21 @@ export const AP4CIndividual = React.memo(() => {
     return toggleState === "Operator" ? "100%" : "33.33%";
   }, [toggleState]);
 
+const setLocationDetails=(floor,zone,location,sensorType) => {
+  setUdatedLocationDetails({
+    floor: floor || locationDetails.floor,
+    zone: zone || locationDetails.zone,
+    location: location || locationDetails.location,
+    sensorType: sensorType || locationDetails.sensorType
+  });
+  
+}
+
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Breadcrumbs />
+        {/* <Breadcrumbs /> */}
+        <BreadCrumbsIndividual locationDetails={locationDetails}/>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Box style={{ whiteSpace: "nowrap" }}>
             {LastFetchLiveData && (
@@ -233,7 +251,7 @@ export const AP4CIndividual = React.memo(() => {
               greyIcon={greyChem}
               dummyKpiData={DUMMY_KPI_DATA}
             />
-            <Alertbar />
+            <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
           </HvStack>
           <IndividualParameters paramsData={param} notifications={notifications} toggleState={toggleState}/>
           <Box mt={2}>

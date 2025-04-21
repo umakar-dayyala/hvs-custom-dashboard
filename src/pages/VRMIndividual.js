@@ -23,6 +23,7 @@ import amberBell  from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
+import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 
 
 
@@ -50,6 +51,13 @@ export const VRMIndividual = () => {
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
+
+  const [locationDetails, setUdatedLocationDetails] = useState({
+      floor: 'default',
+      zone: 'default',
+      location: 'default',
+      sensorType: 'default'
+    });
 
   const formatDateForApi = (isoDate) => {
     if (!isoDate) return null;
@@ -174,11 +182,23 @@ export const VRMIndividual = () => {
     setNewState(null);
     setShowModal(false);
   };
+  
+
+  const setLocationDetails=(floor,zone,location,sensorType) => {
+    setUdatedLocationDetails({
+      floor: floor || locationDetails.floor,
+      zone: zone || locationDetails.zone,
+      location: location || locationDetails.location,
+      sensorType: sensorType || locationDetails.sensorType
+    });
+    
+  }
 
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Breadcrumbs />
+        {/* <Breadcrumbs /> */}
+        <BreadCrumbsIndividual locationDetails={locationDetails}/>
         <div style={{ display: "flex", gap: "10px" ,alignItems:"center"}}>
         <Box style={{ whiteSpace: "nowrap" }}>
   {LastFetchLiveData && (
@@ -199,7 +219,7 @@ export const VRMIndividual = () => {
             { title: "Detector Health Faults", value: "No Data" },
             { title: "Analytics Alert", value: "No Data" }
           ]}/>
-          <Alertbar />
+          <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
         </HvStack>
         {/* <Box mt={2} style={{ display: "flex", flexDirection: "row" ,justifyContent:"flex-end"}}>
           {LastFetchLiveData && (
