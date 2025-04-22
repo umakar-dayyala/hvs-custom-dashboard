@@ -1,4 +1,6 @@
 import React from 'react';
+import PublicImage from '../PublicImage';
+
 import {
   Flex,
   Text,
@@ -41,18 +43,18 @@ const Header = ({ onMenuToggle }) => {
           style={{ width: 'auto', height: '40px', marginRight: '10px' }}
         />
 
-        <img src="/HVS_Hitachi_LOGO.png" alt="Logo" style={{ width: 'auto', height: '20px', marginRight: '5px' }} />
+<PublicImage src="HVS_Hitachi_LOGO.png" alt="Hitachi Logo" style={{ width: 'auto', height: '20px', marginRight: '5px' }} />
         <Text size="sm"> Hitachi Visualization Suite</Text>
       </Box>
 
       <HStack spacing={2}>
         <Text fontSize="sm">{currentTime}</Text>
-        <img src="/helpIcon.svg" size="sm" />
-        <img src="/openWindowIcon.svg" size="sm" />
-        <img src="/connectionIcon.svg" size="sm" />
-        <img src="/filterIcon.svg" size="sm" />
-        <img src="/bellIcon.svg" size="sm" />
-        <img src="/userIcon.svg" size="sm" />
+        <PublicImage src="helpIcon.svg" alt="Help Icon" size="sm" />
+        <PublicImage src="openWindowIcon.svg" alt="Open window" size="sm" />
+        <PublicImage src="connectionIcon.svg" alt="Connection Icon" size="sm" />
+        <PublicImage src="filterIcon.svg" alt="Filter Icon" size="sm" />
+        <PublicImage src="bellIcon.svg" alt="Ball Icon" size="sm" />
+        <PublicImage src="userIcon.svg" alt="User Icon" size="sm" />
       </HStack>
     </Flex>
   );

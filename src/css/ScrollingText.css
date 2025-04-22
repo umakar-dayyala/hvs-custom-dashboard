@@ -1,0 +1,54 @@
+/* ScrollingText.css */
+
+.container {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 8px;
+    position: relative;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+  }
+  
+  .container.alarm {
+    background-color: #E30613;
+    border: 2px solid red;
+    animation: blink 1s infinite;
+  }
+  
+  .container.no-alarm {
+    background-color: #008000;
+    border: 2px solid green;
+  }
+  
+  .scroll-wrapper {
+    display: flex;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scrolling-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scrollText 25s linear infinite;
+    font-weight: bold;
+  }
+  
+  /* Animations */
+  @keyframes scrollText {
+    0% {
+      transform: translateX(100vw);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  
+  @keyframes blink {
+    0% { opacity: 1; }
+    30% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  

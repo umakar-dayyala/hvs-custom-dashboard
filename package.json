@@ -15,10 +15,12 @@
     "@mui/x-charts": "^7.28.0",
     "@mui/x-date-pickers": "^7.28.0",
     "@mui/x-date-pickers-pro": "^7.28.0",
+    "@react-keycloak/web": "^3.4.0",
     "apexcharts": "^4.5.0",
     "axios": "^1.8.4",
     "chart.js": "^4.4.7",
     "cra-template": "1.2.0",
+    "craco": "^0.0.3",
     "date-fns": "^4.1.0",
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
@@ -45,13 +47,14 @@
     "react-virtualized-auto-sizer": "^1.0.26",
     "recharts": "^2.15.2",
     "stream-browserify": "^3.0.0",
+    "url-loader": "^4.1.1",
     "web-vitals": "^4.2.4",
     "webpack": "^5.98.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "lint": "eslint src/"
   },
@@ -72,5 +75,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "url-loader": "^4.1.1"
   }
 }

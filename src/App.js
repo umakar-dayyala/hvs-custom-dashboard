@@ -34,15 +34,19 @@ import ConfigurationPage from "./pages/ConfigurationPage";
 import InventoryDashboard from "./pages/InventoryDashboard";
 
 
-const App = () => {
+const App = (props) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  console.log("App props:  "+JSON.stringify(props)); // Debugging line
+  const basename = props?.basename || ""; // Default to empty string if basename is not provided
 
   return (
-    <MyProvider>
+    <MyProvider basename={basename}>
     <HvProvider >
       <AlertProvider>
-        <Router>
-          <Header onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} />
+      <Router basename={basename || "/"}>
+            {!props?.basename && (
+              <Header onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} />
+            )}
           <FloorMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
           <HvContainer>
           {/* <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
