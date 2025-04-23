@@ -14,7 +14,7 @@ const Breadcrumbs = () => {
     .filter((x) => x);
   console.log("Pathnames:"+JSON.stringify(pathnames)); // Debugging line
   const routes = [
-    { label: "Operators Dashboard", path: `${basename}/` },
+    { label: "Operators Dashboard", path: `${basename}` },
     ...pathnames.map((path, index) => ({
       label: path.charAt(0).toUpperCase() + path.slice(1),
       path: `${basename}/${pathnames.slice(0, index + 1).join("/")}`,
