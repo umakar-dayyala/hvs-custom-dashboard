@@ -13,6 +13,8 @@ export async function bootstrap() {
 
 // Qiankun lifecycle function: mount
 export async function mount(props) {
+  import('@mui/material/styles');
+  import('@hitachivantara/uikit-styles');
   console.log('CBRN DashBoard app mounted with props:', props);
   const container = props?.container 
     ? props.container.querySelector('#root')
