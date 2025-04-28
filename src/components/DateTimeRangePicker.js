@@ -42,9 +42,9 @@ const DateTimeRangePicker = ({ onChange, onOptionChange }) => {
       // case "lastMonth":
       //   newStartDate = dayjs().subtract(1, "month");
       //   break;
-      // case "lastyear":
-      //   newStartDate = dayjs().subtract(1, "year");
-      //   break;
+      case "lastyear":
+        newStartDate = dayjs().subtract(1, "year");
+        break;
     
     default:
       newStartDate = dayjs().subtract(5, "minute");
@@ -101,7 +101,8 @@ const DateTimeRangePicker = ({ onChange, onOptionChange }) => {
           {/* <MenuItem value="48hours">Last 48 hours</MenuItem>
           <MenuItem value="7days">Last 7 days</MenuItem> */}
           {/* <MenuItem value="lastMonth">Last Month</MenuItem>
-          <MenuItem value="lastyear">Last year</MenuItem> */}
+           */}
+           <MenuItem value="lastyear">Last year</MenuItem>
         </Select>
       </FormControl>
     </Box>

@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import "../css/Anomaly.css";
 
 const AnomalyChart = ({ anomalyChartData, onRangeChange ,title,lastFetchTime}) => {
+  console.log("anomalyChartData:", anomalyChartData);
   const [selectedDataset, setSelectedDataset] = useState("");
   const [filteredData, setFilteredData] = useState(null);
   const [selectedRange, setSelectedRange] = useState();
@@ -132,11 +133,15 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange ,title,lastFetchTime}) =
             variant="outlined"
             style={{ height: "2rem" }}
           >
-            {anomalyChartData.datasets.map((dataset) => (
-              <MenuItem key={dataset.label} value={dataset.label}>
-                {dataset.label}
-              </MenuItem>
-            ))}
+            {anomalyChartData.datasets.map((dataset) => {
+  console.log("dataset.label:", dataset);
+  return (
+    <MenuItem key={dataset.label} value={dataset.label}>
+      {dataset.label}
+    </MenuItem>
+  );
+})}
+
           </Select>
         )}
   

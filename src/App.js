@@ -32,6 +32,8 @@ import Weatherv2 from "./pages/Weatherv2";
 import FloorWiseAlarms from "./pages/FloorWiseAlarms";
 import ConfigurationPage from "./pages/ConfigurationPage";
 import InventoryDashboard from "./pages/InventoryDashboard";
+import { FcadIndividual } from "./pages/FcadIndividual";
+import { AamIndividual } from "./pages/AamIndividual";
 
 
 const App = () => {
@@ -72,6 +74,9 @@ const App = () => {
               <Route path="/MABIndividual" element={<MABIndividual/>}/>
               <Route path="/agmindividual" element={<AgmIndividual/>}/>
               <Route path="/wrmIndividual" element={<WRMIndividual/>}/>
+              {/* element needs to be changed to fcadindividual */}
+              <Route path="/fcadIndividual" element={<FcadIndividual/>}/>
+              <Route path="/aamIndividual" element={<AamIndividual/>}/> 
               {/* <Route path="/chartDemo" element={<ChartDemo/>} /> */}
               <Route path="/weather" element={<WeatherDashboard />} />
               <Route path="/Weatherv2" element={<Weatherv2 />} />
