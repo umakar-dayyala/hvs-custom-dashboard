@@ -102,7 +102,7 @@ const DateTimeRangePicker = ({ onChange, onOptionChange }) => {
           <MenuItem value="7days">Last 7 days</MenuItem> */}
           {/* <MenuItem value="lastMonth">Last Month</MenuItem>
            */}
-           <MenuItem value="lastyear">Last year</MenuItem>
+           {/* <MenuItem value="lastyear">Last year</MenuItem> */}
         </Select>
       </FormControl>
     </Box>
