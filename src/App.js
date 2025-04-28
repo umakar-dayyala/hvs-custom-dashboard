@@ -32,6 +32,7 @@ import Weatherv2 from "./pages/Weatherv2";
 import FloorWiseAlarms from "./pages/FloorWiseAlarms";
 import ConfigurationPage from "./pages/ConfigurationPage";
 import InventoryDashboard from "./pages/InventoryDashboard";
+import SensorEventHistory from "./pages/SensorEventHistory";
 
 
 const App = () => {
@@ -78,6 +79,7 @@ const App = () => {
               <Route path="/floorwisealarms" element={<FloorWiseAlarms />} />
               <Route path="/configurationPage" element={<ConfigurationPage />} />
               <Route path="/inventory" element={<InventoryDashboard />} />
+              <Route path="/sensorEventHistory" element={<SensorEventHistory />} />
              
             </Routes>
           </HvContainer>
