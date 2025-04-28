@@ -14,6 +14,7 @@ import Paper from "@mui/material/Paper";
 import "../css/IndividualParameters.css";
 import { FixedSizeList as List } from 'react-window';
 import LivePlot from "./LivePlot";
+import sIcon from "../assets/successIcon.png"
 
 // Styled components defined outside the component to prevent recreation
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -76,8 +77,6 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
       .join(" ");
   }, []);
 
-  const [recentNotifications, setRecentNotifications] = useState([]);
-
   // Memoized derived values
   const noData = useMemo(() => !paramsData || !paramsData.length, [paramsData]);
   const displayData = useMemo(() => noData ? defaultCards : paramsData[0], [noData, paramsData]);
@@ -85,90 +84,76 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
   const isPRM = useMemo(() => window.location.href.includes("prm") || window.location.href.includes("PRM"), []);
   const isAGM = useMemo(() => window.location.href.includes("agm") || window.location.href.includes("AGM"), []);
 
-  // Memoized functions
-  const normalizeTimestamp = useCallback((timestamp) => {
-    if (timestamp && typeof timestamp === "string" && timestamp.includes(" ")) {
-      return new Date(timestamp.replace(" ", "T"));
-    }
-    return new Date(timestamp);
-  }, []);
-
-  const getFilteredParameters = useCallback((parameters,sectionTitle) => {
+  const getFilteredParameters = useCallback((parameters, sectionTitle) => {
     if (toggleState === "Operator" && parameters && sectionTitle === "System Settings") {
       if (isVRM) return Object.fromEntries(Object.entries(parameters).slice(0, 3));
       if (isPRM) return Object.fromEntries(Object.entries(parameters).slice(0, 2));
       if (isAGM) return Object.fromEntries(Object.entries(parameters).slice(0, 4));
     }
-
     return parameters;
-  }, [toggleState, isVRM, isPRM,isAGM]);
+  }, [toggleState, isVRM, isPRM, isAGM]);
 
-  // Effects
-  useEffect(() => {
-    if (notifications.length === 0) return;
-
-    const existing = JSON.parse(localStorage.getItem("notifications")) || [];
-    const now = new Date();
-
-    const updated = [...existing, ...notifications].filter((notif) => {
-      const notifTime = normalizeTimestamp(notif.value);
-      const hoursDiff = (now - notifTime) / (1000 * 60 * 60);
-      return hoursDiff <= 12; // Keep notifications from the last 12 hours
-    });
-
-    // Sort notifications by timestamp in descending order (newest first)
-    updated.sort((a, b) => {
-      const timeA = normalizeTimestamp(a.value).getTime();
-      const timeB = normalizeTimestamp(b.value).getTime();
-      return timeB - timeA; // Descending order
-    });
-
-    const unique = Array.from(
-      new Map(updated.map((n) => [`${n.label}-${n.value}`, n])).values()
-    );
-
-    localStorage.setItem("notifications", JSON.stringify(unique));
-    setRecentNotifications(unique);
-  }, [notifications, normalizeTimestamp]);
-
-
-  // Render functions
   const renderNotificationRow = useCallback(({ index, style }) => {
-   
-    
-    const notification = recentNotifications[index];
+    const notification = notifications[index];
     return (
-      <StyledTableRow style={style}>
-        <StyledTableCell component="th" scope="row">
+      <StyledTableRow style={{ ...style, display: 'flex', justifyContent: 'space-between' }}>
+        <StyledTableCell style={{ flex: 1 }}>
           {notification.label}
         </StyledTableCell>
-        <StyledTableCell align="right">
+        <StyledTableCell style={{ textAlign: 'right' }}>
           {notification.value}
         </StyledTableCell>
       </StyledTableRow>
     );
-  }, [recentNotifications]);
-
+  }, [notifications]);
+  
   const renderParameterGroup = useCallback((groupTitle, subParams) => (
     <div key={groupTitle} style={parameterGroupStyle}>
       <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
         {groupTitle}
       </div>
-      {groupTitle === "Chemical Alarms" || groupTitle === "Radiation Alarms" || groupTitle === "Radiation Alarm"|| groupTitle === "Biological Alarm"  ? (
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingLeft: "10px" }}>
+      {groupTitle === "Chemical Alarms"|| groupTitle === "Chemical Alarm" || groupTitle === "Radiation Alarms" || groupTitle === "Radiation Alarm" || groupTitle === "Biological Alarm"|| groupTitle === "Biological Alarms"  ? (
+        <div style={{ padding: "1rem" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(12rem, 1fr))",
+            gap: "1rem 1.5rem",
+            
+          }}
+        >
           {Object.keys(subParams).map((paramKey) => {
             const isAlarm = subParams[paramKey] > 0;
             const color = isAlarm ? "red" : "green";
             return (
-              <div key={paramKey} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <div style={{ width: "24px", height: "24px", backgroundColor: color, borderRadius: "50%" }} />
-                <span style={{ fontSize: "16px" }}>{paramKey}</span>
-                <span style={{ fontSize: "16px" }}>|</span>
+              <div
+                key={paramKey}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <div
+                  style={{
+                    width: "1rem",
+                    height: "1rem",
+                    backgroundColor: color,
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ fontSize: "1.5rem" }}>{paramKey}</span>
               </div>
             );
           })}
         </div>
-      ) : groupTitle === "Chemical Parameters" || groupTitle === "Radiation Parameter"|| groupTitle === "Radiation Parameters" || groupTitle === "Biological Parameters"? (
+      </div>
+      
+      
+      
+      ) : groupTitle === "Chemical Parameters" || groupTitle === "Radiation Parameter" || groupTitle === "Radiation Parameters" || groupTitle === "Biological Parameters" ? (
         <MemoizedLivePlot data={subParams} />
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
@@ -201,7 +186,6 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     </StyledTableRow>
   ), [memoizedCapitalize]);
 
-  // Update the section title rendering
   const renderSectionTitle = useCallback((title) => memoizedCapitalize(title), [memoizedCapitalize]);
 
   const cardStyle = {
@@ -234,7 +218,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
         <>
           {Object.keys(displayData).map((sectionTitle) => {
             let parameters = displayData[sectionTitle];
-            parameters = getFilteredParameters(parameters,sectionTitle,toggleState);
+            parameters = getFilteredParameters(parameters, sectionTitle, toggleState);
 
             return (
               <HvCard
@@ -254,20 +238,105 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                         renderParameterGroup(groupTitle, subParams)
                       )}
                     </div>
-                  ) : (
+                  ) : sectionTitle === "System Settings" ? (
+
+                   
+  <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" ,backgroundColor: "#F5F5F5", padding: "14px", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+
+<div style={{ display: "flex", flexDirection: "column", gap: "8px",marginTop: "10px" }}>
+                    {Object.entries(parameters).filter(([_, value]) => isNaN(Number(value))).map(([key, value]) => (
+                      <div key={key} style={{ fontSize: "18px" , display: "flex", justifyContent: "space-between",padding: "10px 0"}}> 
+                      <div key={key}>
+                        {key}
+                      </div>
+                      <div>
+                        {value}
+                      </div>
+                      </div>
+                    ))}
+                  </div>
+    
+    {/* Live Plot for numeric values (converted if possible) */}
+    <MemoizedLivePlot 
+      data={Object.fromEntries(
+        Object.entries(parameters).filter(([_, value]) => !isNaN(Number(value)))
+          .map(([key, value]) => [key, Number(value)])
+      )} 
+    />
+
+    {/* Show non-numeric values */}
+    
+  </div>
+) : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
+  <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
+    {Object.entries(parameters).map(([key, value]) => {
+      const numericValue = Number(value);
+      const normalizedValue = String(value).toLowerCase(); // normalize to lowercase
+      const successValues = ["ok", "no fault", "24h", "30s", "2.3 bar", "clear", "none", "not required", "ready", "okay", "no need"];
+      const neutralValues = ["n/a"];
+
+      const isSuccess = successValues.includes(normalizedValue) || (!isNaN(numericValue) && numericValue > 0);
+      const isNeutral = neutralValues.includes(normalizedValue);
+
+      return (
+        <div
+          key={key}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "12px",
+            fontSize: "18px",
+            padding: "10px 0",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: "200px" }}>
+            <span>{isSuccess ? "✅" : isNeutral ? "⚪" : "❌"}</span>
+            <span
+              style={{
+                backgroundColor: "#ddd",
+                borderRadius: "6px",
+                padding: "4px 10px",
+                fontSize: "16px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {key}
+            </span>
+          </div>
+          <div
+            style={{
+              backgroundColor: isSuccess ? "#008000" : "#ffbf00",
+              color: "white",
+              borderRadius: "6px",
+              padding: "4px 12px",
+              fontWeight: "bold",
+              textAlign: "center",
+              minWidth: "90px",
+              flexShrink: 0,
+            }}
+          >
+            {value}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+) : 
+                  (
                     <TableContainer
                       component={Paper}
                       elevation={0}
                       style={{ width: "100%", overflowX: "auto" }}
                     >
                       <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-  <TableBody>
-    {Object.entries(parameters).map(([key, value]) => (
-      renderTableRow(key, value)
-    ))}
-  </TableBody>
-</Table>
-
+                        <TableBody>
+                          {Object.entries(parameters).map(([key, value]) => (
+                            renderTableRow(key, value)
+                          ))}
+                        </TableBody>
+                      </Table>
                     </TableContainer>
                   )}
                 </HvCardContent>
@@ -290,31 +359,30 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                 elevation={0}
                 style={notificationContainerStyle}
               >
-               <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-  <TableBody>
-    {recentNotifications.length > 0 ? (
-      <TableRow>
-        <TableCell colSpan={4}>
-          <List
-            height={550}
-            itemCount={recentNotifications.length}
-            itemSize={100}
-            width="100%"
-          >
-            {renderNotificationRow}
-          </List>
-        </TableCell>
-      </TableRow>
-    ) : (
-      <StyledTableRow>
-        <StyledTableCell colSpan={2} align="center">
-          No notifications available
-        </StyledTableCell>
-      </StyledTableRow>
-    )}
-  </TableBody>
-</Table>
-
+                <Table sx={{ minWidth: "100%" }} aria-label="customized table">
+                  <TableBody>
+                    {notifications.length > 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4}>
+                          <List
+                            height={550}
+                            itemCount={notifications.length}
+                            itemSize={100}
+                            width="100%"
+                          >
+                            {renderNotificationRow}
+                          </List>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <StyledTableRow>
+                        <StyledTableCell colSpan={2} align="center">
+                          No notifications available
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </TableContainer>
             </HvCardContent>
           </HvCard>

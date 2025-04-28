@@ -1,6 +1,7 @@
 //const Live_stream_url = `http://10.131.19.202:4000/sse`; // SSE endpoint
 const Live_stream_url = `http://${process.env.REACT_APP_STREAM_IP}:${process.env.REACT_APP_STREAM_PORT}/sse`; 
 export const getLiveStreamingDataForSensors = (device_id, callback) => {
+
     console.log("device_id web socket: ", device_id);
     const eventSource = new EventSource(Live_stream_url);
 
@@ -8,6 +9,7 @@ export const getLiveStreamingDataForSensors = (device_id, callback) => {
     eventSource.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
+          
 
             // Filter data based on the provided device_id
             if (parseInt(data.device_id) === parseInt(device_id)) {

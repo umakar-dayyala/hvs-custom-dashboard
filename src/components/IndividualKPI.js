@@ -95,7 +95,7 @@ const KPIContainer = ({ ricon, gicon, alertIcon, kpiData, rbell, amberBell, gree
   // Condition checks for icon selection
   const allGreaterThanZero = kpiData.length > 0 && kpiData.every(kpi => parseInt(kpi.value) > 0);
   const hasRiconCategory = kpiData.some(kpi => 
-    ["Chemical Alarms", "Biological Alarms", "Radiological Alarms"].includes(kpi.title) && parseInt(kpi.value) > 0
+    ["Chemical Alarms", "Biological Alarms", "Radiological Alarms","Chemical Alarm", "Biological Alarm", "Radiological Alarm"].includes(kpi.title) && parseInt(kpi.value) > 0
   );
   const hasAiconCategory = kpiData.some(kpi => 
     ["Detector Health Faults", "Analytics Alert"].includes(kpi.title) && parseInt(kpi.value) > 0
