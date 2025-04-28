@@ -267,12 +267,16 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     {/* Show non-numeric values */}
     
   </div>
-) : sectionTitle === "Health Parameters" ||sectionTitle === "Health_Parameters" ? (
+) : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
   <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
     {Object.entries(parameters).map(([key, value]) => {
       const numericValue = Number(value);
-      const isSuccess = ["OK","No Fault", "24h", "30s", "2.3 Bar","clear","Clear","None"].includes(value) || (!isNaN(numericValue) && numericValue > 0);
-      const isNeutral = ["N/A"].includes(value);
+      const normalizedValue = String(value).toLowerCase(); // normalize to lowercase
+      const successValues = ["ok", "no fault", "24h", "30s", "2.3 bar", "clear", "none", "not required", "ready", "okay", "no need"];
+      const neutralValues = ["n/a"];
+
+      const isSuccess = successValues.includes(normalizedValue) || (!isNaN(numericValue) && numericValue > 0);
+      const isNeutral = neutralValues.includes(normalizedValue);
 
       return (
         <div
@@ -281,26 +285,26 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            flexWrap: "wrap", // ensures wrapping on small screens
+            flexWrap: "wrap",
             gap: "12px",
             fontSize: "18px",
             padding: "10px 0",
           }}
         >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: "200px" }}>
-              <span>{isSuccess ? "✅" : isNeutral ? "⚪" : "❌"}</span>
-              <span
-                style={{
-                  backgroundColor: "#ddd",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
-                  fontSize: "16px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {key}
-              </span>
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: "200px" }}>
+            <span>{isSuccess ? "✅" : isNeutral ? "⚪" : "❌"}</span>
+            <span
+              style={{
+                backgroundColor: "#ddd",
+                borderRadius: "6px",
+                padding: "4px 10px",
+                fontSize: "16px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {key}
+            </span>
+          </div>
           <div
             style={{
               backgroundColor: isSuccess ? "#008000" : "#ffbf00",
@@ -317,9 +321,6 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
           </div>
         </div>
       );
-      
-      
-      
     })}
   </div>
 ) : 
