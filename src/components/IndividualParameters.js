@@ -106,53 +106,53 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
       </StyledTableRow>
     );
   }, [notifications]);
-  
+
   const renderParameterGroup = useCallback((groupTitle, subParams) => (
     <div key={groupTitle} style={parameterGroupStyle}>
       <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
         {groupTitle}
       </div>
-      {groupTitle === "Chemical Alarms"|| groupTitle === "Chemical Alarm" || groupTitle === "Radiation Alarms" || groupTitle === "Radiation Alarm" || groupTitle === "Biological Alarm"|| groupTitle === "Biological Alarms"  ? (
+      {groupTitle === "Chemical Alarms" || groupTitle === "Chemical Alarm" || groupTitle === "Radiation Alarms" || groupTitle === "Radiation Alarm" || groupTitle === "Biological Alarm" || groupTitle === "Biological Alarms" ? (
         <div style={{ padding: "1rem" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(12rem, 1fr))",
-            gap: "1rem 1.5rem",
-            
-          }}
-        >
-          {Object.keys(subParams).map((paramKey) => {
-            const isAlarm = subParams[paramKey] > 0;
-            const color = isAlarm ? "red" : "green";
-            return (
-              <div
-                key={paramKey}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  whiteSpace: "nowrap",
-                }}
-              >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(12rem, 1fr))",
+              gap: "1rem 1.5rem",
+
+            }}
+          >
+            {Object.keys(subParams).map((paramKey) => {
+              const isAlarm = subParams[paramKey] > 0;
+              const color = isAlarm ? "red" : "green";
+              return (
                 <div
+                  key={paramKey}
                   style={{
-                    width: "1rem",
-                    height: "1rem",
-                    backgroundColor: color,
-                    borderRadius: "50%",
-                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    whiteSpace: "nowrap",
                   }}
-                />
-                <span style={{ fontSize: "1.5rem" }}>{paramKey}</span>
-              </div>
-            );
-          })}
+                >
+                  <div
+                    style={{
+                      width: "1rem",
+                      height: "1rem",
+                      backgroundColor: color,
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span style={{ fontSize: "1.5rem" }}>{paramKey}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
-      
-      
-      
+
+
+
       ) : groupTitle === "Chemical Parameters" || groupTitle === "Radiation Parameter" || groupTitle === "Radiation Parameters" || groupTitle === "Biological Parameters" ? (
         <MemoizedLivePlot data={subParams} />
       ) : (
@@ -234,116 +234,116 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                   </HvTypography>
                   {["Radiation_Parameters", "Radiation_Readings", "Biological_Parameters", "Chemical Alarms", "Radiation Alarm"].includes(sectionTitle) ? (
                     <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
-                      {Object.entries(parameters).map(([groupTitle, subParams]) => 
+                      {Object.entries(parameters).map(([groupTitle, subParams]) =>
                         renderParameterGroup(groupTitle, subParams)
                       )}
                     </div>
                   ) : sectionTitle === "System Settings" ? (
 
-                   
-  <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" ,backgroundColor: "#F5F5F5", padding: "14px", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
 
-<div style={{ display: "flex", flexDirection: "column", gap: "8px",marginTop: "10px" }}>
-                    {Object.entries(parameters).filter(([_, value]) => isNaN(Number(value))).map(([key, value]) => (
-                      <div key={key} style={{ fontSize: "18px" , display: "flex", justifyContent: "space-between",padding: "10px 0"}}> 
-                      <div key={key}>
-                        {key}
+                    <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#F5F5F5", padding: "14px", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "10px" }}>
+                        {Object.entries(parameters).filter(([_, value]) => isNaN(Number(value))).map(([key, value]) => (
+                          <div key={key} style={{ fontSize: "18px", display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
+                            <div key={key}>
+                              {key}
+                            </div>
+                            <div>
+                              {value}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div>
-                        {value}
-                      </div>
-                      </div>
-                    ))}
-                  </div>
-    
-    {/* Live Plot for numeric values (converted if possible) */}
-    <MemoizedLivePlot 
-      data={Object.fromEntries(
-        Object.entries(parameters).filter(([_, value]) => !isNaN(Number(value)))
-          .map(([key, value]) => [key, Number(value)])
-      )} 
-    />
 
-    {/* Show non-numeric values */}
-    
-  </div>
-) : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
-  <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
-    {Object.entries(parameters).map(([key, value]) => {
-      const numericValue = Number(value);
-      const normalizedValue = String(value).toLowerCase(); // normalize to lowercase
-      const successValues = ["ok", "no fault", "24h", "30s", "2.3 bar", "clear", "none", "not required", "ready", "okay", "no need"];
-      const neutralValues = ["n/a"];
+                      {/* Live Plot for numeric values (converted if possible) */}
+                      <MemoizedLivePlot
+                        data={Object.fromEntries(
+                          Object.entries(parameters).filter(([_, value]) => !isNaN(Number(value)))
+                            .map(([key, value]) => [key, Number(value)])
+                        )}
+                      />
 
-      const isSuccess = successValues.includes(normalizedValue) || (!isNaN(numericValue) && numericValue > 0);
-      const isNeutral = neutralValues.includes(normalizedValue);
+                      {/* Show non-numeric values */}
 
-      return (
-        <div
-          key={key}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "12px",
-            fontSize: "18px",
-            padding: "10px 0",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: "200px" }}>
-            <span>{isSuccess ? "✅" : isNeutral ? "⚪" : "❌"}</span>
-            <span
-              style={{
-                backgroundColor: "#ddd",
-                borderRadius: "6px",
-                padding: "4px 10px",
-                fontSize: "16px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {key}
-            </span>
-          </div>
-          <div
-            style={{
-              backgroundColor: isSuccess ? "#008000" : "#ffbf00",
-              color: "white",
-              borderRadius: "6px",
-              padding: "4px 12px",
-              fontWeight: "bold",
-              textAlign: "center",
-              minWidth: "90px",
-              flexShrink: 0,
-            }}
-          >
-            {value}
-          </div>
-        </div>
-      );
-    })}
-  </div>
-) : 
-                  (
-                    <TableContainer
-                      component={Paper}
-                      elevation={0}
-                      style={{ width: "100%", overflowX: "auto" }}
-                    >
-                      <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                        <TableBody>
-                          {Object.entries(parameters).map(([key, value]) => (
-                            renderTableRow(key, value)
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  )}
+                    </div>
+                  ) : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
+                    <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {Object.entries(parameters).map(([key, value]) => {
+                        const numericValue = Number(value);
+                        const normalizedValue = String(value).toLowerCase(); // normalize to lowercase
+                        const successValues = ["ok", "no fault", "24h", "30s", "2.3 bar", "clear", "none", "not required", "ready", "okay", "no need", "No Alarm"];
+                        const neutralValues = ["n/a"];
+
+                        const isSuccess = successValues.includes(normalizedValue) || (!isNaN(numericValue) && numericValue > 0);
+                        const isNeutral = neutralValues.includes(normalizedValue);
+
+                        return (
+                          <div
+                            key={key}
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              flexWrap: "wrap",
+                              gap: "12px",
+                              fontSize: "18px",
+                              padding: "10px 0",
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: "200px" }}>
+                              <span>{isSuccess ? "✅" : isNeutral ? "⚪" : "⚠️"}</span>
+                              <span
+                                style={{
+                                  backgroundColor: "#ddd",
+                                  borderRadius: "6px",
+                                  padding: "4px 10px",
+                                  fontSize: "16px",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {key}
+                              </span>
+                            </div>
+                            <div
+                              style={{
+                                backgroundColor: isSuccess ? "#008000" : "#ffbf00",
+                                color: "white",
+                                borderRadius: "6px",
+                                padding: "4px 12px",
+                                fontWeight: "bold",
+                                textAlign: "center",
+                                minWidth: "90px",
+                                flexShrink: 0,
+                              }}
+                            >
+                              {value}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) :
+                    (
+                      <TableContainer
+                        component={Paper}
+                        elevation={0}
+                        style={{ width: "100%", overflowX: "auto" }}
+                      >
+                        <Table sx={{ minWidth: "100%" }} aria-label="customized table">
+                          <TableBody>
+                            {Object.entries(parameters).map(([key, value]) => (
+                              renderTableRow(key, value)
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
                 </HvCardContent>
               </HvCard>
             );
           })}
-          
+
           <HvCard
             className="parameter-card"
             elevation={0}
