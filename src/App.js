@@ -34,7 +34,7 @@ import ConfigurationPage from "./pages/ConfigurationPage";
 import InventoryDashboard from "./pages/InventoryDashboard";
 import { FcadIndividual } from "./pages/FcadIndividual";
 import { AamIndividual } from "./pages/AamIndividual";
-import SensorEventHistory from "./pages/SensorEventHistory";
+// import SensorEventHistory from "./pages/SensorEventHistory";
 
 
 const App = () => {
@@ -84,7 +84,7 @@ const App = () => {
               <Route path="/floorwisealarms" element={<FloorWiseAlarms />} />
               <Route path="/configurationPage" element={<ConfigurationPage />} />
               <Route path="/inventory" element={<InventoryDashboard />} />
-              <Route path="/sensorEventHistory" element={<SensorEventHistory />} />
+              {/* <Route path="/sensorEventHistory" element={<SensorEventHistory />} /> */}
              
             </Routes>
           </HvContainer>
