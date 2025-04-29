@@ -13,7 +13,7 @@ export const getInventoryData = async () => {
           assetType: "PPE",
           assetManufacturer: "ABC",
           assetSerialNumber: "ABC-291234",
-          loggedBy: "Raj",
+          loggedBy: "User",
           logDate: "03/04/2025",
           location: "Storeroom",
           status: "Active",
@@ -25,7 +25,7 @@ export const getInventoryData = async () => {
           assetType: "PPE",
           assetManufacturer: "XYZ",
           assetSerialNumber: "XYZ-123456",
-          loggedBy: "Meena",
+          loggedBy: "User",
           logDate: "03/04/2025",
           location: "Warehouse 2",
           status: "Active",
@@ -47,7 +47,7 @@ let assets = [
     Asset_Serial_Number: "SN12345",
     Asset_Location: "Storeroom",
     Asset_Status: "Active",
-    Logged_By: "John Doe",
+    Logged_By: "User1",
     Logged_Date: "2024-12-20",
     Comments: "All good",
     Attachments: null,
@@ -60,7 +60,7 @@ let assets = [
     Asset_Serial_Number: "SN56789",
     Asset_Location: "Upper Ground",
     Asset_Status: "Removed",
-    Logged_By: "Alice",
+    Logged_By: "User1",
     Logged_Date: "2025-01-10",
     Comments: "Replaced",
     Attachments: null,
@@ -153,39 +153,3 @@ export const getAssets = async () => {
 };
 
 
-
-export const getAssets_1 = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: '1',
-          title: 'Asset-001',
-          type: 'Sensor',
-          status: 'Active',
-          probability: 'John Doe',
-          severity: '2024-12-20',
-          priority: 'Storeroom',
-        },
-        {
-          id: '2',
-          title: 'Asset-002',
-          type: 'System',
-          status: 'Removed',
-          probability: 'Alice',
-          severity: '2025-01-10',
-          priority: 'Upper Ground',
-        },
-        {
-          id: '3',
-          title: 'Asset-003',
-          type: 'PPE',
-          status: 'In-active',
-          probability: 'Bob',
-          severity: '2024-11-15',
-          priority: 'Lower Ground',
-        },
-      ]);
-    }, 500); // Simulated delay
-  });
-};
