@@ -21,7 +21,7 @@ import {
 } from "@hitachivantara/uikit-react-core";
 import { Add, Close, Filters } from "@hitachivantara/uikit-react-icons";
 import WriteConfigurationModal from "./ConfigModal";
-import { set } from "lodash";
+import "../css/configurationPage.css";
 
 const slide = keyframes({
   "0%": { maxHeight: 0 },
@@ -36,6 +36,7 @@ const classes = {
     border: "1px solid #e0e0e0",
     overflow: "hidden",
     animation: `${slide} 1.5s ease-in-out`,
+    fontSize: "18px",
   }),
   filters: css({
     display: "flex",
@@ -43,6 +44,7 @@ const classes = {
     padding: "8px",
     justifyContent: "space-between",
     alignItems: "center",
+    fontSize: "18px",
   }),
   gemsContainer: css({
     display: "flex",
@@ -51,9 +53,31 @@ const classes = {
     padding: "0 8px",
     flexWrap: "wrap",
     gap: "8px",
+    fontSize: "18px",
   }),
   actionButton: css({
     padding: "8px 16px",
+    fontSize: "18px",
+  }),
+  tableHeader: css({
+    fontSize: "18px",
+    fontWeight: "bold",
+  }),
+  tableCell: css({
+    fontSize: "18px",
+  }),
+  input: css({
+    fontSize: "18px",
+  }),
+  pagination: css({
+    fontSize: "18px",
+  }),
+  title: css({
+    fontSize: "20px",
+    fontWeight: "bold",
+  }),
+  filterGroup: css({
+    fontSize: "18px",
   }),
 };
 
@@ -67,7 +91,6 @@ const sampleData = [
   { device_id: "dev-006", floor: "1F", zone: "Zone 6", location: "south utility", type: "Chemical", sensor: "AP4C" },
 ];
 
-// Function to generate unique filter options from data
 const generateFilterOptions = (data, field) => {
   const uniqueValues = [...new Set(data.map(item => item[field]))];
   return uniqueValues.map(value => ({
@@ -76,7 +99,6 @@ const generateFilterOptions = (data, field) => {
   }));
 };
 
-// Generate filters dynamically based on sampleData
 const filters = [
   {
     id: "floor",
@@ -119,27 +141,27 @@ export const SearchableTable = () => {
     {
       Header: "Floor",
       accessor: "floor",
-      filter: "includesSome", // This enables multi-select filtering
+      filter: "includesSome",
     },
     {
       Header: "Zone",
       accessor: "zone",
-      filter: "includesSome", // This enables multi-select filtering
+      filter: "includesSome",
     },
     {
       Header: "Location",
       accessor: "location",
-      filter: "includesSome", // This enables multi-select filtering
+      filter: "includesSome",
     },
     {
       Header: "Type",
       accessor: "type",
-      filter: "includesSome", // This enables multi-select filtering
+      filter: "includesSome",
     },
     {
       Header: "Sensor",
       accessor: "sensor",
-      filter: "includesSome", // This enables multi-select filtering
+      filter: "includesSome",
     },
     {
       Header: "Action",
@@ -191,7 +213,7 @@ export const SearchableTable = () => {
       columns,
       data: sampleData,
       initialState: {
-        filters: [], // Initialize with no filters
+        filters: [],
       },
     },
     useHvGlobalFilter,
@@ -218,7 +240,7 @@ export const SearchableTable = () => {
         {row.cells.map((cell) => {
           const { key: cellKey, ...cellProps } = cell.getCellProps();
           return (
-            <HvTableCell key={cellKey} {...cellProps}>
+            <HvTableCell key={cellKey} {...cellProps} className={classes.tableCell}>
               {cell.render("Cell")}
             </HvTableCell>
           );
@@ -242,13 +264,14 @@ export const SearchableTable = () => {
   return (
     <>
       <HvTableSection
-        title={<HvTypography variant="title4">Sensor Data</HvTypography>}
+        title={<HvTypography variant="title4" className={classes.title}>Sensor Data</HvTypography>}
         actions={
           <>
             <HvInput
               type="search"
               placeholder="Search all columns"
               onChange={(e, v) => setGlobalFilter?.(v)}
+              className={classes.input}
             />
             <HvFilterGroup
               ref={filterRef}
@@ -261,6 +284,7 @@ export const SearchableTable = () => {
                 adornment: <Filters aria-hidden />,
                 placeholder: null,
               }}
+              className={classes.filterGroup}
             />
           </>
         }
@@ -272,6 +296,7 @@ export const SearchableTable = () => {
                 variant="primaryGhost"
                 startIcon={<Add />}
                 onClick={() => filterRef.current?.click()}
+                className={classes.actionButton}
               >
                 Add Filter
               </HvButton>
@@ -290,6 +315,7 @@ export const SearchableTable = () => {
                       handleFilters(newFilters);
                     }}
                     aria-label={`Clear filter ${category.label}: ${value.label}`}
+                    className={classes.actionButton}
                   >
                     {category.label}: {value.label}
                   </HvButton>
@@ -298,6 +324,7 @@ export const SearchableTable = () => {
               <HvButton
                 variant="secondaryGhost"
                 onClick={() => handleFilters(undefined)}
+                className={classes.actionButton}
               >
                 Clear
               </HvButton>
@@ -316,6 +343,7 @@ export const SearchableTable = () => {
                     <HvTableHeader
                       {...col.getHeaderProps()}
                       key={col.getHeaderProps().key}
+                      className={classes.tableHeader}
                     >
                       {col.render("Header")}
                     </HvTableHeader>
@@ -331,6 +359,7 @@ export const SearchableTable = () => {
         {page.length > 0 && (
           <HvPagination
             {...getHvPaginationProps?.()}
+            className={classes.pagination}
             labels={{
               pageSizePrev: "",
               pageSizeEntryName: `of ${sampleData.length}`,
@@ -343,7 +372,7 @@ export const SearchableTable = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         deviceId={selectedDeviceId}
-        location ={selectedLocation}
+        location={selectedLocation}
         sensor={selectedSensor}
       />
     </>
