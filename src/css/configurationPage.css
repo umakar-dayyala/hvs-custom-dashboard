@@ -1,0 +1,18 @@
+#HvTableHeader {
+    font-size: 2rem; /* More reasonable default size for table headers */
+    font-weight: 600; /* Semi-bold for better readability */
+    line-height: 1.5; /* Unitless line-height for better scaling */
+  }
+  
+  /* If you specifically want to target the header text */
+  .HvTableHeader .HvTypography-headerText {
+    font-size: 4rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  
+  /* If you need to increase the size significantly */
+  .HvTableHeader.large-header {
+    font-size: 4rem;
+    line-height: 2;
+  }

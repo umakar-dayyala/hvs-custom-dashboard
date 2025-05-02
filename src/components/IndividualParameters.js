@@ -269,11 +269,12 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                     </div>
                   ) : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
                     <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
+                      
                       {Object.entries(parameters).map(([key, value]) => {
                         const numericValue = Number(value);
                         const normalizedValue = String(value).toLowerCase(); // normalize to lowercase
-                        const successValues = ["ok", "no fault", "24h", "30s", "2.3 bar", "clear", "none", "not required", "ready", "okay", "no need", "No Alarm"];
-                        const neutralValues = ["n/a"];
+                        const successValues = ["ok", "no fault", "24h", "30s", "2.3 bar", "clear", "none", "not required", "ready", "okay", "no need", "No Alarm","no alarm","Normal","Active","Not Requested",];
+                        const neutralValues = ["n/a","NA"];
 
                         const isSuccess = successValues.includes(normalizedValue) || (!isNaN(numericValue) && numericValue > 0);
                         const isNeutral = neutralValues.includes(normalizedValue);
