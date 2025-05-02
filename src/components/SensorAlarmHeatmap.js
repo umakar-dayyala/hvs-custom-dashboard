@@ -37,6 +37,8 @@ const SensorAlarmHeatmap = ({ sensorsData = [], title = "" }) => {
       VRM: "vrmIndividual",
       IBAC: "ibacIndividual",
       MAB: "MABIndividual",
+      AAM: "aamIndividual",
+      WRM: "wrmIndividual",
     };
     return routes[detector] || null;
   };
