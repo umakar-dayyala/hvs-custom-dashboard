@@ -35,6 +35,7 @@ import InventoryDashboard from "./pages/InventoryDashboard";
 import { FcadIndividual } from "./pages/FcadIndividual";
 import { AamIndividual } from "./pages/AamIndividual";
 // import SensorEventHistory from "./pages/SensorEventHistory";
+// import FloatingNotificationButton from "./components/FloatingNotificationButton";
 
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
             <SensorStatusCards />
           </div> */}
           <AlertBanner />
+          {/* <FloatingNotificationButton /> */}
             <Routes>
               <Route path="/" element={<OperatorsDashboard />} />
               <Route path="/ibacSensor" element={<IBACSensor />} />
