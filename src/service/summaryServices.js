@@ -27,6 +27,19 @@ export const getSensorData = async () => {
   }
 };
 
+export const summaryData = async () => {
+     try {
+
+      const response = await axios.get(`${API_BASE_URL}/summary/getCardData`); // Replace with your actual API URL
+      const data = response.data.data;
+      console.log("Summary Data: ", data);
+      return data;
+      
+    } catch (error) {
+      console.error("Error fetching sensor data:", error);
+      return []; // Return an empty array in case of error
+    }
+  };
 
 export const floorList = async () => {
   try {

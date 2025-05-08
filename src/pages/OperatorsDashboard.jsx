@@ -3,9 +3,10 @@ import { Box } from "@mui/material";
 import { HvTypography } from "@hitachivantara/uikit-react-core";
 import { useNavigate } from "react-router-dom";
 import FloorTabs from "../components/FloorTabs";
-import FloorCards from "../components/FloorCards";
+// import FloorCards from "../components/FloorCards";
+import FloorCards from "../components/FloorCardsNew";
 import SensorStatusCards from "../components/SensorStatusCards";
-import { floorList } from "../service/summaryServices";
+import { floorList,summaryData } from "../service/summaryServices";
 import Breadcrumbs from "../components/Breadcrumbs";
 import SensorLegend from "../components/SensorLegend";
 import HorizontalDivider from "../components/HorizontalDivider";
@@ -13,6 +14,7 @@ import { css } from "@emotion/react";
 import Loader from "../components/Loader"; // importing the loader from the component 
 import ScrollingText from "../components/ScrollingText";
 import { isEqual } from "lodash";
+import SummaryCards from "../components/SummaryCards"; 
 
 const scrollContainer = css`
   height: 100vh;
@@ -47,6 +49,7 @@ const scrollContainer = css`
 
 const OperatorDashboard = () => {
   const [floorData, setFloorData] = useState([]);
+  const [sensorSummaryData, setSensorSummaryData] = useState([]); 
   const [loading, setLoading] = useState(true);  // adding the load state 
   const navigate = useNavigate();
 
@@ -66,6 +69,12 @@ const OperatorDashboard = () => {
         if (isChanged) {
           setFloorData(response);
         }
+        const data = await summaryData();
+        const isDataChanged = !isEqual(data, sensorSummaryData);  
+        if (isDataChanged) {
+          setSensorSummaryData(data);
+        }
+        
       } catch (error) {
         console.error("Error fetching floor data:", error);
       } finally {
@@ -116,7 +125,8 @@ const OperatorDashboard = () => {
 
                 {/* Sensor Status Cards */}
                 <Box p={1}>
-                <SensorStatusCards />
+                {/* <SensorStatusCards /> */}
+                <SummaryCards SummaryCardsData={sensorSummaryData} /> 
                 </Box>
 
                 <HorizontalDivider />
