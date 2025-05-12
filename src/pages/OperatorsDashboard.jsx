@@ -126,7 +126,7 @@ const OperatorDashboard = () => {
                 {/* Sensor Status Cards */}
                 <Box p={1}>
                 {/* <SensorStatusCards /> */}
-                <SummaryCards SummaryCardsData={sensorSummaryData} /> 
+                <SummaryCards /> 
                 </Box>
 
                 <HorizontalDivider />
