@@ -29,6 +29,7 @@ import aicon from "../assets/aChemical.svg";
 import greyChem from "../assets/greyChem.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import { floor, set } from 'lodash';
+import Connectivitydata from '../components/Connectivitydata';
 
 // Constants
 const DUMMY_KPI_DATA = [
@@ -298,6 +299,7 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
             </>
           )}
         </Box>
+        <Connectivitydata />
       </Box>
       {showModal && (
         <ConfirmationModal

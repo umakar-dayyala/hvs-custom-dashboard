@@ -29,6 +29,7 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import Corelation from "../components/Corelation";
 import aicon from "../assets/aBiological.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import Connectivitydata from "../components/Connectivitydata";
 
 export const IbacIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -322,6 +323,7 @@ export const IbacIndividual = () => {
             </>
           )}
         </Box>
+        <Connectivitydata />
       </Box>
       {showModal && (
         <ConfirmationModal

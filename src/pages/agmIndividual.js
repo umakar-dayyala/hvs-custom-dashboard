@@ -24,6 +24,7 @@ import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import Connectivitydata from '../components/Connectivitydata';
 
 export const AgmIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -264,6 +265,7 @@ export const AgmIndividual = () => {
             </Box>
           )}
         </Box>
+        <Connectivitydata />
         {showModal && (
           <ConfirmationModal
             open={showModal}
