@@ -27,6 +27,7 @@ import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aBiological.svg";
 import greyBio from "../assets/greyBio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import Connectivitydata from '../components/Connectivitydata';
 
 // Constants
 const DUMMY_KPI_DATA = [
@@ -295,7 +296,9 @@ export const MABIndividual = React.memo(() => {
                 <PredictionChart />
               </Box>
             )}
+            
           </Box>
+          <Connectivitydata />
         </Box>
       </Box>
       {showModal && (

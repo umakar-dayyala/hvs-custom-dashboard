@@ -23,6 +23,7 @@ import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import Connectivitydata from '../components/Connectivitydata';
 
 
 
@@ -268,6 +269,7 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
             </Box>
           )}
         </Box>
+        <Connectivitydata />
       </Box>
       {showModal && (
         <ConfirmationModal

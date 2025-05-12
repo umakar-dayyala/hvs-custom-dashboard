@@ -24,6 +24,7 @@ import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import Connectivitydata from '../components/Connectivitydata';
 
 
 
@@ -265,6 +266,7 @@ export const VRMIndividual = () => {
             </Box>
           )}
         </Box>
+        <Connectivitydata />
       </Box>
 
       {showModal && (
