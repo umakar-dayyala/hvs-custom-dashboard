@@ -19,7 +19,7 @@ export const getSensorData = async () => {
       { title: "Active Sensor", value: data.active_sensors.toString() },
       { title: "Inactive Sensor", value: data.inactive_sensors.toString() },
       { title: "Faulty Sensors", value: data.sensor_health },
-      { title: "Open Incident", value: data.incident_tracked.toString() },
+      // { title: "Open Incident", value: data.incident_tracked.toString() },
     ];
   } catch (error) {
     console.error("Error fetching sensor data:", error);
