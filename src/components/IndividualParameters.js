@@ -68,7 +68,8 @@ const notificationContainerStyle = {
   overflowY: "auto",
 };
 
-const IndividualParameters = memo(({ paramsData, notifications = [], toggleState }) => {
+const IndividualParameters = memo(({ paramsData, notifications = [], toggleState, AsmData }) => {
+  console.log("ASM Data", AsmData);
   const memoizedCapitalize = useCallback((str) => {
     if (!str) return '';
     return str
@@ -92,6 +93,48 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     }
     return parameters;
   }, [toggleState, isVRM, isPRM, isAGM]);
+
+  const getBackgroundColor = (key, value) => {
+  const green = "#008000";
+  const yellow = "#ffbf00";
+  const red = "#ff0000";
+
+  const statusMap = {
+    "Detector Ready": (v) => {
+      const val = String(v).toLowerCase();
+      return val === "true" || val === "ready" ? green : yellow;
+    },
+    "Device Fault": (v) => {
+      const val = String(v).toLowerCase();
+      return val === "no fault" || val === "okay" ? green : red;
+    },
+    "Power Supply Too Low": (v) => String(v).toLowerCase() === "false" ? green : yellow,
+    "Algorithm Alarm Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
+    "Pressure": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
+    "Laser Power": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
+    "Laser Current": (v) => parseFloat(v) > 0 ? green : yellow,
+    "Background Light Monitor": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
+    "Low Battery": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
+    "DET 01 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
+    "System Error": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
+    "DET 02 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
+    "Purge": (v) => String(v).toLowerCase() === "not required" ? green : yellow,
+    "Lack Of Hydrogen": (v) => String(v).toLowerCase() === "no need" ? green : yellow,
+    "Maintenance Required": (v) => String(v).toLowerCase() === "not required" ? green : yellow,
+    "Test Mode in Progress": (v) => String(v).toLowerCase() === "on" ? green : yellow,
+    "Low Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
+    "RTC Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
+    "Detector Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
+    "High Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
+    "SD card Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
+    "Mother Board Controller Status ": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
+  };
+
+  const normalizedValue = String(value).toLowerCase();
+  return statusMap[key] ? statusMap[key](value) : (normalizedValue === "true" ? green : yellow);
+};
+
+
 
   const renderNotificationRow = useCallback(({ index, style }) => {
     const notification = notifications[index];
@@ -269,15 +312,11 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                     </div>
                   ) : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
                     <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
-                      
-                      {Object.entries(parameters).map(([key, value]) => {
-                        const numericValue = Number(value);
-                        const normalizedValue = String(value).toLowerCase(); // normalize to lowercase
-                        const successValues = ["ok", "no fault", "24h", "30s", "2.3 bar", "clear", "none", "not required", "ready", "okay", "no need", "No Alarm","no alarm","Normal","Active","Not Requested",];
-                        const neutralValues = ["n/a","NA"];
 
-                        const isSuccess = successValues.includes(normalizedValue) || (!isNaN(numericValue) && numericValue > 0);
-                        const isNeutral = neutralValues.includes(normalizedValue);
+                      {Object.entries(parameters).map(([key, value]) => {
+
+
+
 
                         return (
                           <div
@@ -293,7 +332,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                             }}
                           >
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: "200px" }}>
-                              <span>{isSuccess ? "✅" : isNeutral ? "⚪" : "⚠️"}</span>
+
                               <span
                                 style={{
                                   backgroundColor: "#ddd",
@@ -308,7 +347,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                             </div>
                             <div
                               style={{
-                                backgroundColor: isSuccess ? "#008000" : "#ffbf00",
+                                backgroundColor: getBackgroundColor(key, value),
                                 color: "white",
                                 borderRadius: "6px",
                                 padding: "4px 12px",
@@ -320,6 +359,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                             >
                               {value}
                             </div>
+
                           </div>
                         );
                       })}
@@ -368,7 +408,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                           <List
                             height={550}
                             itemCount={notifications.length}
-                            itemSize={100}
+                            itemSize={150}
                             width="100%"
                           >
                             {renderNotificationRow}
@@ -387,8 +427,41 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
               </TableContainer>
             </HvCardContent>
           </HvCard>
+          {AsmData && (
+            <HvCard
+              className="parameter-card"
+              elevation={0}
+              statusColor="red"
+              style={cardStyle}
+            >
+              <HvCardContent className="parameter-content">
+                <HvTypography variant="title2" className="section-title">
+                  ASM Data
+                </HvTypography>
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  style={{ width: "100%", overflowX: "auto" }}
+                >
+                  <Table sx={{ minWidth: "100%" }} aria-label="customized table">
+                    <TableBody>
+                      {Object.entries(AsmData).map(([key, value]) => (
+                        <StyledTableRow key={key}>
+                          <StyledTableCell component="th" scope="row">
+                            {key}
+                          </StyledTableCell>
+                          <StyledTableCell align="right">{value}</StyledTableCell>
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </HvCardContent>
+            </HvCard>
+          )}
         </>
       )}
+
     </div>
   );
 });
