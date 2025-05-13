@@ -67,7 +67,8 @@ const FloorCards = ({ floorData }) => {
         {floorData.map((floor, index) => {
           const inActiveSensor = (floor.disconnected_sensors ?? 0) + (floor.inactiveSensors ?? 0);
           const totalAlarms = (floor.biological_alarms ?? 0) + (floor.chemical_alarms ?? 0) + (floor.radiological_alarms ?? 0);
-          const totalSensors = (floor.activeSensors ?? 0) + inActiveSensor + (floor.unhealthySensors ?? 0);
+          // const totalSensors = (floor.activeSensors ?? 0) + inActiveSensor + (floor.unhealthySensors ?? 0);
+          const totalSensors = (floor.totalSensors ?? 0) + inActiveSensor;
 
           const borderColor =
             totalAlarms > 0 ? "red" :
@@ -96,7 +97,7 @@ const FloorCards = ({ floorData }) => {
               enabled: true,
               formatter: (val, { seriesIndex }) => {
                 const sensorCounts = [
-                  floor.activeSensors || 0,
+                  (floor.activeSensors || 0) - (floor.unhealthySensors || 0),
                   inActiveSensor || 0,
                   floor.unhealthySensors || 0,
                   totalAlarms || 0,
@@ -123,7 +124,7 @@ const FloorCards = ({ floorData }) => {
           };
 
           const chartSeries = [
-            floor.activeSensors || 0,
+            (floor.activeSensors || 0) - (floor.unhealthySensors || 0),
             inActiveSensor || 0,
             floor.unhealthySensors || 0,
             totalAlarms || 0,
@@ -142,7 +143,8 @@ const FloorCards = ({ floorData }) => {
                   </HvTypography>
 
                   <Box
-                    bgcolor={totalAlarms > 0 ? "#E30613" : "#28A745"}
+                    // bgcolor={totalAlarms > 0 ? "#E30613" : "#28A745"}
+                    bgcolor={ chartSeries.every(val => !val) ? "RGB(128, 128,128)": totalAlarms > 0 ? "#E30613" : "#28A745"}
                     color="white"
                     px={2}
                     py={1}
@@ -162,9 +164,9 @@ const FloorCards = ({ floorData }) => {
                   </Box>
 
 
-                  <Box display="flex" justifyContent="center" mb={2} sx={{ height: 160 }}>
+                  <Box display="flex" justifyContent="center" alignItems="center" mb={2} sx={{ height: 160 }}>
                     {chartSeries.every(val => !val) ? (
-                      <HvTypography variant="body2" color="textSecondary" mt={5}>
+                      <HvTypography variant="title4" color="textSecondary" mt={5}>
                         No sensors available to display
                       </HvTypography>
                     ) : (

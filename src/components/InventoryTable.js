@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   HvTableContainer,
   HvTable,
@@ -16,32 +16,31 @@ const headerStyle = { backgroundColor: "grey", color: "white" };
 
 const InventoryTable = ({
   data,
+  filters = {},
   selectedIds = [],
   onSelectRow = () => {},
   onDialogOpen,
+  openRow,
+  onExpand,
 }) => {
-  const [expandedRows, setExpandedRows] = useState({});
+  const parents = (data || []).filter((p) => {
+    if (!filters.type || p.assetType === filters.type) {
+      const children = Array.isArray(p.children) ? p.children : [];
+      p.filteredChildren = children.filter(
+        (c) =>
+          c &&
+          (!filters.location || c.location === filters.location) && // Changed from c.assetLocation
+          (!filters.status || c.status === filters.status)          // Changed from c.assetStatus
+      );
+      return p.filteredChildren.length > 0 || (!filters.location && !filters.status);
+    }
+    return false;
+  });
+  console.log("Filtered Parents:", parents);
 
-  const handleRowClick = (index) => {
-    setExpandedRows((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
-  const handleSelect = (id) => {
-    alert(`Selected ID: `);
-    const newSelected = selectedIds.includes(id)
-      ? selectedIds.filter((selectedId) => selectedId !== id)
-      : [...selectedIds, id];
-    onSelectRow(newSelected);
-  };
-
-  const handleSelectAll = () => {
-    alert(`Selected All IDs: `);
-    const allIds = data.map((item) => item.uniqueAssetTypeCode);
-    const isAllSelected = allIds.every((id) => selectedIds.includes(id));
-    onSelectRow(isAllSelected ? [] : allIds);
+  const handleHeaderCheckboxChange = () => {
+    const allIds = parents.map((p) => p.uniqueAssetTypeCode);
+    onSelectRow(allIds, true);
   };
 
   return (
@@ -52,98 +51,106 @@ const InventoryTable = ({
             <HvTableHeader style={headerStyle}>
               <HvCheckBox
                 checked={
-                  data.length > 0 &&
-                  data.every((item) => selectedIds.includes(item.uniqueAssetTypeCode))
+                  parents.length > 0 &&
+                  parents.every((p) => selectedIds.includes(p.uniqueAssetTypeCode))
                 }
                 indeterminate={
-                  selectedIds.length > 0 &&
-                  selectedIds.length < data.length
+                  selectedIds.length > 0 && selectedIds.length < parents.length
                 }
-                onChange={handleSelectAll}
+                onChange={handleHeaderCheckboxChange}
               />
             </HvTableHeader>
-            <HvTableHeader style={headerStyle}>Unique Asset Type Code</HvTableHeader>
-            <HvTableHeader style={headerStyle}>Asset Type</HvTableHeader>
-            <HvTableHeader style={headerStyle}>Quantity</HvTableHeader>
-            <HvTableHeader style={headerStyle}>Logged By</HvTableHeader>
-            <HvTableHeader style={headerStyle}>Log Date</HvTableHeader>
-            <HvTableHeader style={headerStyle}>Action</HvTableHeader>
+            {[
+              "Unique Asset Type Code",
+              "Asset Type",
+              "Quantity",
+              "Logged By",
+              "Log Date",
+              "Action",
+            ].map((hdr) => (
+              <HvTableHeader key={hdr} style={headerStyle}>
+                {hdr}
+              </HvTableHeader>
+            ))}
           </HvTableRow>
         </HvTableHead>
 
         <HvTableBody>
-          {data.map((parent, index) => {
-            const isSelected = selectedIds.includes(parent.uniqueAssetTypeCode);
+          {parents.map((p) => {
+            const isSel = selectedIds.includes(p.uniqueAssetTypeCode);
+            const isExp = openRow === p.uniqueAssetTypeCode;
+            const children = p.filteredChildren || [];
+
             return (
-              <React.Fragment key={index}>
-                <HvTableRow
-                  onClick={() => handleRowClick(index)}
-                  style={{ cursor: "pointer" }}
-                >
+              <React.Fragment key={p.uniqueAssetTypeCode}>
+                <HvTableRow onClick={() => onExpand(p.uniqueAssetTypeCode)}>
                   <HvTableCell onClick={(e) => e.stopPropagation()}>
                     <HvCheckBox
-                      checked={isSelected}
-                      onChange={() => handleSelect(parent.uniqueAssetTypeCode)}
+                      checked={isSel}
+                      onChange={() => onSelectRow(p.uniqueAssetTypeCode)}
                     />
                   </HvTableCell>
-                  <HvTableCell>{parent.uniqueAssetTypeCode}</HvTableCell>
-                  <HvTableCell>{parent.assetType}</HvTableCell>
-                  <HvTableCell>{parent.quantity}</HvTableCell>
-                  <HvTableCell>{parent.loggedBy}</HvTableCell>
-                  <HvTableCell>{parent.logDate}</HvTableCell>
-                  <HvTableCell onClick={(e) => e.stopPropagation()}>
-                    <IconButton onClick={() => onDialogOpen("add", parent)}>
+                  <HvTableCell>{p.uniqueAssetTypeCode}</HvTableCell>
+                  <HvTableCell>{p.assetType}</HvTableCell>
+                  <HvTableCell>{p.quantity}</HvTableCell>
+                  <HvTableCell>{p.loggedBy}</HvTableCell>
+                  <HvTableCell>{p.logDate}</HvTableCell>
+                  <HvTableCell>
+                    <IconButton onClick={() => onDialogOpen("add", p)}>
                       <Add color="success" />
                     </IconButton>
-                    <IconButton onClick={() => onDialogOpen("remove", parent)}>
+                    <IconButton onClick={() => onDialogOpen("remove", p)}>
                       <Remove color="error" />
                     </IconButton>
-                    <IconButton onClick={() => onDialogOpen("edit", parent)}>
+                    <IconButton onClick={() => onDialogOpen("edit", p)}>
                       <Edit />
                     </IconButton>
                   </HvTableCell>
                 </HvTableRow>
 
-                {expandedRows[index] && (
+                {isExp && (
                   <HvTableRow>
                     <HvTableCell colSpan={7}>
                       <HvTable>
                         <HvTableHead>
                           <HvTableRow>
-                            <HvTableHeader style={headerStyle}>Unique Asset ID</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Asset Type</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Asset Manufacture</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Asset Serial Number</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Logged By</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Log Date</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Location</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Status</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Comments</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Attachments</HvTableHeader>
-                            <HvTableHeader style={headerStyle}>Action</HvTableHeader>
+                            {[
+                              "Unique Asset ID",
+                              "Asset Type",
+                              "Asset Manufacturer",
+                              "Asset Serial Number",
+                              "Logged By",
+                              "Log Date",
+                              "Location",
+                              "Status",
+                              "Comments",
+                              "Attachments",
+                              "Action",
+                            ].map((h) => (
+                              <HvTableHeader key={h} style={headerStyle}>
+                                {h}
+                              </HvTableHeader>
+                            ))}
                           </HvTableRow>
                         </HvTableHead>
                         <HvTableBody>
-                          {parent.children.map((child, idx) => (
-                            <HvTableRow key={idx}>
-                              <HvTableCell>{child.uniqueAssetID}</HvTableCell>
-                              <HvTableCell>{child.assetType}</HvTableCell>
-                              <HvTableCell>{child.assetManufacturer}</HvTableCell>
-                              <HvTableCell>{child.assetSerialNumber}</HvTableCell>
-                              <HvTableCell>{child.loggedBy}</HvTableCell>
-                              <HvTableCell>{child.logDate}</HvTableCell>
-                              <HvTableCell>{child.location}</HvTableCell>
-                              <HvTableCell>{child.status}</HvTableCell>
-                              <HvTableCell>{child.comments}</HvTableCell>
-                              <HvTableCell>{child.attachments}</HvTableCell>
+                          {children.map((c) => (
+                            <HvTableRow key={c.uniqueAssetID}>
+                              <HvTableCell>{c.uniqueAssetID}</HvTableCell>
+                              <HvTableCell>{c.assetType}</HvTableCell>
+                              <HvTableCell>{c.assetManufacturer || "N/A"}</HvTableCell>
+                              <HvTableCell>{c.assetSerialNumber || "N/A"}</HvTableCell>
+                              <HvTableCell>{c.loggedBy}</HvTableCell>
+                              <HvTableCell>{c.logDate}</HvTableCell>
+                              <HvTableCell>{c.location}</HvTableCell>      {/* Changed from c.assetLocation */}
+                              <HvTableCell>{c.status}</HvTableCell>        {/* Changed from c.assetStatus */}
+                              <HvTableCell>{c.comments || "N/A"}</HvTableCell>
+                              <HvTableCell>{c.attachments || "None"}</HvTableCell>
                               <HvTableCell>
-                                <IconButton onClick={() => onDialogOpen("add", child)}>
-                                  <Add color="success" />
-                                </IconButton>
-                                <IconButton onClick={() => onDialogOpen("remove", child)}>
+                                <IconButton onClick={() => onDialogOpen("remove", c)}>
                                   <Remove color="error" />
                                 </IconButton>
-                                <IconButton onClick={() => onDialogOpen("edit", child)}>
+                                <IconButton onClick={() => onDialogOpen("edit", c)}>
                                   <Edit />
                                 </IconButton>
                               </HvTableCell>
