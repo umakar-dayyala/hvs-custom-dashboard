@@ -1,0 +1,26 @@
+.pin-wrapper {
+    position: relative;
+    width: 40px;
+    height: 60px;
+    transform: translate(-20px, -60px);
+    pointer-events: auto;
+    z-index: 999;
+  }
+  
+  .pin-body {
+    width: 36px;
+    height: 36px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 6px rgba(0,0,0,0.3);
+  }
+  
+  .pin-img {
+    transform: rotate(45deg);
+    width: 18px;
+    height: 18px;
+  }
+  

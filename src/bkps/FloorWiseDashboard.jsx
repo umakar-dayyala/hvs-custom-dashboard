@@ -354,9 +354,9 @@ const FloorWiseDashboard = () => {
                 </Box>
 
                 {/* Notification Panel */}
-                {/* <Box bg="white" p={4} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
+                <Box bg="white" p={4} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
                   <FloorWiseNotificationPanal sensorData={floorSummaryData} />
-                </Box> */}
+                </Box>
               </Box>
             </Box>
 
