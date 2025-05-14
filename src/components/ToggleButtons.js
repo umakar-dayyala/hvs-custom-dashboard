@@ -9,13 +9,13 @@ const ToggleButtons = ({ onToggleChange, currentRole }) => {
         className={`toggle-button ${currentRole === "Operator" ? "active" : ""}`}
         onClick={() => onToggleChange("Operator")}
       >
-        <HvTypography>Operator</HvTypography>
+        <HvTypography>Enable Analytics</HvTypography>
       </button>
       <button
         className={`toggle-button ${currentRole === "Supervisor" ? "active" : ""}`}
         onClick={() => onToggleChange("Supervisor")}
       >
-        <HvTypography>Supervisor</HvTypography>
+        <HvTypography>Disable Analytics</HvTypography>
       </button>
     </div>
   );
