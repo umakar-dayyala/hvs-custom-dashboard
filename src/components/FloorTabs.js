@@ -18,8 +18,8 @@ const FloorTabs = ({ floorData, onTabChange }) => {
   }
 
   return (
-    <Box width="100%" display="flex" justifyContent="space-between" flexWrap="nowrap">
-      {floorData.map((floor, index) => (
+    <Box width="100%" display="flex" justifyContent="flex-end" alignItems="center">
+      {/* {floorData.map((floor, index) => (
         <Button
           key={index}
           variant="outlined"
@@ -52,29 +52,28 @@ const FloorTabs = ({ floorData, onTabChange }) => {
         >
           {floor.floor === "First Floor" ? floor.floor : floor.floor.replace(" Floor", "")}
         </Button>
-      ))}
+      ))} */}
 
       {/* View All Alarms Button */}
       <Button
         variant="outlined"
         sx={{
-          flex: 1,
           color: hasAnyAlarm ? "#E30613" : "#28A745",
           borderColor: hasAnyAlarm ? "#E30613" : "#28A745",
           textTransform: "none",
-          margin: "2px",
+          margin: "4px",
           fontWeight: "bold",
+          minWidth: "150px", // Optional: Ensures consistent button width
           "&:hover": {
             backgroundColor: hasAnyAlarm ? "#E30613" : "#28A745",
             borderColor: hasAnyAlarm ? "#E30613" : "#28A745",
             color: "#FFFFFF",
           },
         }}
-        onClick={() => goToAllAlarms()}
+        onClick={goToAllAlarms}
       >
         All Alarms & Alerts
       </Button>
-
     </Box>
   );
 };

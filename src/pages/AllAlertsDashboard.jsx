@@ -81,9 +81,9 @@ const AllAlertsDashboard = () => {
           <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
 
           {/* Floor Tabs */}
-          <Box width="100%">
+          {/* <Box width="100%">
             <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
-          </Box>
+          </Box> */}
 
           {/* <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} /> */}
           <AllAlertsAlramTable floorWiseAlertsData={floorWiseAlertsData} />

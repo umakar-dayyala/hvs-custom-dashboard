@@ -71,14 +71,10 @@ const routeName = (detector) => {
 const Cell = ({ sensors }) => {
   const navigate = useNavigate();
 
-  if (!sensors || sensors.length === 0)
-    return <Box height={80} border="1px solid #eee" bgcolor="#F5F5F5" />;
-
-  const handleClick = () => {
-    const clickedSensor = sensors[0];
-    const route = routeName(clickedSensor.detector);
+  const handleClick = (sensor) => {
+    const route = routeName(sensor.detector);
     if (route) {
-      navigate(`/${route}?device_id=${clickedSensor.device_id}`);
+      navigate(`/${route}?device_id=${sensor.device_id}`);
     }
   };
 
@@ -96,6 +92,9 @@ const Cell = ({ sensors }) => {
     }
   };
 
+  if (!sensors || sensors.length === 0)
+    return <Box height={80} border="1px solid #eee" bgcolor="#F5F5F5" />;
+
   return (
     <Box
       border="1px solid #ccc"
@@ -103,9 +102,7 @@ const Cell = ({ sensors }) => {
       display="flex"
       flexDirection="column"
       justifyContent="center"
-      alignItems="center"
-      sx={{ cursor: "pointer" }}
-      onClick={handleClick}
+      alignItems="stretch" // Important to make inner Boxes stretch full width
     >
       {sensors.map((sensor, idx) => {
         const icon = getSensorIcon(sensor.detector_type, sensor.status, sensor.alarm_status);
@@ -120,6 +117,8 @@ const Cell = ({ sensors }) => {
             px={0.5}
             py={0.25}
             bgcolor={bgColor}
+            sx={{ cursor: "pointer" }}
+            onClick={() => handleClick(sensor)} // Pass current sensor
           >
             {icon && (
               <img
@@ -128,7 +127,7 @@ const Cell = ({ sensors }) => {
                 style={{
                   width: 18,
                   height: 18,
-                  filter: "brightness(0) invert(1)", // makes icon white
+                  filter: "brightness(0) invert(1)",
                 }}
               />
             )}
