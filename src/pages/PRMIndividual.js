@@ -24,6 +24,7 @@ import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from '../components/Connectivitydata';
+import Imagedata from '../components/Imagedata';
 
 
 
@@ -249,7 +250,15 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
             </Box>
           
         </Box>
-        <Connectivitydata />
+        <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
+  <Box sx={{ flex: 1 }}>
+    <Connectivitydata />
+  </Box>
+  <Box sx={{ flex: 1 }}>
+    <Imagedata/>
+  </Box>
+</Box>
+
       </Box>
       
     </Box>

@@ -16,7 +16,6 @@ const Alertbar = ({ setLocationDetailsforbreadcrumb }) => {
     const fetchData = async () => {
       try {
         const response = await fetchLocationData(device_id);
-        console.log("Fetched data:", response);
         setFloor(response?.data?.floor || "-");
         setZone(response?.data?.zone || "-");
         setLocation(response?.data?.location || "-");
@@ -36,21 +35,21 @@ const Alertbar = ({ setLocationDetailsforbreadcrumb }) => {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
       <Box style={{ display: "flex", gap: "5px" }}>
-        <HvTypography variant="label">Floor: {floor} |</HvTypography>
-        <HvTypography variant="label">Zone: {zone} |</HvTypography>
-        <HvTypography variant="label">Location: {location} |</HvTypography>
-        <HvTypography variant="label">Sensor: {sensorType}</HvTypography>
+        <HvTypography variant="title3">Floor: {floor} |</HvTypography>
+        <HvTypography variant="title3">Zone: {zone} |</HvTypography>
+        <HvTypography variant="title3">Location: {location} |</HvTypography>
+        <HvTypography variant="title3">Sensor: {sensorType}</HvTypography>
       </Box>
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <HvTypography variant="label">
-          <span style={{ color: "green", fontSize: "24px" }}>●</span> Normal
+        <HvTypography variant="title3">
+          <span style={{ color: "green",fontSize:"30px" }}>●</span> Normal
         </HvTypography>
-        <HvTypography variant="label">
-          <span style={{ color: "orange", fontSize: "24px" }}>●</span> Health & Analytics Alert
+        <HvTypography variant="title3">
+          <span style={{ color: "orange",fontSize:"30px" }}>●</span> Health & Analytics Alert
         </HvTypography>
-        <HvTypography variant="label">
-          <span style={{ color: "red", fontSize: "24px" }}>●</span> CBRN Alarm
+        <HvTypography variant="title3">
+          <span style={{ color: "red" ,fontSize:"30px"}}>●</span> CBRN Alarm
         </HvTypography>
       </div>
     </div>
