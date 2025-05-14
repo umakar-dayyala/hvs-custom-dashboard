@@ -4,7 +4,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import WifiIcon from "@mui/icons-material/Wifi";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
 import WarningIcon from "@mui/icons-material/Warning";
-import { summaryData } from "../service/summaryServices"; 
+import { summaryData } from "../service/summaryServices";
 
 const SummaryCards = () => {
   const [data, setData] = useState(null);
@@ -130,14 +130,16 @@ const SummaryCards = () => {
               <WifiIcon color="primary" />
             </Grid>
             <Grid item>
-              <Typography fontWeight="bold">Active: {data.active_sensors}</Typography>
+              {/* <Typography fontWeight="bold">Active: {data.active_sensors }</Typography> */}
+              <Typography fontWeight="bold">Active: {data.active_sensors - data.unhealthy_sensors}</Typography>
             </Grid>
 
             <Grid item>
               <WifiOffIcon color="disabled" />
             </Grid>
             <Grid item>
-              <Typography fontWeight="bold">Inactive: {data.inactive_sensors}</Typography>
+              {/* <Typography fontWeight="bold">Inactive: {data.inactive_sensors}</Typography> */}
+              <Typography fontWeight="bold"> Inactive: {data.inactive_sensors + data.disconnected_sensors}</Typography>
             </Grid>
 
             <Grid item>

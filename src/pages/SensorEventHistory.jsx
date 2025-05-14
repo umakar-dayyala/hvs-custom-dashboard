@@ -4,7 +4,7 @@ import DataTableComponent from "../components/HistoryDataTable";
 import { getSensorEventHistory } from "../service/HistoryService";
 import { Button } from "@mui/material";
 import { CSVLink } from "react-csv";
-
+import Breadcrumbs from "../components/Breadcrumbs";
 const SensorEventHistory = () => {
   const [filters, setFilters] = useState({});
   const [tableData, setTableData] = useState([]);
@@ -27,16 +27,23 @@ const SensorEventHistory = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <FilterComponent onFilterChange={handleFilterChange} />
-      <div style={{ margin: "10px 0" }}>
-        <CSVLink data={tableData} filename={"sensor-event-history.csv"}>
-          <Button variant="outlined">Export to CSV</Button>
-        </CSVLink>
+    <>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Breadcrumbs />
       </div>
-      <DataTableComponent data={tableData} />
-    </div>
+      <div style={{ padding: "20px" }}>
+
+        <FilterComponent onFilterChange={handleFilterChange} />
+        {/* <div style={{ margin: "10px 0" }}>
+          <CSVLink data={tableData} filename={"sensor-event-history.csv"}>
+            <Button variant="outlined">Export to CSV</Button>
+          </CSVLink>
+        </div> */}
+        <DataTableComponent data={tableData} />
+      </div>
+    </>
   );
+
 };
 
 export default SensorEventHistory;

@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import Breadcrumbs from "../components/Breadcrumbs";
 import { Add, Remove, Upload, Download } from "@mui/icons-material";
 import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
@@ -228,8 +229,8 @@ const InventoryDashboard = () => {
         }
 
         const payload = {
-          asset_type_unique_id: "TYPE-001", // Use known valid ID
-          asset_unique_id: `ASSET-${Date.now()}`,
+          asset_type_unique_id: formData.asset_type_unique_id || '',
+          asset_unique_id: formData.asset_unique_id || '',
           asset_type: formData.Asset_Type,
           asset_quantity: 1,
           asset_name: formData.Asset_Name,
@@ -253,6 +254,7 @@ const InventoryDashboard = () => {
           const payload = {
             asset_type_unique_id: asset.asset_type_unique_id || '',
             asset_unique_id: asset.uniqueAssetID || '',
+            asset_type: asset.assetType || '',
           };
           console.log('Submitting remove payload:', JSON.stringify(payload, null, 2));
           await removeAsset(payload);
@@ -279,6 +281,7 @@ const InventoryDashboard = () => {
           'Asset Location': formData.Asset_Location,
           'Asset Status': formData.Asset_Status,
         };
+
         for (const [fieldName, value] of Object.entries(requiredFields)) {
           if (!value) {
             throw new Error(`${fieldName} is required`);
@@ -304,10 +307,10 @@ const InventoryDashboard = () => {
           asset_serial_number: formData.Asset_Serial_Number || '',
           asset_location: formData.Asset_Location,
           asset_status: formData.Asset_Status,
-          installation_date: formData.installation_date || '2024-01-01',
+          installation_date: formData.installation_date || '',
           camc_period: formData.camc_period || '',
-          warranty_start_date: formData.warranty_start_date || '2024-01-01',
-          warranty_end_date: formData.warranty_end_date || '2026-01-01',
+          warranty_start_date: formData.warranty_start_date || '',
+          warranty_end_date: formData.warranty_end_date || '',
           comments: formData.Comments || '',
           asset_log_date: new Date().toISOString(),
         };
@@ -374,116 +377,121 @@ const InventoryDashboard = () => {
   };
 
   return (
-    <Box p={2} mt={5}>
-      {loading && <div>Loading...</div>}
-      <Stack direction="row" justifyContent="space-between" mb={2}>
-        <Stack direction="row" spacing={2}>
-          <IconButton onClick={() => handleDialogOpen("add")} disabled={loading}>
-            <Add color="success" />
-          </IconButton>
-          <IconButton onClick={() => handleDialogOpen("remove", { type: "all" })} disabled={loading}>
-            <Remove color="error" />
-          </IconButton>
-          <IconButton onClick={handleDownload} disabled={loading}>
-            <Download />
-          </IconButton>
-          <Button component="label" variant="outlined" startIcon={<Upload />} disabled={loading}>
-            Upload
-            <input hidden type="file" onChange={handleUpload} />
-          </Button>
+    <>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Breadcrumbs />
+      </div>
+      <Box p={2} mt={2}>
+        {loading && <div>Loading...</div>}
+        <Stack direction="row" justifyContent="space-between" mb={2}>
+          <Stack direction="row" spacing={2}>
+            <IconButton onClick={() => handleDialogOpen("add")} disabled={loading}>
+              <Add color="success" />
+            </IconButton>
+            <IconButton onClick={() => handleDialogOpen("remove", { type: "all" })} disabled={loading}>
+              <Remove color="error" />
+            </IconButton>
+            <IconButton onClick={handleDownload} disabled={loading}>
+              <Download />
+            </IconButton>
+            <Button component="label" variant="outlined" startIcon={<Upload />} disabled={loading}>
+              Upload
+              <input hidden type="file" onChange={handleUpload} />
+            </Button>
+          </Stack>
+          <Stack direction="row" spacing={2}>
+            <TextField
+              select
+              label="Filter Type"
+              name="type"
+              value={filters.type}
+              onChange={handleFilterChange}
+              sx={{ minWidth: 160 }}
+              disabled={loading}
+            >
+              <MenuItem value="">All</MenuItem>
+              {assetTypes.map((t) => (
+                <MenuItem key={t} value={t}>
+                  {t}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="Filter Location"
+              name="location"
+              value={filters.location}
+              onChange={handleFilterChange}
+              sx={{ minWidth: 180 }}
+              disabled={loading}
+            >
+              <MenuItem value="">All</MenuItem>
+              {assetLocations.map((l) => (
+                <MenuItem key={l} value={l}>
+                  {l}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="Filter Status"
+              name="status"
+              value={filters.status}
+              onChange={handleFilterChange}
+              sx={{ minWidth: 160 }}
+              disabled={loading}
+            >
+              <MenuItem value="">All</MenuItem>
+              {assetStatuses.map((s) => (
+                <MenuItem key={s} value={s}>
+                  {s}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Stack>
         </Stack>
-        <Stack direction="row" spacing={2}>
-          <TextField
-            select
-            label="Filter Type"
-            name="type"
-            value={filters.type}
-            onChange={handleFilterChange}
-            sx={{ minWidth: 160 }}
-            disabled={loading}
-          >
-            <MenuItem value="">All</MenuItem>
-            {assetTypes.map((t) => (
-              <MenuItem key={t} value={t}>
-                {t}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            select
-            label="Filter Location"
-            name="location"
-            value={filters.location}
-            onChange={handleFilterChange}
-            sx={{ minWidth: 180 }}
-            disabled={loading}
-          >
-            <MenuItem value="">All</MenuItem>
-            {assetLocations.map((l) => (
-              <MenuItem key={l} value={l}>
-                {l}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            select
-            label="Filter Status"
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-            sx={{ minWidth: 160 }}
-            disabled={loading}
-          >
-            <MenuItem value="">All</MenuItem>
-            {assetStatuses.map((s) => (
-              <MenuItem key={s} value={s}>
-                {s}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Stack>
-      </Stack>
 
-      <InventoryTable
-        data={allRows}
-        filters={filters}
-        openRow={openRow}
-        onExpand={handleExpand}
-        onDialogOpen={handleDialogOpen}
-        selectedIds={selectedIds}
-        onSelectRow={handleSelectRow}
-      />
+        <InventoryTable
+          data={allRows}
+          filters={filters}
+          openRow={openRow}
+          onExpand={handleExpand}
+          onDialogOpen={handleDialogOpen}
+          selectedIds={selectedIds}
+          onSelectRow={handleSelectRow}
+        />
 
-      <AssetDialog
-        open={dialog.open}
-        type={dialog.type}
-        onClose={handleDialogClose}
-        onSubmit={handleDialogSubmit}
-        formData={formData}
-        onChange={handleChange}
-        selectedAsset={selectedAsset}
-        assetTypes={assetTypes}
-        assetLocations={assetLocations}
-        assetStatuses={assetStatuses}
-        onSelectChildForEdit={handleSelectChildForEdit}
-        allRows={allRows}
-      />
+        <AssetDialog
+          open={dialog.open}
+          type={dialog.type}
+          onClose={handleDialogClose}
+          onSubmit={handleDialogSubmit}
+          formData={formData}
+          onChange={handleChange}
+          selectedAsset={selectedAsset}
+          assetTypes={assetTypes}
+          assetLocations={assetLocations}
+          assetStatuses={assetStatuses}
+          onSelectChildForEdit={handleSelectChildForEdit}
+          allRows={allRows}
+        />
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
+        <Snackbar
+          open={notification.open}
+          autoHideDuration={6000}
           onClose={handleCloseNotification}
-          severity={notification.severity}
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
-          {notification.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert
+            onClose={handleCloseNotification}
+            severity={notification.severity}
+            sx={{ width: "100%" }}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </>
   );
 };
 
