@@ -20,7 +20,7 @@ import {
   useHvFilters,
 } from "@hitachivantara/uikit-react-core";
 import { Add, Close, Filters } from "@hitachivantara/uikit-react-icons";
-// Import sensor-type icons
+import { useNavigate } from "react-router-dom"; // Added import
 import RadiationIcon from "../assets/rRadiological.svg";
 import BioIcon from "../assets/rBiological.svg";
 import ChemicalIcon from "../assets/rChemical.svg";
@@ -41,9 +41,7 @@ const classes = {
     border: "1px solid #e0e0e0",
     overflow: "hidden",
     animation: `${slide} 0.5s ease-in-out`,
- 
-
-}),
+  }),
   filters: css({
     display: "flex",
     width: "100%",
@@ -60,7 +58,6 @@ const classes = {
   sortButton: css({ border: "1px solid #e0e0e0" }),
 };
 
-// Mapping for sensor type icons
 const sensorTypeIcons = (isAlarm, isFault) => ({
   Radiation: isAlarm ? RadiationIcon : isFault ? ARadiationIcon : ARadiationIcon,
   Biological: isAlarm ? BioIcon : isFault ? ABioIcon : ABioIcon,
@@ -71,8 +68,29 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
   const filterRef = useRef(null);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
+  const navigate = useNavigate(); // Added useNavigate
 
-  // Build filter options
+  // Added navigation logic
+  const routeName = (detector) => {
+    const routes = {
+      AGM: "agmindividual",
+      "AP4C-F": "AP4CIndividual",
+      FCAD: "FCADIndividual",
+      PRM: "PRMIndividual",
+      VRM: "vrmIndividual",
+      IBAC: "ibacIndividual",
+      MAB: "MABIndividual",
+    };
+    return routes[detector] || null;
+  };
+
+  const handleDetectorClick = (device_id, detector) => {
+    const route = routeName(detector);
+    if (device_id && route) {
+      navigate(`/${route}?device_id=${device_id}`);
+    }
+  };
+
   const filters = useMemo(() => {
     const opts = { floor: new Set(), zone: new Set(), sensor_type: new Set() };
     (floorWiseAlertsData || []).forEach(group =>
@@ -89,7 +107,6 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
     ];
   }, [floorWiseAlertsData]);
 
-  // Flatten data
   const tableData = useMemo(() => {
     let counter = 1;
     return (floorWiseAlertsData || []).flatMap(group =>
@@ -112,7 +129,6 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
     );
   }, [floorWiseAlertsData]);
 
-  // Columns with custom filter functions
   const columns = useMemo(() => [
     { Header: "Sr No", accessor: "srl", disableFilters: true },
     { Header: "Alarm Timestamp", accessor: "alarm_timestamp", disableFilters: true },
@@ -131,7 +147,10 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
         const Icon = sensorTypeIcons(isAlarm, isFault)[sensor_type];
         return (
           <div
-            onClick={() => onDetectorClick?.(device_id, sensor_name)}
+            onClick={() => {
+              handleDetectorClick(device_id, sensor_name); // Added navigation
+              onDetectorClick?.(device_id, sensor_name); // Preserved original prop
+            }}
             style={{ display: "flex", alignItems: "center", cursor: onDetectorClick ? "pointer" : "default", gap: "0.5rem" }}
           >
             {Icon && <img src={Icon} alt={sensor_type} style={{ width: 24, height: 24 }} />}
@@ -174,7 +193,6 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
     },
   ], [onDetectorClick]);
 
-  // Table hooks
   const {
     getTableProps,
     getTableBodyProps,
@@ -189,27 +207,25 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
     {
       columns,
       data: tableData,
-      initialState: { filters: [] }, // Ensure filters start empty
+      initialState: { filters: [] },
     },
     useHvGlobalFilter,
     useHvFilters,
     useHvPagination
   );
 
-  // Handle filter changes
   const handleFilters = (_, value) => {
-    setSelectedFilters(value || []); // Default to empty array if value is undefined
+    setSelectedFilters(value || []);
     const hvf = (value || []).flatMap((vals, idx) => {
       if (!vals?.length) return [];
       return [{
         id: filters[idx].id,
-        value: vals, // Pass the array of values directly
+        value: vals,
       }];
     });
     setAllFilters(hvf);
   };
 
-  // Sorted page
   const sorted = useMemo(() => [...page].sort((a, b) => (sortOrder === "asc" ? a.index - b.index : b.index - a.index)), [page, sortOrder]);
 
   return (

@@ -22,8 +22,10 @@ import FloorWiseChart from "../components/FloorWiseChart";
 import SensorAlarmHeatmap from "../components/SensorAlarmHeatmap";
 import SensorAlertTable from "../components/SensorAlertMapTable";
 import Loader from "../components/Loader";  // Import the Loader component
-// import FloorWiseStatusGrid from "../components/FloorWiseStatusGrid";
-// import FloorWiseAlarmPanel from "../components/FloorWiseAlarmPanel";
+import FloorWiseStatusGrid from "../components/FloorWiseStatusGrid";
+import FloorWiseAlarmPanel from "../components/FloorWiseAlarmPanel";
+// import FloorPlanMap from "../components/FloorPlanMap";
+// import FloorWiseNotificationPanal from "../components/FloorWiseNotificationPanal";
 import SummaryCards from "../components/SummaryCards";
 
 const FloorWiseDashboard = () => {
@@ -43,7 +45,7 @@ const FloorWiseDashboard = () => {
   const [sensorTypeData, setSensorTypeData] = useState([]);
   const [sensorNameData, setSensorNameData] = useState([]);
   const [sensorStatusData, setSensorStatusData] = useState([]);
-  
+
   // New loading state
   const [loading, setLoading] = useState(true);
 
@@ -211,12 +213,12 @@ const FloorWiseDashboard = () => {
     let isMounted = true;
     let timeoutId;
     let isFirstLoad = true;
-  
+
     const fetchAllData = async () => {
       if (isFirstLoad) {
         setLoading(true);
       }
-  
+
       try {
         const floorSummaryRes = await getFloorSummary(
           `param_floor=${floor}&param_zone=${formatFilter(filters.zone)}&param_location=${formatFilter(filters.location)}&param_sensor_type=${formatFilter(filters.sensorType)}&param_sensor_name=${formatFilter(filters.sensor)}&param_sensor_status=${formatFilter(filters.sensorStatus)}`
@@ -228,7 +230,7 @@ const FloorWiseDashboard = () => {
         // const sensorTypeRes = await getSensorTypeSelector(`param_floor=${floor}&param_zone=ALL&param_location=ALL`);
         // const sensorNameRes = await getSensorNameSelector(`param_floor=${floor}&param_zone=ALL&param_location=ALL&param_sensor_type=ALL`);
         // const sensorStatusRes = await getSensorStatusSelector(`param_floor=${floor}&param_zone=ALL&param_location=ALL&param_sensor_type=ALL&param_sensor_name=ALL`);
-  
+
         if (isMounted) {
           setFloorSummaryData(floorSummaryRes);
           setSensorSummary(sensorSummaryRes.data);
@@ -253,7 +255,7 @@ const FloorWiseDashboard = () => {
     };
   
     fetchAllData();
-  
+
     return () => {
       isMounted = false;
       clearTimeout(timeoutId);
@@ -269,6 +271,7 @@ const FloorWiseDashboard = () => {
     }, {});
   };
   const sensorCounts = countDetectorTypes(floorSummaryData || []);
+  console.log("Floor Summary Data: "+JSON.stringify(floorSummaryData));
   
   const transformSensorData = (data) => {
     if (!Array.isArray(data)) {
@@ -331,12 +334,12 @@ const FloorWiseDashboard = () => {
             </Box>
             <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
               <Box flex="1" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
-                <SensorAlarmHeatmap sensorsData={formattedSensorsData} title={`${floor} Sensor Status`} />
-                {/* <FloorWiseStatusGrid sensorData={floorSummaryData}/> */}
+                {/* <SensorAlarmHeatmap sensorsData={formattedSensorsData} title={`${floor} Sensor Status`} /> */}
+                <FloorWiseStatusGrid sensorData={floorSummaryData}/>
               </Box>
               <Box flex="1" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px" borderColor={"#E8E8E8"}>
-                 <SensorAlertTable sensorsData={floorSummaryData} title={`${floor} Sensor Alarms`} />
-                {/* <FloorWiseAlarmPanel sensorData={floorSummaryData} /> */}
+                 {/* <SensorAlertTable sensorsData={floorSummaryData} title={`${floor} Sensor Alarms`} /> */}
+                <FloorWiseAlarmPanel sensorData={floorSummaryData} />
               </Box>
                 {/* <FloorWiseStatusGrid /> */} 
             </Box>
