@@ -22,6 +22,9 @@ import FloorWiseChart from "../components/FloorWiseChart";
 import SensorAlarmHeatmap from "../components/SensorAlarmHeatmap";
 import SensorAlertTable from "../components/SensorAlertMapTable";
 import Loader from "../components/Loader";  // Import the Loader component
+// import FloorWiseStatusGrid from "../components/FloorWiseStatusGrid";
+// import FloorWiseAlarmPanel from "../components/FloorWiseAlarmPanel";
+import SummaryCards from "../components/SummaryCards";
 
 const FloorWiseDashboard = () => {
   const location = useLocation();
@@ -316,7 +319,8 @@ const FloorWiseDashboard = () => {
           </div>
           <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
           <div>
-            <SensorStatusCards />
+            {/* <SensorStatusCards /> */}
+            <SummaryCards /> 
           </div>
           <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
           <Box width="100%">
@@ -328,10 +332,13 @@ const FloorWiseDashboard = () => {
             <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
               <Box flex="1" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
                 <SensorAlarmHeatmap sensorsData={formattedSensorsData} title={`${floor} Sensor Status`} />
+                {/* <FloorWiseStatusGrid sensorData={floorSummaryData}/> */}
               </Box>
               <Box flex="1" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px" borderColor={"#E8E8E8"}>
-                <SensorAlertTable sensorsData={floorSummaryData} title={`${floor} Sensor Alarms`} />
+                 <SensorAlertTable sensorsData={floorSummaryData} title={`${floor} Sensor Alarms`} />
+                {/* <FloorWiseAlarmPanel sensorData={floorSummaryData} /> */}
               </Box>
+                {/* <FloorWiseStatusGrid /> */} 
             </Box>
           </Box>
         </>

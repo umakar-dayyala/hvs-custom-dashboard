@@ -32,6 +32,7 @@ const FloorTabs = ({ floorData, onTabChange }) => {
             fontWeight: "bold",
             "&:hover": {
               backgroundColor: value[index] || "green",
+              borderColor: value[index] || "green",
               color: "#FFFFFF",
             },
           }}
@@ -65,6 +66,7 @@ const FloorTabs = ({ floorData, onTabChange }) => {
           fontWeight: "bold",
           "&:hover": {
             backgroundColor: hasAnyAlarm ? "#E30613" : "#28A745",
+            borderColor: hasAnyAlarm ? "#E30613" : "#28A745",
             color: "#FFFFFF",
           },
         }}

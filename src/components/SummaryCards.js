@@ -1,11 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Paper, Typography, Grid } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import WifiIcon from "@mui/icons-material/Wifi";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
 import WarningIcon from "@mui/icons-material/Warning";
+import { summaryData } from "../service/summaryServices"; 
 
-const SummaryCards = ({ SummaryCardsData }) => {
+const SummaryCards = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const fetchSummaryData = async () => {
+      const result = await summaryData();
+      setData(result);
+    };
+    fetchSummaryData();
+  }, []);
+
+  if (!data) return null; // Or a loading spinner
+
   return (
     <Grid container spacing={2}>
       {/* CBRN Alarms */}
@@ -16,61 +29,44 @@ const SummaryCards = ({ SummaryCardsData }) => {
             p: 2,
             borderRadius: 2,
             border: "1px solid #ddd",
-            borderTop: `5px solid ${SummaryCardsData?.cbrn_alarms > 0 ? "red" : "#28a745"}`,
+            borderTop: `5px solid ${data?.cbrn_alarms > 0 ? "red" : "#28a745"}`,
             position: "relative",
             minHeight: 120,
           }}
         >
-          <Box position="absolute" top={8} right={8}>
-            {/* <ErrorIcon color="error" /> */}
-          </Box>
           <Grid container spacing={1}>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                CBRN Alarms
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                Chemical
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                Biological
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                Radiological
-              </Typography>
-            </Grid>
-
+            {["CBRN Alarms", "Chemical", "Biological", "Radiological"].map((label, index) => (
+              <Grid item xs={3} key={label}>
+                <Typography variant="subtitle1" fontWeight="bold" color="#333">
+                  {label}
+                </Typography>
+              </Grid>
+            ))}
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.cbrn_alarms}
+                {data.cbrn_alarms}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.chemical_alarms}
+                {data.chemical_alarms}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.biological_alarms}
+                {data.biological_alarms}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.radiological_alarms}
+                {data.radiological_alarms}
               </Typography>
             </Grid>
           </Grid>
         </Paper>
       </Grid>
 
-      {/* Sensors Total */}
+      {/* Total Sensors */}
       <Grid item xs={12} md={4}>
         <Paper
           elevation={3}
@@ -83,45 +79,31 @@ const SummaryCards = ({ SummaryCardsData }) => {
           }}
         >
           <Grid container spacing={1}>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                Total Sensor
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                Chemical
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                Biological
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="#333">
-                Radiological
-              </Typography>
-            </Grid>
-
+            {["Total Sensor", "Chemical", "Biological", "Radiological"].map((label, i) => (
+              <Grid item xs={3} key={label}>
+                <Typography variant="subtitle1" fontWeight="bold" color="#333">
+                  {label}
+                </Typography>
+              </Grid>
+            ))}
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.total_sensors}
+                {data.total_sensors}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.total_chemical}
+                {data.total_chemical}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.total_biological}
+                {data.total_biological}
               </Typography>
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h5" fontWeight="bold" color="#333">
-                {SummaryCardsData.total_radiation}
+                {data.total_radiation}
               </Typography>
             </Grid>
           </Grid>
@@ -136,40 +118,33 @@ const SummaryCards = ({ SummaryCardsData }) => {
             p: 2,
             borderRadius: 2,
             border: "1px solid #ddd",
-            borderTop: `5px solid ${SummaryCardsData?.cbrn_alarms > 0 ? "red" : "#28a745"}`,
+            borderTop: `5px solid ${data?.cbrn_alarms > 0 ? "red" : "#28a745"}`,
             minHeight: 120,
           }}
         >
           <Typography variant="subtitle1" sx={{ mb: 2 }} fontWeight="bold" color="#333">
             Sensors Health
           </Typography>
-
           <Grid container spacing={2} alignItems="center">
             <Grid item>
-              <WifiIcon color="primary" fontSize="medium" />
+              <WifiIcon color="primary" />
             </Grid>
             <Grid item>
-              <Typography variant="body1" fontWeight="bold" color="#333">
-                Active: {SummaryCardsData.active_sensors}
-              </Typography>
+              <Typography fontWeight="bold">Active: {data.active_sensors}</Typography>
             </Grid>
 
             <Grid item>
-              <WifiOffIcon color="disabled" fontSize="medium" />
+              <WifiOffIcon color="disabled" />
             </Grid>
             <Grid item>
-              <Typography variant="body1" fontWeight="bold" color="#333">
-                Inactive: {SummaryCardsData.inactive_sensors}
-              </Typography>
+              <Typography fontWeight="bold">Inactive: {data.inactive_sensors}</Typography>
             </Grid>
 
             <Grid item>
-              <WarningIcon color="warning" fontSize="medium" />
+              <WarningIcon color="warning" />
             </Grid>
             <Grid item>
-              <Typography variant="body1" fontWeight="bold" color="#333">
-                Unhealthy: {SummaryCardsData.unhealthy_sensors}
-              </Typography>
+              <Typography fontWeight="bold">Unhealthy: {data.unhealthy_sensors}</Typography>
             </Grid>
           </Grid>
         </Paper>
