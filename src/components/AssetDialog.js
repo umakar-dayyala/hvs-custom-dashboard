@@ -20,7 +20,7 @@ const AssetDialog = ({
   type,
   onClose,
   onSubmit,
-  formData = {}, // Default to empty object
+  formData = {},
   onChange,
   selectedAsset,
   assetTypes,
@@ -48,6 +48,8 @@ const AssetDialog = ({
   const validateForm = () => {
     if (!formData.Asset_Type) return "Asset Type is required";
     if (!formData.Asset_Name) return "Asset Name is required";
+    if (!formData.Asset_Location) return "Asset Location is required";
+    if (!formData.Asset_Status) return "Asset Status is required";
     return null;
   };
 
@@ -204,58 +206,134 @@ const AssetDialog = ({
     if (type === "add" || (type === "edit" && editStep === "edit")) {
       return (
         <>
-          {/* Hidden fields for unique IDs */}
-          <input type="hidden" name="asset_type_unique_id" value={formData.asset_type_unique_id || ""} />
-          <input type="hidden" name="asset_unique_id" value={formData.asset_unique_id || ""} />
-          
           <TextField
-            select fullWidth margin="normal" label="Asset Type" name="Asset_Type"
-            value={formData.Asset_Type || ""} onChange={onChange}
+            select
+            fullWidth
+            margin="normal"
+            label="Asset Type"
+            name="Asset_Type"
+            value={formData.Asset_Type || ""}
+            onChange={onChange}
+            required
           >
             {assetTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
           </TextField>
 
-          <TextField fullWidth margin="normal" label="Asset Name" name="Asset_Name"
-            value={formData.Asset_Name || ""} onChange={onChange} />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Asset Name"
+            name="Asset_Name"
+            value={formData.Asset_Name || ""}
+            onChange={onChange}
+            required
+          />
 
-          <TextField fullWidth margin="normal" label="Asset Manufacturer" name="Asset_Manufacturer"
-            value={formData.Asset_Manufacturer || ""} onChange={onChange} />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Asset Manufacturer"
+            name="Asset_Manufacturer"
+            value={formData.Asset_Manufacturer || ""}
+            onChange={onChange}
+          />
 
-          <TextField fullWidth margin="normal" label="Asset Serial Number" name="Asset_Serial_Number"
-            value={formData.Asset_Serial_Number || ""} onChange={onChange} />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Asset Serial Number"
+            name="Asset_Serial_Number"
+            value={formData.Asset_Serial_Number || ""}
+            onChange={onChange}
+          />
 
-          <TextField select fullWidth margin="normal" label="Asset Location" name="Asset_Location"
-            value={formData.Asset_Location || ""} onChange={onChange}
+          <TextField
+            select
+            fullWidth
+            margin="normal"
+            label="Asset Location"
+            name="Asset_Location"
+            value={formData.Asset_Location || ""}
+            onChange={onChange}
+            required
           >
             {assetLocations.map((loc) => <MenuItem key={loc} value={loc}>{loc}</MenuItem>)}
           </TextField>
 
-          <TextField fullWidth margin="normal" label="Installation Date" name="installation_date" type="date"
-            value={formData.installation_date || ""} onChange={onChange} InputLabelProps={{ shrink: true }} />
-
-          <TextField fullWidth margin="normal" label="CAMC Period" name="camc_period"
-            value={formData.camc_period || ""} onChange={onChange} />
-
-          <TextField fullWidth margin="normal" label="Warranty Start Date" name="warranty_start_date" type="date"
-            InputLabelProps={{ shrink: true }}
-            value={formData.warranty_start_date || ""} onChange={onChange} />
-
-          <TextField fullWidth margin="normal" label="Warranty End Date" name="warranty_end_date" type="date"
-            InputLabelProps={{ shrink: true }}
-            value={formData.warranty_end_date || ""} onChange={onChange} />
-
-          <TextField select fullWidth margin="normal" label="Asset Status" name="Asset_Status"
-            value={formData.Asset_Status || ""} onChange={onChange}
+          <TextField
+            select
+            fullWidth
+            margin="normal"
+            label="Asset Status"
+            name="Asset_Status"
+            value={formData.Asset_Status || ""}
+            onChange={onChange}
+            required
           >
             {assetStatuses.map((status) => <MenuItem key={status} value={status}>{status}</MenuItem>)}
           </TextField>
 
-          <TextField fullWidth multiline rows={3} margin="normal" label="Comments" name="Comments"
-            value={formData.Comments || ""} onChange={onChange} />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Installation Date"
+            name="installation_date"
+            type="date"
+            value={formData.installation_date || ""}
+            onChange={onChange}
+            InputLabelProps={{ shrink: true }}
+          />
 
-          <Button variant="outlined" component="label" fullWidth sx={{ mt: 2 }}>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="CAMC Period"
+            name="camc_period"
+            value={formData.camc_period || ""}
+            onChange={onChange}
+          />
+
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Warranty Start Date"
+            name="warranty_start_date"
+            type="date"
+            value={formData.warranty_start_date || ""}
+            onChange={onChange}
+            InputLabelProps={{ shrink: true }}
+          />
+
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Warranty End Date"
+            name="warranty_end_date"
+            type="date"
+            value={formData.warranty_end_date || ""}
+            onChange={onChange}
+            InputLabelProps={{ shrink: true }}
+          />
+
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            margin="normal"
+            label="Comments"
+            name="Comments"
+            value={formData.Comments || ""}
+            onChange={onChange}
+          />
+
+          <Button
+            variant="outlined"
+            component="label"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
             Upload Attachment
-            <input hidden type="file" name="Attachments" onChange={onChange} />
+            <input hidden type="file" name="Attachments" onChange={onChange}  />
           </Button>
           {formData.Attachments ? (
             <p style={{ marginTop: 8 }}>Uploaded: {formData.Attachments.name}</p>
