@@ -3,14 +3,14 @@
   display: flex;
   border: 2px solid #1e88e5;
   overflow: hidden;
-  width: 248px;
-  height: 32px;
+  width: 300px;
+  height: 40px; /* Increased height */
 }
 
 /* Toggle button styling */
 .toggle-button {
   flex: 1;
-  padding: 5px 10px;
+  padding: 8px 12px; /* Adjusted padding for better text space */
   background-color: white;
   color: #1e88e5;
   border: none;
@@ -21,6 +21,9 @@
   font: normal normal 600 14px/19px Open Sans;
   letter-spacing: 0px;
   opacity: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Active button */
@@ -35,9 +38,9 @@
     width: 100%;
     max-width: 248px;
   }
-  
+
   .toggle-button {
     font-size: 12px;
-    padding: 4px 8px;
+    padding: 6px 10px; /* Adjusted padding */
   }
 }
