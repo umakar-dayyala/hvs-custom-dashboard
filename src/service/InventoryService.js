@@ -1,4 +1,3 @@
-
 const API_BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/inventory`;
 
 export const getInventoryData = async () => {
@@ -55,7 +54,9 @@ export const getInventoryData = async () => {
 // Add a new asset
 export const addAsset = async (asset) => {
   try {
+    // Log the payload being sent
     console.log('Sending payload to /insertInventoryRecords:', JSON.stringify(asset, null, 2));
+
     const response = await fetch(`${API_BASE_URL}/insertInventoryRecords`, {
       method: 'POST',
       headers: {
@@ -64,16 +65,31 @@ export const addAsset = async (asset) => {
       body: JSON.stringify(asset),
     });
 
+    // Log response details
+    const responseBody = await response.text();
+    console.log('Received response from /insertInventoryRecords:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+      body: responseBody,
+    });
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Server response:', errorText); // Log full response
-      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+      console.error('Server error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: responseBody,
+      });
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${responseBody}`);
     }
 
-    const result = await response.json();
+    const result = JSON.parse(responseBody);
     if (!result.success) {
-      throw new Error('Failed to add asset');
+      console.error('Server indicated failure:', result);
+      throw new Error('Failed to add asset: ' + (result.error || 'Unknown error'));
     }
+
+    console.log('Successfully added asset:', result.data);
     return result.data;
   } catch (error) {
     console.error('Error adding asset:', error);
@@ -178,3 +194,4 @@ export const downloadAssets = () => {
   console.log("Simulated CSV Download:\n", csv);
 };
 */
+

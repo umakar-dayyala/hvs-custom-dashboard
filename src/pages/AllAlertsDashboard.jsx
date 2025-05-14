@@ -8,6 +8,9 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import SensorLegend from "../components/SensorLegend";
 import { floorList, getFloorAlartList } from "../service/summaryServices";
 import Loader from "../components/Loader";
+import AllAlertsAlramTable from "../components/AllAlertsAlarmTable";
+import SummaryCards from "../components/SummaryCards"; 
+
 
 const AllAlertsDashboard = () => {
   const location = useLocation();
@@ -21,7 +24,7 @@ const AllAlertsDashboard = () => {
   const [floor, setFloor] = useState(initialFloor);
   const [floorData, setFloorData] = useState([]);
   const [floorWiseAlertsData, setFloorWiseAlertsData] = useState([]);
-  
+
   const fetchFloorList = async () => {
     try {
       const response = await floorList();
@@ -38,14 +41,15 @@ const AllAlertsDashboard = () => {
     } catch (error) {
       console.error("Error fetching floor alerts:", error);
     }
-  }; 
+  };
 
+  console.log("floorWiseAlertsData", floorWiseAlertsData);
   const handleTabClick = (floorName) => {
     setFloor(floorName);
     // Navigate to the "floorwise" route with the floor parameter
     navigate(`/floorwise?floor=${encodeURIComponent(floorName)}`, { replace: true });
   };
-  
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Start loading
@@ -70,7 +74,10 @@ const AllAlertsDashboard = () => {
             </div>
           </div>
           {/* Sensor Status Cards */}
-          <SensorStatusCards />
+          <Box p={1}>
+            {/* <SensorStatusCards /> */}
+            <SummaryCards />
+          </Box>
           <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
 
           {/* Floor Tabs */}
@@ -78,7 +85,10 @@ const AllAlertsDashboard = () => {
             <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
           </Box>
 
-          <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} />
+          {/* <AllAlertsFloorWiseTable floorWiseAlertsData={floorWiseAlertsData} /> */}
+          <AllAlertsAlramTable floorWiseAlertsData={floorWiseAlertsData} />
+
+          {/* Floor Title */}
         </>
       )}
     </Box>

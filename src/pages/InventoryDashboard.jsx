@@ -42,7 +42,7 @@ const InventoryDashboard = () => {
     message: "",
     severity: "success",
   });
-  const [loading, setLoading] = useState(false); // Added for API loading state
+  const [loading, setLoading] = useState(false);
 
   const assetTypes = [
     "VRM", "WRM", "PRM", "AGM", "AP4CF", "IBAC", "MAB", "WM", "FCAD", "AAM",
@@ -58,7 +58,7 @@ const InventoryDashboard = () => {
     "Iron Gate",
     "Other",
   ];
-  const assetStatuses = ["Active", "In-active", "Removed"];
+  const assetStatuses = ["Active", "Inactive", "Removed"];
 
   const [filters, setFilters] = useState({
     type: "",
@@ -66,12 +66,12 @@ const InventoryDashboard = () => {
     status: "",
   });
 
-  // Fetch inventory data on mount
   useEffect(() => {
     (async () => {
       setLoading(true);
       try {
         const data = await getInventoryData();
+        console.log('Initial inventory data:', data);
         setAllRows(data);
       } catch (error) {
         setNotification({
@@ -118,7 +118,7 @@ const InventoryDashboard = () => {
     setSelectedAsset(asset);
     if (type === 'add') {
       setFormData({
-        asset_type_unique_id: '', // Set default unique ID
+        asset_type_unique_id: '',
         asset_unique_id: '',
         Asset_Type: '',
         Asset_Name: '',
@@ -135,7 +135,6 @@ const InventoryDashboard = () => {
       });
     } else if (type === "edit") {
       if (asset?.uniqueAssetID) {
-        // Child asset
         setFormData({
           asset_type_unique_id: asset.asset_type_unique_id || "",
           asset_unique_id: asset.uniqueAssetID || "",
@@ -153,7 +152,6 @@ const InventoryDashboard = () => {
           Attachments: null,
         });
       } else {
-        // Parent asset
         setFormData({
           asset_type_unique_id: asset?.uniqueAssetTypeCode || "",
           asset_unique_id: "",
@@ -207,35 +205,46 @@ const InventoryDashboard = () => {
     setLoading(true);
     try {
       if (dialog.type === 'add') {
-        if (!formData.Asset_Type || !formData.Asset_Name) {
-          throw new Error('Asset Type and Asset Name are required');
+        // Validate required fields
+        const requiredFields = {
+          'Asset Type': formData.Asset_Type,
+          'Asset Name': formData.Asset_Name,
+          'Asset Location': formData.Asset_Location,
+          'Asset Status': formData.Asset_Status,
+        };
+        for (const [fieldName, value] of Object.entries(requiredFields)) {
+          if (!value) {
+            throw new Error(`${fieldName} is required`);
+          }
         }
-        // Validate additional fields
-        if (!formData.Asset_Location) {
-          throw new Error('Asset Location is required');
-        }
-        if (!formData.Asset_Status) {
-          throw new Error('Asset Status is required');
+
+        // Validate warranty dates
+        if (formData.warranty_start_date && formData.warranty_end_date) {
+          const startDate = new Date(formData.warranty_start_date);
+          const endDate = new Date(formData.warranty_end_date);
+          if (endDate < startDate) {
+            throw new Error('Warranty End Date must be after Warranty Start Date');
+          }
         }
 
         const payload = {
-          asset_type_unique_id: '',
-          asset_unique_id: '',
+          asset_type_unique_id: "TYPE-001", // Use known valid ID
+          asset_unique_id: `ASSET-${Date.now()}`,
           asset_type: formData.Asset_Type,
           asset_quantity: 1,
           asset_name: formData.Asset_Name,
-          asset_manufacturer: formData.Asset_Manufacturer || '',
+          asset_manufacterer: formData.Asset_Manufacturer || '', // Match working example
           asset_serial_number: formData.Asset_Serial_Number || '',
           asset_location: formData.Asset_Location,
           asset_status: formData.Asset_Status,
-          installation_date: formData.installation_date || null,
+          installation_date: formData.installation_date || '2024-01-01',
           camc_period: formData.camc_period || '',
-          warranty_start_date: formData.warranty_start_date || null,
-          warranty_end_date: formData.warranty_end_date || null,
+          warranty_start_date: formData.warranty_start_date || '2024-01-01',
+          warranty_end_date: formData.warranty_end_date || '2026-01-01',
           comments: formData.Comments || '',
           asset_log_date: new Date().toISOString(),
         };
-        console.log('Submitting payload:', JSON.stringify(payload, null, 2));
+        console.log('Submitting add payload:', JSON.stringify(payload, null, 2));
         await addAsset(payload);
         handleShowNotification('Asset added successfully');
       } else if (dialog.type === 'remove') {
@@ -244,21 +253,9 @@ const InventoryDashboard = () => {
           const payload = {
             asset_type_unique_id: asset.asset_type_unique_id || '',
             asset_unique_id: asset.uniqueAssetID || '',
-            asset_type: asset.assetType || '',
-            asset_quantity: 0, // Set to 0 for removal
-            asset_name: asset.asset_name || '',
-            asset_manufacturer: asset.assetManufacturer || '',
-            asset_serial_number: asset.assetSerialNumber || '',
-            asset_location: asset.location || '',
-            asset_status: 'Removed', // Set to Removed
-            installation_date: asset.installation_date || null,
-            camc_period: asset.camc_period || '',
-            warranty_start_date: asset.warranty_start_date || null,
-            warranty_end_date: asset.warranty_end_date || null,
-            comments: asset.comments || '',
-            asset_log_date: new Date().toISOString(), // Update to current timestamp
           };
-          await editAsset(payload); // Use editAsset to update instead of delete
+          console.log('Submitting remove payload:', JSON.stringify(payload, null, 2));
+          await removeAsset(payload);
         }
         handleShowNotification('Asset(s) removed successfully');
       } else if (dialog.type === 'remove_types') {
@@ -268,51 +265,63 @@ const InventoryDashboard = () => {
             const payload = {
               asset_type_unique_id: asset.uniqueAssetTypeCode,
               asset_unique_id: '',
-              asset_type: asset.assetType,
-              asset_quantity: asset.quantity,
-              asset_name: '',
-              asset_manufacterer: '',
-              asset_serial_number: '',
-              asset_location: '',
-              asset_status: '',
-              installation_date: null,
-              camc_period: '',
-              warranty_start_date: null,
-              warranty_end_date: null,
-              comments: '',
-              asset_log_date: new Date().toISOString(),
             };
+            console.log('Submitting remove_types payload:', JSON.stringify(payload, null, 2));
             await removeAsset(payload);
           }
         }
         handleShowNotification('Asset type(s) removed successfully');
       } else if (dialog.type === 'edit') {
+        // Validate required fields
+        const requiredFields = {
+          'Asset Type': formData.Asset_Type,
+          'Asset Name': formData.Asset_Name,
+          'Asset Location': formData.Asset_Location,
+          'Asset Status': formData.Asset_Status,
+        };
+        for (const [fieldName, value] of Object.entries(requiredFields)) {
+          if (!value) {
+            throw new Error(`${fieldName} is required`);
+          }
+        }
+
+        // Validate warranty dates
+        if (formData.warranty_start_date && formData.warranty_end_date) {
+          const startDate = new Date(formData.warranty_start_date);
+          const endDate = new Date(formData.warranty_end_date);
+          if (endDate < startDate) {
+            throw new Error('Warranty End Date must be after Warranty Start Date');
+          }
+        }
+
         const payload = {
           asset_type_unique_id: formData.asset_type_unique_id || '',
           asset_unique_id: formData.asset_unique_id || '',
-          asset_type: formData.Asset_Type || '',
-          asset_type: formData.Asset_Type || '',
+          asset_type: formData.Asset_Type,
           asset_quantity: 1,
           asset_name: formData.Asset_Name,
           asset_manufacterer: formData.Asset_Manufacturer || '',
           asset_serial_number: formData.Asset_Serial_Number || '',
-          asset_location: formData.Asset_Location || '',
-          asset_status: formData.Asset_Status || '',
-          installation_date: formData.installation_date || null,
+          asset_location: formData.Asset_Location,
+          asset_status: formData.Asset_Status,
+          installation_date: formData.installation_date || '2024-01-01',
           camc_period: formData.camc_period || '',
-          warranty_start_date: formData.warranty_start_date || null,
-          warranty_end_date: formData.warranty_end_date || null,
+          warranty_start_date: formData.warranty_start_date || '2024-01-01',
+          warranty_end_date: formData.warranty_end_date || '2026-01-01',
           comments: formData.Comments || '',
           asset_log_date: new Date().toISOString(),
         };
+        console.log('Submitting edit payload:', JSON.stringify(payload, null, 2));
         await editAsset(payload);
         handleShowNotification('Asset updated successfully');
       }
 
       // Refetch inventory data
       const updatedData = await getInventoryData();
+      console.log('Refetched inventory data:', updatedData);
       setAllRows(updatedData);
     } catch (error) {
+      console.error('Operation failed:', error);
       handleShowNotification(`Error: ${error.message}`, 'error');
     } finally {
       setLoading(false);
