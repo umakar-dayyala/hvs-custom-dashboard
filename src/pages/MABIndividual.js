@@ -30,7 +30,7 @@ import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from '../components/Connectivitydata';
 
 // Constants
-const AsmData= {
+const AsmData = {
   "fan_status": "OK",
   "pump_status": "OK",
   "cyclone_fluid": "OK",
@@ -54,8 +54,7 @@ export const MABIndividual = React.memo(() => {
     outlier: null
   });
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
-  const [imageModalOpen, setImageModalOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+
 
   // Time range states initialized as null
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
@@ -190,18 +189,7 @@ export const MABIndividual = React.memo(() => {
 
 
 
-  // Image modal handlers
-  const handleOpenImageModal = useCallback(() => {
-    // Here you could fetch the image URL if needed
-    // For now, we'll just set a placeholder
-    setSelectedImage("path_to_your_image.jpg"); // Replace with actual image path or API call
-    setImageModalOpen(true);
-  }, []);
 
-  const handleCloseImageModal = useCallback(() => {
-    setImageModalOpen(false);
-    setSelectedImage(null);
-  }, []);
 
   // Memoized layout values based on toggle state
   const chartLayout = useMemo(() => {
@@ -228,8 +216,8 @@ export const MABIndividual = React.memo(() => {
                 <span>Last Live Data fetched time: {LastFetchLiveData}</span>
               )}
             </Box>
-            
-            <HvButton onClick={handleOpenImageModal}>Image</HvButton>
+
+
           </div>
         </div>
 
@@ -253,7 +241,7 @@ export const MABIndividual = React.memo(() => {
               />
               <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
             </HvStack>
-            <IndividualParameters paramsData={param} notifications={notifications} AsmData={AsmData}/>
+            <IndividualParameters paramsData={param} notifications={notifications} AsmData={AsmData} />
             <Box mt={2}>
               <PlotlyDataChart
                 bioParamChartData={mabParamChartData}
@@ -285,67 +273,17 @@ export const MABIndividual = React.memo(() => {
 
           <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
             <Box width={"50%"} >
-              <IntensityChart  />
+              <IntensityChart />
             </Box>
-            
-              <Box width={"50%"}>
-                <PredictionChart />
-              </Box>
-            
+
+            <Box width={"50%"}>
+              <PredictionChart />
+            </Box>
+
           </Box>
           <Connectivitydata />
         </Box>
       </Box>
-
-      {/* Image Modal */}
-      <HvDialog
-        open={imageModalOpen}
-        onClose={handleCloseImageModal}
-        title="Equipment Image"
-        maxWidth="sm"
-        fullWidth
-      >
-        <div style={{ 
-  padding: 20,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: '100%',
-  minHeight: '300px' // Ensures minimum height even if image is small
-}}>
-  {selectedImage ? (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: '100%',
-      
-      overflow: 'hidden'
-    }}>
-      <img 
-        src={selectedImage}
-        alt="fetched image" 
-        style={{ 
-          maxWidth: '100%',
-          maxHeight: '100%',
-          objectFit: 'contain',
-          display: 'block' // Removes extra space below image
-        }}
-      />
-    </div>
-  ) : (
-    <p>No image available</p>
-  )}
-  <div style={{ marginTop: 20, textAlign: 'center' }}>
-    <HvButton variant="primary" onClick={handleCloseImageModal}>
-      Close
-    </HvButton>
-  </div>
-</div>
-      </HvDialog>
-
-     
     </Box>
   );
 });

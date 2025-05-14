@@ -102,7 +102,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
   const statusMap = {
     "Detector Ready": (v) => {
       const val = String(v).toLowerCase();
-      return val === "true" || val === "ready" ? green : yellow;
+      return val === "false" || val === "ready" ? green : yellow;
     },
     "Device Fault": (v) => {
       const val = String(v).toLowerCase();
@@ -113,19 +113,35 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
       return val === "clear" || val === "ok" ? green : yellow;
     },
 
+     "Lack Of Hydrogen": (v) =>{
+      const val = String(v).toLowerCase();
+      return val === "no need" || val === "no" ? green : yellow;
+    },
+
+   "Laser Current": (v) => {
+  const val = String(v).toLowerCase();
+  return val === "no fault" || parseFloat(v) > 0 ? green : yellow;
+}
+,
+
+    "Power Supply Too Low": (v) =>{
+      const val = String(v).toLowerCase();
+      return val === "false" || val === "no"  ? green : yellow;
+    },
+
+    
+
     "Power Supply Too Low": (v) => String(v).toLowerCase() === "false" ? green : yellow,
     "Algorithm Alarm Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
     "Pressure": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "Laser Power": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
-    "Laser Current": (v) => parseFloat(v) > 0 ? green : yellow,
     "Background Light Monitor": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "Low Battery": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "DET 01 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
     "System Error": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "DET 02 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
     "Purge": (v) => String(v).toLowerCase() === "not required" ? green : yellow,
-    "Lack Of Hydrogen": (v) => String(v).toLowerCase() === "no need" ? green : yellow,
-    "Maintenance Required": (v) => String(v).toLowerCase() === "not required" ? green : yellow,
+    "Maintenance Required": (v) => String(v).toLowerCase() === "not requested" ? green : yellow,
     "Test Mode in Progress": (v) => String(v).toLowerCase() === "on" ? green : yellow,
     "Low Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
     "RTC Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
@@ -133,6 +149,13 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     "High Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
     "SD card Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
     // "Mother Board Controller Status": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
+    "Hydrogen Lack": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
+    "Device Defect": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
+    "Maintenance Request": (v) => String(v).toLowerCase() === "Not Requested" ? green : yellow,
+    "Waiting": (v) => String(v).toLowerCase() === "false" ? green : yellow,
+    "Waking State": (v) => String(v).toLowerCase() === "false" ? green : yellow,
+    "Test Mode": (v) => String(v).toLowerCase() === "na" ? green : yellow,
+
   };
 
   const normalizedValue = String(value).toLowerCase();
@@ -150,6 +173,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
         display: 'flex',
         justifyContent: 'space-between',
         width: '100%',
+        fontSize: '18px',
       }}
     >
       <StyledTableCell style={{ flex: 7, wordBreak: 'break-word' }}>
@@ -200,7 +224,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontSize: "1.5rem" }}>{paramKey}</span>
+                  <span style={{ fontSize: "18px" }}>{paramKey}</span>
                 </div>
               );
             })}
@@ -249,6 +273,16 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
   };
 
+  const fontSizes = {
+  sectionTitle: "20px",
+  tableCell: "16px",
+  parameterName: "16px",
+  parameterValue: "16px",
+  notificationText: "16px",
+  cardTitle: "18px",
+  cardValue: "16px"
+};
+
   return (
     <div className="parameter-container">
       {noData ? (
@@ -295,88 +329,93 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
                       )}
                     </div>
                   ) : sectionTitle === "System Settings" ? (
-
-
-                    <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#F5F5F5", padding: "14px", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "10px" }}>
-                        {Object.entries(parameters).filter(([_, value]) => isNaN(Number(value))).map(([key, value]) => (
-                          <div key={key} style={{ fontSize: "18px", display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
-                            <div key={key}>
-                              {key}
-                            </div>
-                            <div>
-                              {value}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Live Plot for numeric values (converted if possible) */}
+                    <div style={{ padding: "10px 0" }}>
+                      <TableContainer
+                        component={Paper}
+                        elevation={0}
+                        style={{ width: "100%", overflowX: "auto", marginBottom: "16px" }}
+                      >
+                        <Table sx={{ minWidth: "100%" }} aria-label="system-settings-table">
+                          <TableBody>
+                            {Object.entries(parameters)
+                              .filter(([_, value]) => isNaN(Number(value)))
+                              .map(([key, value]) => (
+                                <StyledTableRow key={key}>
+                                  <StyledTableCell component="th" scope="row" style={{ width: '60%' }}>
+                                    <div style={{ padding: '8px 0' }}>
+                                      {key}
+                                    </div>
+                                  </StyledTableCell>
+                                  <StyledTableCell align="right" style={{ width: '40%' }}>
+                                    <div style={{ padding: '8px 0' }}>
+                                      {value}
+                                    </div>
+                                  </StyledTableCell>
+                                </StyledTableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                      
+                      {/* Live Plot for numeric values */}
                       <MemoizedLivePlot
                         data={Object.fromEntries(
-                          Object.entries(parameters).filter(([_, value]) => !isNaN(Number(value)))
+                          Object.entries(parameters)
+                            .filter(([_, value]) => !isNaN(Number(value)))
                             .map(([key, value]) => [key, Number(value)])
                         )}
                       />
-
-                      {/* Show non-numeric values */}
-
                     </div>
-                  ) : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
-                    <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
-
-                      {Object.entries(parameters).map(([key, value]) => {
-
-
-
-
-                        return (
-                          <div
-                            key={key}
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              flexWrap: "wrap",
-                              gap: "12px",
-                              fontSize: "18px",
-                              padding: "10px 0",
-                            }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: "200px" }}>
-
-                              <span
-                                style={{
-                                  backgroundColor: "#ddd",
-                                  borderRadius: "6px",
-                                  padding: "4px 10px",
-                                  fontSize: "16px",
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                {key}
-                              </span>
-                            </div>
-                            <div
-                              style={{
-                                backgroundColor: getBackgroundColor(key, value),
-                                color: "white",
-                                borderRadius: "6px",
-                                padding: "4px 12px",
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                minWidth: "90px",
-                                flexShrink: 0,
-                              }}
-                            >
-                              {value}
-                            </div>
-
-                          </div>
-                        );
-                      })}
-                    </div>
+                  )  : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
+                    <TableContainer
+                      component={Paper}
+                      elevation={0}
+                      style={{ width: "100%", overflowX: "auto" }}
+                    >
+                      <Table sx={{ minWidth: "100%" }} aria-label="health-parameters-table">
+                        <TableBody>
+                          {Object.entries(parameters).map(([key, value], index) => (
+                            <StyledTableRow key={key}>
+                              <StyledTableCell component="th" scope="row" style={{ width: '60%' }}>
+                                <div style={{ 
+                                  display: 'flex', 
+                                  alignItems: 'center',
+                                  padding: '8px 0'
+                                }}>
+                                  <span
+                                    style={{
+                                      // backgroundColor: "#ddd",
+                                      borderRadius: "6px",
+                                      padding: "4px 10px",
+                                      fontSize: "18px",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {key}
+                                  </span>
+                                </div>
+                              </StyledTableCell>
+                              <StyledTableCell align="right" style={{ width: '40%' }}>
+                                <div
+                                  style={{
+                                    backgroundColor: getBackgroundColor(key, value),
+                                    color: "white",
+                                    borderRadius: "6px",
+                                    padding: "4px 12px",
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    minWidth: "90px",
+                                    display: 'inline-block'
+                                  }}
+                                >
+                                  {value}
+                                </div>
+                              </StyledTableCell>
+                            </StyledTableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                   ) :
                     (
                       <TableContainer
@@ -404,7 +443,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
             statusColor="red"
             style={cardStyle}
           >
-            <HvCardContent className="parameter-content">
+            <HvCardContent >
               <HvTypography variant="title2" className="section-title">
                 Notifications
               </HvTypography>
