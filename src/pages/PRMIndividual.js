@@ -164,27 +164,7 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
     }
   }, [outlierRange]);
 
-  // Toggle state handling
-  const handleToggleClick = (state) => {
-    if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state);
-      setShowModal(true);
-    } else {
-      setToggleState(state);
-    }
-  };
-
-  const handleConfirmChange = () => {
-    if (newState) {
-      setToggleState(newState);
-    }
-    setShowModal(false);
-  };
-
-  const handleCancelChange = () => {
-    setNewState(null);
-    setShowModal(false);
-  };
+ 
 
   const setLocationDetails=(floor,zone,location,sensorType) => {
     setUdatedLocationDetails({
@@ -208,7 +188,7 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
   )}
 </Box>
 
-          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+          
          
         </div>
       </div>
@@ -260,26 +240,18 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-          <Box width={toggleState === "Operator" ? "100%" : "50%"}>
+          <Box width={"50%"}>
             <IntensityChart />
           </Box>
-          {toggleState !== "Operator" && (
+          
             <Box width={"50%"}>
               <PredictionChart />
             </Box>
-          )}
+          
         </Box>
         <Connectivitydata />
       </Box>
-      {showModal && (
-        <ConfirmationModal
-          open={showModal}
-          onClose={handleCancelChange}
-          onConfirm={handleConfirmChange}
-          title="Confirm Role Change"
-          message="Are you sure you want to switch to Supervisor mode?"
-        />
-      )}
+      
     </Box>
   );
 };

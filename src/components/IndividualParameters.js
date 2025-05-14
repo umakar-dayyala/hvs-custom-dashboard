@@ -81,18 +81,18 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
   // Memoized derived values
   const noData = useMemo(() => !paramsData || !paramsData.length, [paramsData]);
   const displayData = useMemo(() => noData ? defaultCards : paramsData[0], [noData, paramsData]);
-  const isVRM = useMemo(() => window.location.href.includes("vrm") || window.location.href.includes("VRM"), []);
-  const isPRM = useMemo(() => window.location.href.includes("prm") || window.location.href.includes("PRM"), []);
-  const isAGM = useMemo(() => window.location.href.includes("agm") || window.location.href.includes("AGM"), []);
+  // const isVRM = useMemo(() => window.location.href.includes("vrm") || window.location.href.includes("VRM"), []);
+  // const isPRM = useMemo(() => window.location.href.includes("prm") || window.location.href.includes("PRM"), []);
+  // const isAGM = useMemo(() => window.location.href.includes("agm") || window.location.href.includes("AGM"), []);
 
-  const getFilteredParameters = useCallback((parameters, sectionTitle) => {
-    if (toggleState === "Operator" && parameters && sectionTitle === "System Settings") {
-      if (isVRM) return Object.fromEntries(Object.entries(parameters).slice(0, 3));
-      if (isPRM) return Object.fromEntries(Object.entries(parameters).slice(0, 2));
-      if (isAGM) return Object.fromEntries(Object.entries(parameters).slice(0, 4));
-    }
-    return parameters;
-  }, [toggleState, isVRM, isPRM, isAGM]);
+  // const getFilteredParameters = useCallback((parameters, sectionTitle) => {
+  //   if (toggleState === "Operator" && parameters && sectionTitle === "System Settings") {
+  //     if (isVRM) return Object.fromEntries(Object.entries(parameters).slice(0, 3));
+  //     if (isPRM) return Object.fromEntries(Object.entries(parameters).slice(0, 2));
+  //     if (isAGM) return Object.fromEntries(Object.entries(parameters).slice(0, 4));
+  //   }
+  //   return parameters;
+  // }, [toggleState, isVRM, isPRM, isAGM]);
 
   const getBackgroundColor = (key, value) => {
   const green = "#008000";
@@ -106,8 +106,13 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     },
     "Device Fault": (v) => {
       const val = String(v).toLowerCase();
-      return val === "no fault" || val === "okay" ? green : red;
+      return val === "no fault" || val === "okay" ? green : yellow;
     },
+    "Mother Board Controller Status": (v) =>{
+      const val = String(v).toLowerCase();
+      return val === "clear" || val === "ok" ? green : yellow;
+    },
+
     "Power Supply Too Low": (v) => String(v).toLowerCase() === "false" ? green : yellow,
     "Algorithm Alarm Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
     "Pressure": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
@@ -127,7 +132,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     "Detector Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
     "High Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
     "SD card Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
-    "Mother Board Controller Status ": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
+    // "Mother Board Controller Status": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
   };
 
   const normalizedValue = String(value).toLowerCase();
@@ -136,19 +141,27 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
 
 
 
-  const renderNotificationRow = useCallback(({ index, style }) => {
-    const notification = notifications[index];
-    return (
-      <StyledTableRow style={{ ...style, display: 'flex', justifyContent: 'space-between' }}>
-        <StyledTableCell style={{ flex: 1 }}>
-          {notification.label}
-        </StyledTableCell>
-        <StyledTableCell style={{ textAlign: 'right' }}>
-          {notification.value}
-        </StyledTableCell>
-      </StyledTableRow>
-    );
-  }, [notifications]);
+ const renderNotificationRow = useCallback(({ index, style }) => {
+  const notification = notifications[index];
+  return (
+    <StyledTableRow
+      style={{
+        ...style,
+        display: 'flex',
+        justifyContent: 'space-between',
+        width: '100%',
+      }}
+    >
+      <StyledTableCell style={{ flex: 7, wordBreak: 'break-word' }}>
+        {notification.label}
+      </StyledTableCell>
+      <StyledTableCell style={{ flex: 3, textAlign: 'right' }}>
+        {notification.value}
+      </StyledTableCell>
+    </StyledTableRow>
+  );
+}, [notifications]);
+
 
   const renderParameterGroup = useCallback((groupTitle, subParams) => (
     <div key={groupTitle} style={parameterGroupStyle}>
@@ -261,7 +274,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
         <>
           {Object.keys(displayData).map((sectionTitle) => {
             let parameters = displayData[sectionTitle];
-            parameters = getFilteredParameters(parameters, sectionTitle, toggleState);
+            // parameters = getFilteredParameters(parameters, sectionTitle, toggleState);
 
             return (
               <HvCard

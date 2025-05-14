@@ -188,27 +188,7 @@ export const MABIndividual = React.memo(() => {
     }
   }, [outlierRange, fetchData]);
 
-  // Toggle state handling
-  const handleToggleClick = useCallback((state) => {
-    if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state);
-      setShowModal(true);
-    } else {
-      setToggleState(state);
-    }
-  }, [toggleState]);
 
-  const handleConfirmChange = useCallback(() => {
-    if (newState) {
-      setToggleState(newState);
-    }
-    setShowModal(false);
-  }, [newState]);
-
-  const handleCancelChange = useCallback(() => {
-    setNewState(null);
-    setShowModal(false);
-  }, []);
 
   // Image modal handlers
   const handleOpenImageModal = useCallback(() => {
@@ -248,7 +228,7 @@ export const MABIndividual = React.memo(() => {
                 <span>Last Live Data fetched time: {LastFetchLiveData}</span>
               )}
             </Box>
-            <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+            
             <HvButton onClick={handleOpenImageModal}>Image</HvButton>
           </div>
         </div>
@@ -304,14 +284,14 @@ export const MABIndividual = React.memo(() => {
           </Box>
 
           <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-            <Box width={toggleState === "Operator" ? "100%" : "50%"}>
-              <IntensityChart />
+            <Box width={"50%"} >
+              <IntensityChart  />
             </Box>
-            {toggleState !== "Operator" && (
+            
               <Box width={"50%"}>
                 <PredictionChart />
               </Box>
-            )}
+            
           </Box>
           <Connectivitydata />
         </Box>
@@ -365,16 +345,7 @@ export const MABIndividual = React.memo(() => {
 </div>
       </HvDialog>
 
-      {/* Role Change Confirmation Modal */}
-      {showModal && (
-        <ConfirmationModal
-          open={showModal}
-          onClose={handleCancelChange}
-          onConfirm={handleConfirmChange}
-          title="Confirm Role Change"
-          message="Are you sure you want to switch to Supervisor mode?"
-        />
-      )}
+     
     </Box>
   );
 });

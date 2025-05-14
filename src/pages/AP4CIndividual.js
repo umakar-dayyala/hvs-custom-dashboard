@@ -13,7 +13,6 @@ import PredictionChart from '../components/PredictionChart';
 import chemicon from "../assets/rChemical.svg";
 import gchemicon from "../assets/gChemical.svg";
 import Corelation from '../components/Corelation';
-import ToggleButtons from '../components/ToggleButtons';
 import Breadcrumbs from '../components/Breadcrumbs';
 import {
   fetchAP4CParamChartData,
@@ -22,13 +21,11 @@ import {
 } from "../service/AP4CSensorService";
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
-import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aChemical.svg";
 import greyChem from "../assets/greyChem.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
-import { floor, set } from 'lodash';
 import Connectivitydata from '../components/Connectivitydata';
 
 // Constants
@@ -44,9 +41,6 @@ export const AP4CIndividual = React.memo(() => {
   const [kpiData, setKpiData] = useState([]);
   const [anomalyChartData, setAnomalyChartData] = useState({});
   const [outlierChartData, setOutlierChartData] = useState({});
-  const [toggleState, setToggleState] = useState("Operator");
-  const [showModal, setShowModal] = useState(false);
-  const [newState, setNewState] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
   const [lastFetchTimes, setLastFetchTimes] = useState({
@@ -66,6 +60,7 @@ export const AP4CIndividual = React.memo(() => {
     location: 'default',
     sensorType: 'default'
   });
+
   // Memoized device ID
   const deviceId = useMemo(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -186,47 +181,18 @@ export const AP4CIndividual = React.memo(() => {
     }
   }, [outlierRange, fetchData]);
 
-  // Toggle state handling
-  const handleToggleClick = useCallback((state) => {
-    if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state);
-      setShowModal(true);
-    } else {
-      setToggleState(state);
-    }
-  }, [toggleState]);
-
-  const handleConfirmChange = useCallback(() => {
-    if (newState) {
-      setToggleState(newState);
-    }
-    setShowModal(false);
-  }, [newState]);
-
-  const handleCancelChange = useCallback(() => {
-    setNewState(null);
-    setShowModal(false);
-  }, []);
-
-  // Memoized layout values based on toggle state
-  const chartLayout = useMemo(() => {
-    return toggleState === "Operator" ? "100%" : "33.33%";
-  }, [toggleState]);
-
-const setLocationDetails=(floor,zone,location,sensorType) => {
-  setUdatedLocationDetails({
-    floor: floor || locationDetails.floor,
-    zone: zone || locationDetails.zone,
-    location: location || locationDetails.location,
-    sensorType: sensorType || locationDetails.sensorType
-  });
-  
-}
+  const setLocationDetails = (floor, zone, location, sensorType) => {
+    setUdatedLocationDetails({
+      floor: floor || locationDetails.floor,
+      zone: zone || locationDetails.zone,
+      location: location || locationDetails.location,
+      sensorType: sensorType || locationDetails.sensorType
+    });
+  }
 
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {/* <Breadcrumbs /> */}
         <BreadCrumbsIndividual locationDetails={locationDetails}/>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Box style={{ whiteSpace: "nowrap" }}>
@@ -234,7 +200,6 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
             )}
           </Box>
-          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
         </div>
       </div>
 
@@ -254,7 +219,7 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
             />
             <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
           </HvStack>
-          <IndividualParameters paramsData={param} notifications={notifications} toggleState={toggleState}/>
+          <IndividualParameters paramsData={param} notifications={notifications} />
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={ap4cParamChartData}
@@ -285,31 +250,18 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} gap={2}>
-          <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <IntensityChart />
           </Box>
-          {toggleState !== "Operator" && (
-            <>
-              <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                <Corelation />
-              </Box>
-              <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                <PredictionChart />
-              </Box>
-            </>
-          )}
+          <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <Corelation />
+          </Box>
+          <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <PredictionChart />
+          </Box>
         </Box>
         <Connectivitydata />
       </Box>
-      {showModal && (
-        <ConfirmationModal
-          open={showModal}
-          onClose={handleCancelChange}
-          onConfirm={handleConfirmChange}
-          title="Confirm Role Change"
-          message="Are you sure you want to switch to Supervisor mode?"
-        />
-      )}
     </Box>
   );
 });
