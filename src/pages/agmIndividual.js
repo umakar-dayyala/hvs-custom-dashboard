@@ -14,17 +14,14 @@ import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from 'dayjs';
 import { fetchAGMParamChartData } from '../service/AGMSensorService';
 import { fetchAnomalyChartData, fetchOutlierChartData } from '../service/AGMSensorService';
-import Breadcrumbs from '../components/Breadcrumbs';
-import ToggleButtons from '../components/ToggleButtons';
-import ConfirmationModal from '../components/ConfirmationModal';
+import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import Connectivitydata from '../components/Connectivitydata';
 import IntensityChart from '../components/IntensityChart';
 import PredictionChart from '../components/PredictionChart';
 import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
-import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
-import Connectivitydata from '../components/Connectivitydata';
 
 export const AgmIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
@@ -32,9 +29,6 @@ export const AgmIndividual = () => {
   const [kpiData, setKpiData] = useState([]);
   const [anomalyChartData, setAnomalyChartData] = useState({});
   const [outlierChartData, setOutlierChartData] = useState({});
-  const [toggleState, setToggleState] = useState("Operator");
-  const [showModal, setShowModal] = useState(false);
-  const [newState, setNewState] = useState(null);
   const [param, setParam] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [lastFetchTimes, setLastFetchTimes] = useState({
@@ -49,12 +43,12 @@ export const AgmIndividual = () => {
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
 
-   const [locationDetails, setUdatedLocationDetails] = useState({
-      floor: 'default',
-      zone: 'default',
-      location: 'default',
-      sensorType: 'default'
-    });
+  const [locationDetails, setUdatedLocationDetails] = useState({
+    floor: 'default',
+    zone: 'default',
+    location: 'default',
+    sensorType: 'default'
+  });
 
   const formatDateForApi = (isoDate) => {
     if (!isoDate) return null;
@@ -160,51 +154,25 @@ export const AgmIndividual = () => {
     }
   }, [outlierRange]);
 
-  // Toggle state handling
-  const handleToggleClick = (state) => {
-    if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state);
-      setShowModal(true);
-    } else {
-      setToggleState(state);
-    }
-  };
-
-  const handleConfirmChange = () => {
-    if (newState) {
-      setToggleState(newState);
-    }
-    setShowModal(false);
-  };
-
-  const handleCancelChange = () => {
-    setNewState(null);
-    setShowModal(false);
-  };
-
-  const setLocationDetails=(floor,zone,location,sensorType) => {
+  const setLocationDetails = (floor, zone, location, sensorType) => {
     setUdatedLocationDetails({
       floor: floor || locationDetails.floor,
       zone: zone || locationDetails.zone,
       location: location || locationDetails.location,
       sensorType: sensorType || locationDetails.sensorType
     });
-    
   }
-  
 
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {/* <Breadcrumbs /> */}
         <BreadCrumbsIndividual locationDetails={locationDetails}/>
-        <div style={{ display: "flex", gap: "10px",alignItems:"center" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Box style={{ whiteSpace: "nowrap" }}>
             {LastFetchLiveData && (
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
             )}
           </Box>
-          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
         </div>
       </div>
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -227,7 +195,7 @@ export const AgmIndividual = () => {
             />
             <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
           </HvStack>
-          <IndividualParameters paramsData={param} notifications={notifications} toggleState ={toggleState}/>
+          <IndividualParameters paramsData={param} notifications={notifications} />
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={agmParamChartData}
@@ -256,25 +224,14 @@ export const AgmIndividual = () => {
           </Box>
         </Box>
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-          <Box width={toggleState === "Operator" ? "100%" : "50%"}>
+          <Box width="50%">
             <IntensityChart />
           </Box>
-          {toggleState !== "Operator" && (
-            <Box width={"50%"}>
-              <PredictionChart />
-            </Box>
-          )}
+          <Box width="50%">
+            <PredictionChart />
+          </Box>
         </Box>
         <Connectivitydata />
-        {showModal && (
-          <ConfirmationModal
-            open={showModal}
-            onClose={handleCancelChange}
-            onConfirm={handleConfirmChange}
-            title="Confirm Role Change"
-            message="Are you sure you want to switch to Supervisor mode?"
-          />
-        )}
       </Box>
     </Box>
   );

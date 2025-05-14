@@ -67,12 +67,15 @@ const LivePlot = ({ data }) => {
             yaxis: { title: "Value" },
             showlegend: true, // <-- Add this line
             legend: {
-              orientation: "v",
-              x: 0.2,
-              y: 1.5,
-              itemwidth: 10,
-              traceorder: "normal",
-            },
+  orientation: "h",        // horizontal layout
+  x: 0,
+  y: -0.1,                 // below the chart
+  xanchor: "left",
+  yanchor: "top",
+  traceorder: "normal",
+            // uniform width
+  tracegroupgap: 10,       // spacing between rows
+},
             autosize: true,
             margin: { t: 50, r: 30, b: 40, l: 50 },
           }}

@@ -186,27 +186,6 @@ export const FcadIndividual = React.memo(() => {
     }
   }, [outlierRange, fetchData]);
 
-  // Toggle state handling
-  const handleToggleClick = useCallback((state) => {
-    if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state);
-      setShowModal(true);
-    } else {
-      setToggleState(state);
-    }
-  }, [toggleState]);
-
-  const handleConfirmChange = useCallback(() => {
-    if (newState) {
-      setToggleState(newState);
-    }
-    setShowModal(false);
-  }, [newState]);
-
-  const handleCancelChange = useCallback(() => {
-    setNewState(null);
-    setShowModal(false);
-  }, []);
 
   // Memoized layout values based on toggle state
   const chartLayout = useMemo(() => {
@@ -234,7 +213,7 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
             )}
           </Box>
-          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+          
         </div>
       </div>
 
@@ -288,7 +267,7 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
           <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <IntensityChart />
           </Box>
-          {toggleState !== "Operator" && (
+          
             <>
               <Box width={chartLayout} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <Corelation />
@@ -297,19 +276,11 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
                 <PredictionChart />
               </Box>
             </>
-          )}
+         
         </Box>
         <Connectivitydata />
       </Box>
-      {showModal && (
-        <ConfirmationModal
-          open={showModal}
-          onClose={handleCancelChange}
-          onConfirm={handleConfirmChange}
-          title="Confirm Role Change"
-          message="Are you sure you want to switch to Supervisor mode?"
-        />
-      )}
+      
     </Box>
   );
 });

@@ -172,27 +172,7 @@ export const WRMIndividual = () => {
      }
    }, [outlierRange]);
 
-  // Toggle state handling
-  const handleToggleClick = (state) => {
-    if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state); // Store new state temporarily
-      setShowModal(true); // Show confirmation modal
-    } else {
-      setToggleState(state); // Directly update state if no confirmation needed
-    }
-  };
-
-  const handleConfirmChange = () => {
-    if (newState) {
-      setToggleState(newState); // Apply only confirmed changes
-    }
-    setShowModal(false); // Close modal
-  };
-
-  const handleCancelChange = () => {
-    setNewState(null); // Reset temporary state
-    setShowModal(false); // Close modal without changing state
-  };
+  
 
   const setLocationDetails=(floor,zone,location,sensorType) => {
     setUdatedLocationDetails({
@@ -215,7 +195,7 @@ export const WRMIndividual = () => {
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
             )}
           </Box>
-          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
+          
         </div>
       </div>
 
@@ -259,30 +239,22 @@ export const WRMIndividual = () => {
         </Box>
 
         <Box display={"flex"} style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-          <Box width={toggleState === "Operator" ? "100%" : "50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <Box width={ "50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <IntensityChart />
           </Box>
-          {toggleState !== "Operator" && (
+          
             <>
               
               <Box width={"50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <PredictionChart />
               </Box>
             </>
-          )}
+         
         </Box>
         <Connectivitydata />
       </Box>
 
-      {showModal && (
-        <ConfirmationModal
-          open={showModal}
-          onClose={handleCancelChange}
-          onConfirm={handleConfirmChange}
-          title="Confirm Role Change"
-          message="Are you sure you want to switch to Supervisor mode?"
-        />
-      )}
+      
     </Box>
   );
 };

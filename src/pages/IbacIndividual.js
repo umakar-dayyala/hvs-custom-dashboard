@@ -37,9 +37,6 @@ export const IbacIndividual = () => {
   const [kpiData, setKpiData] = useState([]);
   const [anomalyChartData, setAnomalyChartData] = useState({});
   const [outlierChartData, setOutlierChartData] = useState({});
-  const [toggleState, setToggleState] = useState("Operator");
-  const [showModal, setShowModal] = useState(false);
-  const [newState, setNewState] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
@@ -49,20 +46,16 @@ export const IbacIndividual = () => {
     outlier: null
   });
 
-  // Track initial mount
-  // const initialMount = useRef(true);
-
-  // Time range states initialized as null
   const [plotlyTimeRange, setPlotlyTimeRange] = useState({ fromTime: null, toTime: null });
   const [anomalyTimeRange, setAnomalyTimeRange] = useState({ fromTime: null, toTime: null });
   const [outlierTimeRange, setOutlierTimeRange] = useState({ fromTime: null, toTime: null });
 
-   const [locationDetails, setUdatedLocationDetails] = useState({
-      floor: 'default',
-      zone: 'default',
-      location: 'default',
-      sensorType: 'default'
-    });
+  const [locationDetails, setUdatedLocationDetails] = useState({
+    floor: 'default',
+    zone: 'default',
+    location: 'default',
+    sensorType: 'default'
+  });
 
   const formatDateForApi = (date) => {
     if (!date) return null;
@@ -147,7 +140,6 @@ export const IbacIndividual = () => {
     }
   };
 
-  // Handler functions with improved validation
   const handlePlotlyRangeChange = (range) => {
     if (!range || range.length < 2) {
       console.error("Invalid range received:", range);
@@ -163,7 +155,6 @@ export const IbacIndividual = () => {
       return;
     }
 
-    // Only update if range actually changed
     if (fromTime !== plotlyTimeRange.fromTime || toTime !== plotlyTimeRange.toTime) {
       setPlotlyTimeRange({ fromTime, toTime });
     }
@@ -209,7 +200,6 @@ export const IbacIndividual = () => {
     }
   };
 
-  // Effect hooks for data fetching
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
@@ -234,27 +224,6 @@ export const IbacIndividual = () => {
     }
   }, [outlierTimeRange]);
 
-  const handleToggleClick = (state) => {
-    if (toggleState === "Operator" && state === "Supervisor") {
-      setNewState(state);
-      setShowModal(true);
-    } else {
-      setToggleState(state);
-    }
-  };
-
-  const handleConfirmChange = () => {
-    if (newState) {
-      setToggleState(newState);
-    }
-    setShowModal(false);
-  };
-
-  const handleCancelChange = () => {
-    setNewState(null);
-    setShowModal(false);
-  };
-
   const setLocationDetails=(floor,zone,location,sensorType) => {
     setUdatedLocationDetails({
       floor: floor || locationDetails.floor,
@@ -262,13 +231,11 @@ export const IbacIndividual = () => {
       location: location || locationDetails.location,
       sensorType: sensorType || locationDetails.sensorType
     });
-    
   }
 
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {/* <Breadcrumbs /> */}
         <BreadCrumbsIndividual locationDetails={locationDetails}/>
         <div style={{ display: "flex", gap: "10px" ,alignItems:"center"}}>
           <Box style={{ whiteSpace: "nowrap" }}>
@@ -276,7 +243,6 @@ export const IbacIndividual = () => {
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
             )}
           </Box>
-          <ToggleButtons onToggleChange={handleToggleClick} currentRole={toggleState} />
         </div>
       </div>
 
@@ -305,35 +271,18 @@ export const IbacIndividual = () => {
         </Box>
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
-          {toggleState === "Operator" ? (
-            <Box width="100%">
-              <IntensityChart />
-            </Box>
-          ) : (
-            <>
-              <Box width="33.33%">
-                <IntensityChart />
-              </Box>
-              <Box width="33.33%">
-                <PredictionChart />
-              </Box>
-              <Box width="33.33%">
-                <Corelation />
-              </Box>
-            </>
-          )}
+          <Box width="33.33%">
+            <IntensityChart />
+          </Box>
+          <Box width="33.33%">
+            <PredictionChart />
+          </Box>
+          <Box width="33.33%">
+            <Corelation />
+          </Box>
         </Box>
         <Connectivitydata />
       </Box>
-      {showModal && (
-        <ConfirmationModal
-          open={showModal}
-          onClose={handleCancelChange}
-          onConfirm={handleConfirmChange}
-          title="Confirm Role Change"
-          message="Are you sure you want to switch to Supervisor mode?"
-        />
-      )}
     </Box>
   );
 };
