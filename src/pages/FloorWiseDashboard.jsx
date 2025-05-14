@@ -233,7 +233,7 @@ const FloorWiseDashboard = () => {
 
         if (isMounted) {
           setFloorSummaryData(floorSummaryRes);
-          console.log("Floor Summary Data:"+JSON.stringify(floorSummaryRes));
+          console.log("Floor Summary Data:" + JSON.stringify(floorSummaryRes));
           setSensorSummary(sensorSummaryRes.data);
           setFloorData(floorListRes);
           // setZoneData(zoneDataRes.data);
@@ -272,8 +272,8 @@ const FloorWiseDashboard = () => {
     }, {});
   };
   const sensorCounts = countDetectorTypes(floorSummaryData || []);
-  console.log("Floor Summary Data: "+JSON.stringify(floorSummaryData));
-  
+  console.log("Floor Summary Data: " + JSON.stringify(floorSummaryData));
+
   const transformSensorData = (data) => {
     if (!Array.isArray(data)) {
       console.warn("transformSensorData: data is not an array", data);
@@ -336,7 +336,11 @@ const FloorWiseDashboard = () => {
             <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
               {/* Floor Plan Map on the left */}
               <Box flex="1" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
-                <FloorPlanMap sensorData={floorSummaryData}/>
+                {floor === "Upper Ground Floor" ? (
+                  <FloorPlanMap sensorData={floorSummaryData} />
+                ) : (
+                  <FloorWiseStatusGrid sensorData={floorSummaryData} />
+                )}
               </Box>
 
               {/* Alarm + Notification Panels on the right, stacked vertically */}
@@ -354,9 +358,12 @@ const FloorWiseDashboard = () => {
                 </Box>
 
                 {/* Notification Panel */}
-                {/* <Box bg="white" p={4} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
+                <Box bg="white" p={4} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
+                  {/* <FloorWiseNotificationPanal sensorData={floorSummaryData} /> */}
+                {floor === "Upper Ground Floor" ? (
                   <FloorWiseNotificationPanal sensorData={floorSummaryData} />
-                </Box> */}
+                ) : null}
+                </Box>
               </Box>
             </Box>
 
