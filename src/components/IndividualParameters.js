@@ -102,7 +102,7 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
   const statusMap = {
     "Detector Ready": (v) => {
       const val = String(v).toLowerCase();
-      return val === "true" || val === "ready" ? green : yellow;
+      return val === "false" || val === "ready" ? green : yellow;
     },
     "Device Fault": (v) => {
       const val = String(v).toLowerCase();
@@ -113,18 +113,28 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
       return val === "clear" || val === "ok" ? green : yellow;
     },
 
+     "Lack Of Hydrogen": (v) =>{
+      const val = String(v).toLowerCase();
+      return val === "no need" || val === "no" ? green : yellow;
+    },
+
+    "Laser Current": (v) =>{
+      const val = String(v).toLowerCase();
+      return val === "no fault" || val === parseFloat(v) > 0 ? green : yellow;
+    },
+
+    
+
     "Power Supply Too Low": (v) => String(v).toLowerCase() === "false" ? green : yellow,
     "Algorithm Alarm Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
     "Pressure": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "Laser Power": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
-    "Laser Current": (v) => parseFloat(v) > 0 ? green : yellow,
     "Background Light Monitor": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "Low Battery": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "DET 01 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
     "System Error": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
     "DET 02 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
     "Purge": (v) => String(v).toLowerCase() === "not required" ? green : yellow,
-    "Lack Of Hydrogen": (v) => String(v).toLowerCase() === "no need" ? green : yellow,
     "Maintenance Required": (v) => String(v).toLowerCase() === "not required" ? green : yellow,
     "Test Mode in Progress": (v) => String(v).toLowerCase() === "on" ? green : yellow,
     "Low Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
@@ -133,6 +143,13 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
     "High Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
     "SD card Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
     // "Mother Board Controller Status": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
+    "Hydrogen Lack": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
+    "Device Defect": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
+    "Maintenance Request": (v) => String(v).toLowerCase() === "Not Requested" ? green : yellow,
+    "Waiting": (v) => String(v).toLowerCase() === "false" ? green : yellow,
+    "Waking State": (v) => String(v).toLowerCase() === "false" ? green : yellow,
+    "Test Mode": (v) => String(v).toLowerCase() === "na" ? green : yellow,
+
   };
 
   const normalizedValue = String(value).toLowerCase();
