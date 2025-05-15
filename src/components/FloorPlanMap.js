@@ -18,6 +18,8 @@ import greyBio from "../assets/greyBio.svg"; // Inactive - Bio
 import greyChemical from "../assets/greyChem.svg"; // Inactive - Chem
 import greyRadio from "../assets/greyRadio.svg"; // Inactive - Rad
 
+import { routeName } from "../utils/RouteUtils"; // Route mapping
+
 
 const imageBounds = [[0, 0], [775, 825]]; // [height, width]
 
@@ -54,19 +56,6 @@ const sensorPositions = {
   68: [605, 263],   // AP4C - u //Done
 };
 
-// Determine route by detector name
-const routeName = (detector) => {
-  const routes = {
-    AGM: "agmindividual",
-    "AP4C-F": "AP4CIndividual",
-    FCAD: "FCADIndividual",
-    PRM: "PRMIndividual",
-    VRM: "vrmIndividual",
-    IBAC: "ibacIndividual",
-    MAB: "MABIndividual"
-  };
-  return routes[detector] || null;
-};
 
 // Get icon by sensor type and status
 const getIconByStatus = (detector_type, status) => {
