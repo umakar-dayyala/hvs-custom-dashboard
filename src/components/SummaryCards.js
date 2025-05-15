@@ -81,6 +81,9 @@ const SummaryCards = () => {
           <Grid container spacing={1}>
             {["Total Sensor", "Chemical", "Biological", "Radiological"].map((label, i) => (
               <Grid item xs={3} key={label}>
+                {/* Enablen when they want to show generic */}
+            {/* {["Total Sensor", "Chemical", "Biological", "Radiological","Generic"].map((label, i) => (
+              <Grid item xs={2.4} key={label}> */}
                 <Typography variant="subtitle1" fontWeight="bold" color="#333">
                   {label}
                 </Typography>
@@ -106,6 +109,12 @@ const SummaryCards = () => {
                 {data.total_radiation}
               </Typography>
             </Grid>
+             {/* Enablen when they want to show generic */}
+            {/* <Grid item xs={3}>
+              <Typography variant="h5" fontWeight="bold" color="#333">
+                {data.total_radiation}
+              </Typography>
+            </Grid> */}
           </Grid>
         </Paper>
       </Grid>
