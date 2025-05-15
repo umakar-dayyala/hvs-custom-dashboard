@@ -68,7 +68,8 @@ const FloorCards = ({ floorData }) => {
           const inActiveSensor = (floor.disconnected_sensors ?? 0) + (floor.inactiveSensors ?? 0);
           const totalAlarms = (floor.biological_alarms ?? 0) + (floor.chemical_alarms ?? 0) + (floor.radiological_alarms ?? 0);
           // const totalSensors = (floor.activeSensors ?? 0) + inActiveSensor + (floor.unhealthySensors ?? 0);
-          const totalSensors = (floor.totalSensors ?? 0) + inActiveSensor;
+          //const totalSensors = (floor.totalSensors ?? 0) + inActiveSensor;
+          const totalSensors = floor.totalSensors;
 
           const borderColor =
             totalAlarms > 0 ? "red" :
@@ -218,7 +219,7 @@ const FloorCards = ({ floorData }) => {
                           Total
                         </HvTypography>
                         <HvTypography variant="caption" style={{ fontWeight: 'bold', color: '#000' }}>
-                          {totalSensors}
+                          {floor.totalSensors}
                         </HvTypography>
                       </Box>
                     </Box>
