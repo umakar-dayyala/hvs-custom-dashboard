@@ -64,6 +64,7 @@ const FloorTabs = ({ floorData, onTabChange }) => {
           margin: "4px",
           fontWeight: "bold",
           minWidth: "150px", // Optional: Ensures consistent button width
+          height: "48px",
           "&:hover": {
             backgroundColor: hasAnyAlarm ? "#E30613" : "#28A745",
             borderColor: hasAnyAlarm ? "#E30613" : "#28A745",
