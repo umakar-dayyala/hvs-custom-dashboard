@@ -127,7 +127,7 @@ const SummaryCards = () => {
           </Typography>
           <Grid container spacing={2} alignItems="center">
             <Grid item>
-              <WifiIcon color="primary" />
+              <WifiIcon color="success" />
             </Grid>
             <Grid item>
               {/* <Typography fontWeight="bold">Active: {data.active_sensors }</Typography> */}
