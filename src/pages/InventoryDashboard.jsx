@@ -15,6 +15,7 @@ import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
 import AssetDialog from "../components/AssetDialog";
 import { getInventoryData, addAsset, editAsset, removeAsset } from "../service/InventoryService";
+import Loader from "../components/Loader";
 
 const InventoryDashboard = () => {
   const [allRows, setAllRows] = useState([]);
@@ -382,7 +383,7 @@ const InventoryDashboard = () => {
         <Breadcrumbs />
       </div>
       <Box p={2} mt={2}>
-        {loading && <div>Loading...</div>}
+        {loading && <Loader />}
         <Stack direction="row" justifyContent="space-between" mb={2}>
           <Stack direction="row" spacing={2}>
             <IconButton onClick={() => handleDialogOpen("add")} disabled={loading}>
