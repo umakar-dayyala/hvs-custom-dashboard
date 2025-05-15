@@ -52,6 +52,7 @@ const ScrollingText = () => {
         backgroundColor: hasAlarm ? "#E30613" : "#008000", // Red for alarm, Green for no alarm
         padding: "8px",
         position: "relative",
+        height: "48px", 
         border: hasAlarm ? "2px solid red" : "2px solid green", // Red border for alarm, Green for no alarm
         borderRadius: "5px",
         color: "white", // Text is always white
