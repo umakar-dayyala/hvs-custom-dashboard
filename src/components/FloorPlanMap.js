@@ -147,7 +147,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
                 <p>Status: {sensor.status}</p>
                 <p>Zone: {sensor.zone}</p>
                 <p>Location: {sensor.location}</p>
-                <p>Testing ID : {sensor.device_id}</p>
+                {/* <p>ID : {sensor.device_id}</p> */}
               </div>
             </Popup>
           </Marker>
