@@ -69,7 +69,15 @@ const FloorWiseAlarmPanel = ({ sensorData }) => {
   const detectorTypes = [...new Set(sensorData.map((d) => d.s_no.detector_type))];
 
   return (
-    <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+    <Paper elevation={1}
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        maxHeight: '42vh',
+        overflow: 'hidden',
+      }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography variant="subtitle1" fontWeight="bold">Alarms</Typography>
@@ -84,60 +92,63 @@ const FloorWiseAlarmPanel = ({ sensorData }) => {
       </Box>
 
       <Divider sx={{ my: 1 }} />
-
-      {alarms.length === 0 ? (
-        <Typography variant="subtitle1" color="success.main" align="center" mt={2}>
-          ✅ All good. No active alarms.
-        </Typography>
-      ) : (
-        alarms.map((item, index) => {
-          const { detector, detector_type, alarm_description, location, zone, alarm_start_timestamp, device_id } = item.s_no;
-          return (
-            <Box
-              key={index}
-              bgcolor="#FAFAFA"
-              p={1.5}
-              borderRadius={1}
-              my={1}
-              display="flex"
-              flexDirection="column"
-              gap={0.5}
-              border="1px solid #eee"
-            >
-              <Box display="flex" justifyContent="space-between">
-                <Box display="flex" alignItems="center" gap={1}>
-                <img src={getIconByType(detector_type)} width={20} height={20} />
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight="bold"
-                    sx={{ cursor: "pointer", textDecoration: "underline", color: "red" }}
-                    onClick={() => handleClick({ detector, device_id })} 
-                  >
-                    {detector}
-                  </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', minHeight:'30vh'}}>
+        {alarms.length === 0 ? (
+           <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+          <Typography variant="subtitle1" color="success.main">
+            ✅ All good. No active alarms.
+          </Typography>
+          </Box>
+        ) : (
+          alarms.map((item, index) => {
+            const { detector, detector_type, alarm_description, location, zone, alarm_start_timestamp, device_id } = item.s_no;
+            return (
+              <Box
+                key={index}
+                bgcolor="#FAFAFA"
+                p={1.5}
+                borderRadius={1}
+                my={1}
+                display="flex"
+                flexDirection="column"
+                gap={0.5}
+                border="1px solid #eee"
+              >
+                <Box display="flex" justifyContent="space-between">
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <img src={getIconByType(detector_type)} width={20} height={20} />
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="bold"
+                      sx={{ cursor: "pointer", textDecoration: "underline", color: "red" }}
+                      onClick={() => handleClick({ detector, device_id })}
+                    >
+                      {detector}
+                    </Typography>
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={0.5}>
+                    <AccessTimeIcon fontSize="small" color="disabled" />
+                    <Typography variant="caption" color="textSecondary">
+                      {new Date(alarm_start_timestamp).toLocaleString("en-IN", {
+                        timeZone: "Asia/Kolkata",
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      }).replace(/am|pm/, "").trim()}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  <AccessTimeIcon fontSize="small" color="disabled" />
-                  <Typography variant="caption" color="textSecondary">
-                    {new Date(alarm_start_timestamp).toLocaleString("en-IN", {
-                      timeZone: "Asia/Kolkata",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    }).replace(/am|pm/, "").trim()}
-                  </Typography>
-                </Box>
+                <Typography variant="body2">
+                  {alarm_description || `Alert detected in ${location} - Zone ${zone}`}
+                </Typography>
               </Box>
-              <Typography variant="body2">
-                {alarm_description || `Alert detected in ${location} - Zone ${zone}`}
-              </Typography>
-            </Box>
-          );
-        })
-      )}
+            );
+          })
+        )}
+      </Box>
     </Paper>
   );
 };

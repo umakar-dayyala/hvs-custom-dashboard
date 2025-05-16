@@ -55,7 +55,15 @@ const FloorWiseNotificationPanel = () => {
   const notificationTypes = [...new Set(notifications.map((n) => n.type))];
 
   return (
-    <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+    <Paper elevation={1}
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        maxHeight: '42vh',
+        overflow: 'hidden',
+      }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography variant="subtitle1" fontWeight="bold">
@@ -81,41 +89,45 @@ const FloorWiseNotificationPanel = () => {
 
       <Divider sx={{ my: 1 }} />
 
-      {filteredNotifications.length === 0 ? (
-        <Typography color="textSecondary" align="center" mt={2}>
-          No notifications to display.
-        </Typography>
-      ) : (
-        filteredNotifications.map((n) => (
-          <Box
-            key={n.id}
-            bgcolor="#FAFAFA"
-            p={1.5}
-            borderRadius={1}
-            my={1}
-            display="flex"
-            flexDirection="column"
-            gap={0.5}
-            border="1px solid #eee"
-          >
-            <Box display="flex" justifyContent="space-between">
-              <Box display="flex" alignItems="center" gap={1}>
-                <NotificationsActiveIcon color="primary" fontSize="small" />
-                <Typography variant="body2" fontWeight="bold">
-                  {n.title}
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="center" gap={0.5}>
-                <AccessTimeIcon fontSize="small" color="disabled" />
-                <Typography variant="caption" color="textSecondary">
-                  {timeAgo(n.time)}
-                </Typography>
-              </Box>
-            </Box>
-            <Typography variant="body2">{n.description}</Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', minHeight: '30vh' }}>
+        {filteredNotifications.length === 0 ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+            <Typography color="textSecondary">
+              No notifications to display.
+            </Typography>
           </Box>
-        ))
-      )}
+        ) : (
+          filteredNotifications.map((n) => (
+            <Box
+              key={n.id}
+              bgcolor="#FAFAFA"
+              p={1.5}
+              borderRadius={1}
+              my={1}
+              display="flex"
+              flexDirection="column"
+              gap={0.5}
+              border="1px solid #eee"
+            >
+              <Box display="flex" justifyContent="space-between">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <NotificationsActiveIcon color="primary" fontSize="small" />
+                  <Typography variant="body2" fontWeight="bold">
+                    {n.title}
+                  </Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={0.5}>
+                  <AccessTimeIcon fontSize="small" color="disabled" />
+                  <Typography variant="caption" color="textSecondary">
+                    {timeAgo(n.time)}
+                  </Typography>
+                </Box>
+              </Box>
+              <Typography variant="body2">{n.description}</Typography>
+            </Box>
+          ))
+        )}
+      </Box>
     </Paper>
   );
 };
