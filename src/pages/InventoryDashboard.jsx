@@ -49,7 +49,7 @@ const InventoryDashboard = () => {
   const assetTypes = [
     "VRM", "WRM", "PRM", "AGM", "AP4CF", "IBAC", "MAB", "WM", "FCAD", "AAM",
     "FTIR", "APC", "DO", "PCAD", "GCMS", "RCM", "LRGS", "LDGS", "OM", "ASU",
-    "BAT", "FIS", "ANCM", "ATR", "OTH"
+    "BAT", "FIS", "ANCM", "ATR", "OTH", "Sensor"
   ];
 
   const assetLocations = [
@@ -136,6 +136,7 @@ const InventoryDashboard = () => {
         Attachments: null,
       });
     } else if (type === "edit") {
+      console.log('Editing asset:', asset);
       if (asset?.uniqueAssetID) {
         setFormData({
           asset_type_unique_id: asset.asset_type_unique_id || "",
@@ -239,10 +240,10 @@ const InventoryDashboard = () => {
           asset_serial_number: formData.Asset_Serial_Number || '',
           asset_location: formData.Asset_Location,
           asset_status: formData.Asset_Status,
-          installation_date: formData.installation_date || '2024-01-01',
+          installation_date: formData.installation_date || '',
           camc_period: formData.camc_period || '',
-          warranty_start_date: formData.warranty_start_date || '2024-01-01',
-          warranty_end_date: formData.warranty_end_date || '2026-01-01',
+          warranty_start_date: formData.warranty_start_date || '',
+          warranty_end_date: formData.warranty_end_date || '',
           comments: formData.Comments || '',
           asset_log_date: new Date().toISOString(),
         };
@@ -351,10 +352,43 @@ const InventoryDashboard = () => {
   };
 
   const handleDownload = () => {
-    saveAs(
-      process.env.PUBLIC_URL + "/templates/Inventory-Template.xlsx",
-      "Inventory-Template.xlsx"
-    );
+    const allAssets = allRows.flatMap(row => row.children);
+    const headers = [
+      'asset_type_unique_id',
+      'asset_unique_id',
+      'Asset_Type',
+      'Asset_Name',
+      'Asset_Manufacturer',
+      'Asset_Serial_Number',
+      'Asset_Location',
+      'Asset_Status',
+      'installation_date',
+      'camc_period',
+      'warranty_start_date',
+      'warranty_end_date',
+      'Comments'
+    ];
+    const csvRows = [
+      headers.join(','), // Header row
+      ...allAssets.map(asset => [
+        asset.asset_type_unique_id || '',
+        asset.uniqueAssetID || '',
+        asset.assetType || '',
+        asset.asset_name || '',
+        asset.assetManufacturer || '',
+        asset.assetSerialNumber || '',
+        asset.location || '',
+        asset.status || '',
+        asset.installation_date || '',
+        asset.camc_period || '',
+        asset.warranty_start_date || '',
+        asset.warranty_end_date || '',
+        asset.comments || ''
+      ].map(value => `"${value.replace(/"/g, '""')}"`).join(','))
+    ];
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'Inventory-Data.csv');
   };
 
   const handleSelectChildForEdit = (child) => {
