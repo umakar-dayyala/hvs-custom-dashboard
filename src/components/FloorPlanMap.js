@@ -69,15 +69,36 @@ const getIconByStatus = (detector_type, status) => {
 };
 
 // Generate styled pin icon
-const createPinIcon = (imgUrl, status) => {
+const createPinIcon = (imgUrl, status, alarm_status) => {
   // const backgroundColor = status === "Active" ? "#4CAF50" : "#9E9E9E";
-  const backgroundColor = "white";
+  let backgroundColor;
+  
+  if (alarm_status === "Alarm") {
+    backgroundColor = "red";
+  } else {
+    switch (status) {
+      case "Active":
+        backgroundColor = "green";
+        break;
+      case "Fault":
+        backgroundColor = "#ff9933";
+        break;
+      case "Inactive":
+        backgroundColor = "rgb(128, 128, 128)";
+        break;
+      case "Disconnected":
+        backgroundColor = "rgb(128, 128, 128)";
+      default:
+        backgroundColor = "white";
+    }
+  }
+
   return L.divIcon({
     className: "custom-icon",
     html: `
       <div class="pin-wrapper">
         <div class="pin-body" style="background-color: ${backgroundColor};">
-          <img src="${imgUrl}" class="pin-img" />
+           <img src="${imgUrl}" class="pin-img" style="filter: brightness(0) invert(1);" />
         </div>
       </div>
     `,
@@ -113,7 +134,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         if (!position) return null;
 
         const iconUrl = getIconByStatus(sensor.detector_type, sensor.status);
-        const icon = createPinIcon(iconUrl, sensor.status);
+        const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
 
         return (
           <Marker
@@ -127,15 +148,15 @@ const FloorPlanMap = ({ sensorData = [] }) => {
                   style={{
                     color: "blue",
                     cursor: "pointer",
-                    textDecoration: "underline"
+                    textDecoration: "underline",
                   }}
                   onClick={() => handleClick(sensor)}
                 >
                   {sensor.detector}
                 </strong>
-                <p>Status: {sensor.status}</p>
-                <p>Zone: {sensor.zone}</p>
-                <p>Location: {sensor.location}</p>
+                <p><strong>Status: </strong>{sensor.status}</p>
+                <p><strong>Zone :</strong> {sensor.zone}</p>
+                <p><strong>Location :</strong> {sensor.location}</p>
                 {/* <p>ID : {sensor.device_id}</p> */}
               </div>
             </Popup>
