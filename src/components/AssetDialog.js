@@ -81,10 +81,13 @@ const AssetDialog = ({
       !showConfirm
     ) {
       const children = selectedAsset.children.filter((c) => c && c.uniqueAssetID) || [];
+      const availableAssets = children.filter(
+        (asset) => asset.status?.toLowerCase() !== "removed"
+      );
       return (
         <>
           <p>Select assets to remove:</p>
-          {children.length > 0 ? (
+          {availableAssets.length > 0 ? (
             <Table>
               <TableHead>
                 <TableRow>
@@ -94,7 +97,7 @@ const AssetDialog = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {children.map((c) => (
+                {availableAssets.map((c) => (
                   <TableRow key={c.uniqueAssetID}>
                     <TableCell>
                       <Checkbox
@@ -115,7 +118,7 @@ const AssetDialog = ({
               </TableBody>
             </Table>
           ) : (
-            <p>No child assets available.</p>
+            <p>No assets available for selection.</p>
           )}
         </>
       );
@@ -123,20 +126,44 @@ const AssetDialog = ({
 
     if (type === "remove" && showConfirm) {
       const children = (selectedAsset.children || [])
-        .filter((c) => c && c.uniqueAssetID && selectedChildren.includes(c.uniqueAssetID));
+        .filter(
+          (c) =>
+            c &&
+            c.uniqueAssetID &&
+            selectedChildren.includes(c.uniqueAssetID) &&
+            c.status?.toLowerCase() !== "removed"
+        );
       return (
         <>
           <p>Confirm remove these assets?</p>
-          {children.map((c) => (
-            <div key={c.uniqueAssetID} style={{ marginTop: 12, padding: "8px 12px", background: "#f9f9f9", borderRadius: 6 }}>
-              <strong>Asset Code:</strong> {c.uniqueAssetTypeCode || c.uniqueAssetID || "N/A"}<br />
-              <strong>Type:</strong> {c.assetType || "N/A"}<br />
-              <strong>Status:</strong> {c.status || "N/A"}<br />
-              <strong>Location:</strong> {c.location || "N/A"}<br />
-              <strong>Logged By:</strong> {c.loggedBy || "N/A"}<br />
-              <strong>Log Date:</strong> {c.logDate || "N/A"}
-            </div>
-          ))}
+          {children.length > 0 ? (
+            children.map((c) => (
+              <div
+                key={c.uniqueAssetID}
+                style={{
+                  marginTop: 12,
+                  padding: "8px 12px",
+                  background: "#f9f9f9",
+                  borderRadius: 6,
+                }}
+              >
+                <strong>Asset Code:</strong>{" "}
+                {c.uniqueAssetTypeCode || c.uniqueAssetID || "N/A"}
+                <br />
+                <strong>Type:</strong> {c.assetType || "N/A"}
+                <br />
+                <strong>Status:</strong> {c.status || "N/A"}
+                <br />
+                <strong>Location:</strong> {c.location || "N/A"}
+                <br />
+                <strong>Logged By:</strong> {c.loggedBy || "N/A"}
+                <br />
+                <strong>Log Date:</strong> {c.logDate || "N/A"}
+              </div>
+            ))
+          ) : (
+            <p>No assets to display.</p>
+          )}
         </>
       );
     }
@@ -149,7 +176,15 @@ const AssetDialog = ({
             selectedAsset.assetTypes.map((typeId) => {
               const row = (allRows || []).find((r) => r.uniqueAssetTypeCode === typeId);
               return (
-                <div key={typeId} style={{ marginTop: 12, padding: "8px 12px", background: "#f9f9f9", borderRadius: 6 }}>
+                <div
+                  key={typeId}
+                  style={{
+                    marginTop: 12,
+                    padding: "8px 12px",
+                    background: "#f9f9f9",
+                    borderRadius: 6,
+                  }}
+                >
                   <strong>Asset Type:</strong> {row?.assetType || typeId}
                   <br />
                   <strong>Quantity:</strong> {row?.quantity || "N/A"}
@@ -157,10 +192,21 @@ const AssetDialog = ({
               );
             })
           ) : (
-            <div style={{ marginTop: 12, padding: "8px 12px", background: "#f9f9f9", borderRadius: 6 }}>
-              <strong>Asset Type:</strong> {selectedAsset.assetType?.assetType || selectedAsset.assetType?.uniqueAssetTypeCode || "N/A"}
+            <div
+              style={{
+                marginTop: 12,
+                padding: "8px 12px",
+                background: "#f9f9f9",
+                borderRadius: 6,
+              }}
+            >
+              <strong>Asset Type:</strong>{" "}
+              {selectedAsset.assetType?.assetType ||
+                selectedAsset.assetType?.uniqueAssetTypeCode ||
+                "N/A"}
               <br />
-              <strong>Quantity:</strong> {selectedAsset.assetType?.quantity || "N/A"}
+              <strong>Quantity:</strong>{" "}
+              {selectedAsset.assetType?.quantity || "N/A"}
             </div>
           )}
         </>
@@ -216,7 +262,11 @@ const AssetDialog = ({
             onChange={onChange}
             required
           >
-            {assetTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
+            {assetTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
           </TextField>
 
           <TextField
@@ -228,7 +278,24 @@ const AssetDialog = ({
             onChange={onChange}
             required
           />
-
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Asset Type Unique ID"
+            name="asset_type_unique_id"
+            value={formData.asset_type_unique_id || ""}
+            onChange={onChange}
+            required
+          />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Asset Unique ID"
+            name="asset_unique_id"
+            value={formData.asset_unique_id || ""}
+            onChange={onChange}
+            required
+          />
           <TextField
             fullWidth
             margin="normal"
@@ -237,7 +304,6 @@ const AssetDialog = ({
             value={formData.Asset_Manufacturer || ""}
             onChange={onChange}
           />
-
           <TextField
             fullWidth
             margin="normal"
@@ -246,7 +312,6 @@ const AssetDialog = ({
             value={formData.Asset_Serial_Number || ""}
             onChange={onChange}
           />
-
           <TextField
             select
             fullWidth
@@ -257,9 +322,12 @@ const AssetDialog = ({
             onChange={onChange}
             required
           >
-            {assetLocations.map((loc) => <MenuItem key={loc} value={loc}>{loc}</MenuItem>)}
+            {assetLocations.map((loc) => (
+              <MenuItem key={loc} value={loc}>
+                {loc}
+              </MenuItem>
+            ))}
           </TextField>
-
           <TextField
             select
             fullWidth
@@ -270,9 +338,12 @@ const AssetDialog = ({
             onChange={onChange}
             required
           >
-            {assetStatuses.map((status) => <MenuItem key={status} value={status}>{status}</MenuItem>)}
+            {assetStatuses.map((status) => (
+              <MenuItem key={status} value={status}>
+                {status}
+              </MenuItem>
+            ))}
           </TextField>
-
           <TextField
             fullWidth
             margin="normal"
@@ -283,7 +354,6 @@ const AssetDialog = ({
             onChange={onChange}
             InputLabelProps={{ shrink: true }}
           />
-
           <TextField
             fullWidth
             margin="normal"
@@ -292,7 +362,6 @@ const AssetDialog = ({
             value={formData.camc_period || ""}
             onChange={onChange}
           />
-
           <TextField
             fullWidth
             margin="normal"
@@ -303,7 +372,6 @@ const AssetDialog = ({
             onChange={onChange}
             InputLabelProps={{ shrink: true }}
           />
-
           <TextField
             fullWidth
             margin="normal"
@@ -314,7 +382,6 @@ const AssetDialog = ({
             onChange={onChange}
             InputLabelProps={{ shrink: true }}
           />
-
           <TextField
             fullWidth
             multiline
@@ -325,7 +392,6 @@ const AssetDialog = ({
             value={formData.Comments || ""}
             onChange={onChange}
           />
-
           <Button
             variant="outlined"
             component="label"
@@ -333,7 +399,12 @@ const AssetDialog = ({
             sx={{ mt: 2 }}
           >
             Upload Attachment
-            <input hidden type="file" name="Attachments" onChange={onChange}  />
+            <input
+              hidden
+              type="file"
+              name="Attachments"
+              onChange={onChange}
+            />
           </Button>
           {formData.Attachments ? (
             <p style={{ marginTop: 8 }}>Uploaded: {formData.Attachments.name}</p>
@@ -345,15 +416,23 @@ const AssetDialog = ({
     }
 
     if (type === "remove") {
-      return (
-        <>
-          <p>Confirm remove this asset?</p>
-          <div>
-            <strong>{selectedAsset?.uniqueAssetID || "Unknown"}</strong> —{" "}
-            {selectedAsset?.assetType || "Unknown"}
-          </div>
-        </>
-      );
+      if (selectedAsset?.status?.toLowerCase() === "removed") {
+        return (
+          <>
+            <p>This asset is already removed and cannot be removed again.</p>
+          </>
+        );
+      } else {
+        return (
+          <>
+            <p>Confirm remove this asset?</p>
+            <div>
+              <strong>{selectedAsset?.uniqueAssetID || "Unknown"}</strong> —{" "}
+              {selectedAsset?.assetType || "Unknown"}
+            </div>
+          </>
+        );
+      }
     }
 
     return null;
@@ -440,14 +519,25 @@ const AssetDialog = ({
         </>
       );
     }
-    return (
-      <>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button color="error" onClick={() => onSubmit([selectedAsset])}>
-          Confirm
-        </Button>
-      </>
-    );
+    if (type === "remove") {
+      if (selectedAsset?.status?.toLowerCase() === "removed") {
+        return (
+          <>
+            <Button onClick={onClose}>Close</Button>
+          </>
+        );
+      } else {
+        return (
+          <>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button color="error" onClick={() => onSubmit([selectedAsset])}>
+              Confirm
+            </Button>
+          </>
+        );
+      }
+    }
+    return null;
   };
 
   return (

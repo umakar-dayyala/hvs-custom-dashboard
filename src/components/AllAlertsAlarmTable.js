@@ -112,8 +112,8 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
     return (floorWiseAlertsData || []).flatMap(group =>
       (group.alerts || []).map(alert => ({
         srl: counter++,
-        alarm_timestamp: alert.alarm_timestamp,
-        alarm_desc: alert.alarm_columns,
+        alarm_timestamp: alert.alarm_timestamp || "NA",
+        alarm_desc: alert.alarm_columns || "NA",
         fault_timestamp: alert.fault_timestamp || "NA",
         fault_description: alert.fault_columns || "NA",
         sensor_name: alert.detector,
