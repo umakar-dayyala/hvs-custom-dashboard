@@ -1,13 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Plot from "react-plotly.js";
 import { HvCard, HvTypography } from "@hitachivantara/uikit-react-core";
 import DateTimeRangePicker from "./DateTimeRangePicker";
 import { Box } from "@mui/material";
 
-const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title ,lastFetchTime }) => {
+const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title, lastFetchTime }) => {
   const [selectedRange, setSelectedRange] = useState([null, null]);
   const [rate, setRate] = useState(1);
   const [visibleTraces, setVisibleTraces] = useState({});
+  const [layout, setLayout] = useState({
+    xaxis: {
+      showticklabels: false,
+      title: "",
+      showgrid: false,
+      zeroline: false,
+    },
+    yaxis: { title: "Count" },
+    showlegend: true,
+    legend: { orientation: "h", x: 0.3, y: -0.1, font: { size: 15 }, traceorder: "normal" },
+    margin: { t: 50, b: 80, l: 50, r: 50 },
+    plot_bgcolor: "#F5F6F6",
+  });
+  const [revision, setRevision] = useState(0);
+  const plotRef = useRef(null);
 
   useEffect(() => {
     if (bioParamChartData?.Time?.length > 0) {
@@ -22,7 +37,7 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title ,lastFetchTim
       setVisibleTraces((prev) => {
         const updated = { ...prev };
         newKeys.forEach((key) => {
-          if (!(key in updated)) updated[key] = true; // Default to visible
+          if (!(key in updated)) updated[key] = true;
         });
         return updated;
       });
@@ -70,27 +85,33 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title ,lastFetchTim
     }));
   }
 
-  const layout = {
-    xaxis: {
-      showticklabels: false,
-      title: "",
-      showgrid: false,
-      zeroline: false,
-    },
-    yaxis: { title: "Count" },
-    showlegend: true,
-    legend: { orientation: "h", x: 0.3, y: -0.1, font: { size: 15 }, traceorder: "normal" },
-    margin: { t: 50, b: 80, l: 50, r: 50 },
-    plot_bgcolor: "#F5F6F6",
-  };
-
   const handleLegendClick = (event) => {
     const clickedTraceName = event.data[event.curveNumber].name;
     setVisibleTraces((prev) => ({
       ...prev,
-      [clickedTraceName]: !prev[clickedTraceName], // Toggle trace visibility
+      [clickedTraceName]: !prev[clickedTraceName],
     }));
-    return false; // Prevent default legend click behavior
+    return false;
+  };
+
+  const handleRelayout = (newLayout) => {
+    // Preserve user zoom unless double-clicked
+    if (newLayout["xaxis.range[0]"] && newLayout["xaxis.range[1]"]) {
+      setLayout((prevLayout) => ({
+        ...prevLayout,
+        xaxis: {
+          ...prevLayout.xaxis,
+          range: [newLayout["xaxis.range[0]"], newLayout["xaxis.range[1]"]],
+        },
+      }));
+    } else if (newLayout["xaxis.autorange"]) {
+      setLayout((prevLayout) => {
+        const newLayoutCopy = { ...prevLayout };
+        delete newLayoutCopy.xaxis.range;
+        return newLayoutCopy;
+      });
+    }
+    setRevision((r) => r + 1); // trigger update
   };
 
   return (
@@ -103,8 +124,7 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title ,lastFetchTim
         boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center',paddingTop: '1rem',paddingRight: '1rem' }}>
-        
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', paddingTop: '1rem', paddingRight: '1rem' }}>
         {lastFetchTime && (
           <div style={{ fontSize: '0.8rem', color: '#666' }}>
             Last updated: {lastFetchTime}
@@ -116,15 +136,19 @@ const PlotlyDataChart = ({ bioParamChartData, onRangeChange, title ,lastFetchTim
         <HvTypography variant="title2">{title}</HvTypography>
         <DateTimeRangePicker onChange={handleRangeChange} />
       </Box>
+
       <div style={{ width: "100%", height: "400px", display: "flex", justifyContent: "center", alignItems: "center" }}>
         {traces.length > 0 ? (
           <Plot
+            ref={plotRef}
             config={{ displayModeBar: false }}
             data={traces}
             layout={layout}
+            revision={revision}
             useResizeHandler
             style={{ width: "100%", height: "100%" }}
-            onLegendClick={handleLegendClick} // Handle legend click
+            onLegendClick={handleLegendClick}
+            onRelayout={handleRelayout}
             onRestyle={(data) => {
               if (data[1] && data[1].length > 0) {
                 const updatedVisibility = { ...visibleTraces };

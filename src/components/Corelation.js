@@ -1,90 +1,111 @@
-import { HvCard, HvCardContent, HvTypography } from '@hitachivantara/uikit-react-core'
-import { Box } from '@mui/material'
-import React from 'react'
+import { HvCard, HvCardContent, HvTypography } from "@hitachivantara/uikit-react-core";
+import { Box } from "@mui/material";
+import React from "react";
 
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
+const Corelation = ({ corelationData }) => {
+  const isEmpty = !corelationData || Object.keys(corelationData).length === 0;
 
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-
-
-
-// Styled components for Material-UI table
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: "#000", // Black header
-      color: "#fff", // White text
-      fontWeight: "bold",
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      color: "#000", // Black text for values
-    },
-  }));
-  
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-      backgroundColor: "#f7f7f7", // Light gray background for odd rows
-    },
-    "&:nth-of-type(even)": {
-      backgroundColor: "#ffffff", // White background for even rows
-    },
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
-  
- 
-
-  const Corelation = ({ corelationData }) => {
-    // Check if corelationData is empty or undefined
-    const isEmpty = !corelationData || Object.keys(corelationData).length === 0;
-  
-    return (
-      <Box>
-        <HvCard
-          bgcolor="white"
-          style={{
-            height: "500px",
-            borderRadius: "0px",
-            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-          }}
-          statusColor="red"
-        >
-          <HvCardContent>
-            <Box p={2} >
-                            <HvTypography variant="title2">Correlation Chart</HvTypography>
-                            </Box>
-  
-            {isEmpty ? (
-              <Box flex={1} display="flex" justifyContent="center" alignItems="center">
-              <HvTypography variant="title3" >No data Available</HvTypography>
+  return (
+    <Box>
+      
+      <HvCard
+        bgcolor="white"
+        style={{
+          height: "500px",
+          borderRadius: "0px",
+          boxShadow:
+            "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+        }}
+        statusColor="red"
+      >
+         <Box p={2}>
+                <HvTypography variant="title2">Correlation</HvTypography>
               </Box>
-            ) : (
-              <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
-                <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                  <TableBody>
-                    {Object.entries(corelationData).map(([key, value]) => (
-                      <StyledTableRow key={key}>
-                        <StyledTableCell component="th" scope="row">
-                          {key}
-                        </StyledTableCell>
-                        <StyledTableCell align="right">{value}</StyledTableCell>
-                      </StyledTableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </HvCardContent>
-        </HvCard>
-      </Box>
-    );
-  };
-  
-  export default Corelation ;
-  
+        <HvCardContent>
+          {isEmpty ? (
+            <Box
+              height="100%"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <HvTypography variant="title3">No data available</HvTypography>
+            </Box>
+          ) : (
+            <>
+             
+
+              <Box textAlign="center" mb={2}>
+                <HvTypography variant="title3">
+                  Floor | Zone | Location
+                </HvTypography>
+              </Box>
+
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                gap={4}
+                flexWrap="wrap"
+              >
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  gap={1}
+                >
+                  <Box
+                    sx={{
+                      backgroundColor: "red",
+                      width: { xs: 120, sm: 150, md: 200 },
+                      height: { xs: 120, sm: 150, md: 200 },
+                      color: "white",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    Alarm CN
+                    <br />
+                    (Cyanide)
+                  </Box>
+                  <HvTypography>AP4C - F</HvTypography>
+                </Box>
+
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  gap={1}
+                >
+                  <Box
+                    sx={{
+                      backgroundColor: "green",
+                      width: { xs: 120, sm: 150, md: 200 },
+                      height: { xs: 120, sm: 150, md: 200 },
+                      color: "white",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    No Alarm
+                  </Box>
+                  <HvTypography>FCAD</HvTypography>
+                </Box>
+              </Box>
+            </>
+          )}
+        </HvCardContent>
+      </HvCard>
+    </Box>
+  );
+};
+
+export default Corelation;
