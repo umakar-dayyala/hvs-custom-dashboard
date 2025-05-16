@@ -31,7 +31,7 @@ import SummaryCards from "../components/SummaryCards";
 
 const FloorWiseDashboard = () => {
   const location = useLocation();
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const initialFloor = queryParams.get("floor") || "ALL";
   const [view, setView] = useState("map"); // Default view is "map"
@@ -323,76 +323,77 @@ const FloorWiseDashboard = () => {
       {loading ? (
         <Loader />  // Display loader while fetching data
       ) : (
-      <>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Breadcrumbs />
-          <div style={{ display: "flex", gap: "10px" }}></div>
-        </div>
-        <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
-        <div>
-          {/* <SensorStatusCards /> */}
-          <SummaryCards />
-        </div>
-        <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
-        <Box width="100%">
-          <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
+        <>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Breadcrumbs />
+            <div style={{ display: "flex", gap: "10px" }}></div>
+          </div>
           <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
+          <div>
+            {/* <SensorStatusCards /> */}
+            <SummaryCards />
+          </div>
+          <Divider style={{ border: "1px solid #70707059", margin: "8px 0", marginTop: "2rem" }} />
           <Box width="100%">
-            <FloorSummary data={sensorSummary} sensorCounts={sensorCounts} />
-          </Box>
-          <Box display="flex" justifyContent="flex-start" mb={1} ml={4} mt={2}>
-            <ToggleButtonGroup
-              value={view}
-              exclusive
-              onChange={handleViewChange}
-              aria-label="View Toggle"
-            >
-              <ToggleButton value="map" aria-label="Map View">
-                Map View
-              </ToggleButton>
-              <ToggleButton value="grid" aria-label="Grid View">
-                Grid View
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
-          <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
-            {/* Floor Plan Map on the left */}
-            <Box flex="1.5" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
-            {view === "map" ? (
-                <FloorPlanMap sensorData={floorSummaryData} />
-              ) : (
-                <FloorWiseStatusGrid sensorData={floorSummaryData}/>
-              )}
+            <FloorTabs floorData={floorData} onTabChange={handleTabClick} />
+            <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
+            <Box width="100%">
+              <FloorSummary data={sensorSummary} sensorCounts={sensorCounts} />
             </Box>
-
-            {/* Alarm + Notification Panels on the right, stacked vertically */}
-            <Box
-              flex="1"
-              display="flex"
-              flexDirection="column"
-              gap={2}
-              bg="transparent"
-              minW="300px"
-              minHeight="90vh"
-            >
-              {/* Alarm Panel */}
-              <Box bg="white" p={2} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
-                <FloorWiseAlarmPanel sensorData={floorSummaryData} />
+            <Box display="flex" justifyContent="flex-start" mb={1} ml={4} mt={2}>
+              <ToggleButtonGroup
+                value={view}
+                exclusive
+                onChange={floor === "Upper Ground Floor" ? handleViewChange : () => { }}
+                aria-label="View Toggle"
+                disabled={floor !== "Upper Ground Floor"}  // Disable for other floors
+              >
+                <ToggleButton value="map" aria-label="Map View">
+                  Map View
+                </ToggleButton>
+                <ToggleButton value="grid" aria-label="Grid View">
+                  Grid View
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+            <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
+              {/* Floor Plan Map on the left */}
+              <Box flex="1.5" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
+                {view === "grid" ? (
+                  <FloorPlanMap sensorData={floorSummaryData} />
+                ) : (
+                  <FloorWiseStatusGrid sensorData={floorSummaryData} />
+                )}
               </Box>
 
-              {/* Notification Panel */}
-              <Box bg="white" p={1} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
-                {/* <FloorWiseNotificationPanal sensorData={floorSummaryData} /> */}
-                {floor === "Upper Ground Floor" ? (
-                  <FloorWiseNotificationPanal sensorData={floorSummaryData} />
-                ) : null}
+              {/* Alarm + Notification Panels on the right, stacked vertically */}
+              <Box
+                flex="1"
+                display="flex"
+                flexDirection="column"
+                gap={2}
+                bg="transparent"
+                minW="300px"
+                minHeight="90vh"
+              >
+                {/* Alarm Panel */}
+                <Box bg="white" p={2} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
+                  <FloorWiseAlarmPanel sensorData={floorSummaryData} />
+                </Box>
+
+                {/* Notification Panel */}
+                <Box bg="white" p={1} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
+                  {/* <FloorWiseNotificationPanal sensorData={floorSummaryData} /> */}
+                  {floor === "Upper Ground Floor" ? (
+                    <FloorWiseNotificationPanal sensorData={floorSummaryData} />
+                  ) : null}
+                </Box>
               </Box>
             </Box>
-          </Box>
 
-        </Box>
-      </>
-      )} 
+          </Box>
+        </>
+      )}
     </Box>
   );
 };

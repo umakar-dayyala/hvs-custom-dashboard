@@ -119,6 +119,7 @@ const InventoryTable = ({
                               "Asset Type",
                               "Asset Manufacturer",
                               "Asset Serial Number",
+                              "Asset Name",
                               "Logged By",
                               "Log Date",
                               "Location",
@@ -140,10 +141,11 @@ const InventoryTable = ({
                               <HvTableCell>{c.assetType}</HvTableCell>
                               <HvTableCell>{c.assetManufacturer || "N/A"}</HvTableCell>
                               <HvTableCell>{c.assetSerialNumber || "N/A"}</HvTableCell>
+                              <HvTableCell>{c.asset_name || "N/A"}</HvTableCell> 
                               <HvTableCell>{c.loggedBy}</HvTableCell>
                               <HvTableCell>{c.logDate}</HvTableCell>
-                              <HvTableCell>{c.location}</HvTableCell>      {/* Changed from c.assetLocation */}
-                              <HvTableCell>{c.status}</HvTableCell>        {/* Changed from c.assetStatus */}
+                              <HvTableCell>{c.location}</HvTableCell>      
+                              <HvTableCell>{c.status}</HvTableCell>        
                               <HvTableCell>{c.comments || "N/A"}</HvTableCell>
                               <HvTableCell>{c.attachments || "None"}</HvTableCell>
                               <HvTableCell>
