@@ -122,7 +122,7 @@ const InventoryDashboard = () => {
       setFormData({
         asset_type_unique_id: '',
         asset_unique_id: '',
-        Asset_Type: '',
+        Asset_Type: asset?.assetType || '',
         Asset_Name: '',
         Asset_Manufacturer: '',
         Asset_Serial_Number: '',
@@ -211,7 +211,7 @@ const InventoryDashboard = () => {
         // Validate required fields
         const requiredFields = {
           'Asset Type': formData.Asset_Type,
-          'Asset Name': formData.Asset_Name,
+          'Asset Unique ID': formData.asset_unique_id,
           'Asset Location': formData.Asset_Location,
           'Asset Status': formData.Asset_Status,
         };
@@ -235,15 +235,15 @@ const InventoryDashboard = () => {
           asset_unique_id: formData.asset_unique_id || '',
           asset_type: formData.Asset_Type,
           asset_quantity: 1,
-          asset_name: formData.Asset_Name,
-          asset_manufacterer: formData.Asset_Manufacturer || '', // Match working example
+          asset_name: formData.Asset_Name || '',
+          asset_manufacterer: formData.Asset_Manufacturer || '', 
           asset_serial_number: formData.Asset_Serial_Number || '',
           asset_location: formData.Asset_Location,
           asset_status: formData.Asset_Status,
-          installation_date: formData.installation_date || '',
+          installation_date: formData.installation_date || null,
           camc_period: formData.camc_period || '',
-          warranty_start_date: formData.warranty_start_date || '',
-          warranty_end_date: formData.warranty_end_date || '',
+          warranty_start_date: formData.warranty_start_date || null,
+          warranty_end_date: formData.warranty_end_date || null,
           comments: formData.Comments || '',
           asset_log_date: new Date().toISOString(),
         };
@@ -279,7 +279,6 @@ const InventoryDashboard = () => {
         // Validate required fields
         const requiredFields = {
           'Asset Type': formData.Asset_Type,
-          'Asset Name': formData.Asset_Name,
           'Asset Location': formData.Asset_Location,
           'Asset Status': formData.Asset_Status,
         };

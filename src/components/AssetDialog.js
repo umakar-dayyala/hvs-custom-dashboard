@@ -13,7 +13,39 @@ import {
   TableHead,
   TableRow,
   Checkbox,
+  Typography,
 } from "@mui/material";
+
+// Utility function to format date to ISO (YYYY-MM-DDTHH:mm:ss.sss)
+const formatToISO = (dateTimeString) => {
+  if (!dateTimeString) return "";
+  try {
+    const date = new Date(dateTimeString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().slice(0, -1); // Returns YYYY-MM-DDTHH:mm:ss.sss
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "";
+  }
+};
+
+// Utility function to format ISO to datetime-local input format (YYYY-MM-DDTHH:mm)
+const formatForDateTimeLocal = (isoString) => {
+  if (!isoString) return "";
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  } catch (error) {
+    console.error("Error formatting for datetime-local:", error);
+    return "";
+  }
+};
 
 const AssetDialog = ({
   open,
@@ -47,9 +79,7 @@ const AssetDialog = ({
 
   const validateForm = () => {
     if (!formData.Asset_Type) return "Asset Type is required";
-    if (!formData.Asset_Name) return "Asset Name is required";
-    if (!formData.Asset_Location) return "Asset Location is required";
-    if (!formData.Asset_Status) return "Asset Status is required";
+    if (!formData.asset_unique_id) return "Asset Unique ID is required";
     return null;
   };
 
@@ -72,6 +102,31 @@ const AssetDialog = ({
       onSubmit([typeId].filter(Boolean));
     }
     onClose();
+  };
+
+  // Modified onChange handler to format date-time fields
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    let formattedValue = value;
+
+    // Format date-time fields to ISO
+    if (
+      ["installation_date", "warranty_start_date", "warranty_end_date"].includes(
+        name
+      )
+    ) {
+      formattedValue = formatToISO(value);
+      console.log(`Formatted ${name}:`, formattedValue); // Debug log
+    } else if (name === "Attachments" && files?.length) {
+      formattedValue = files[0];
+    }
+
+    onChange({
+      target: {
+        name,
+        value: formattedValue,
+      },
+    });
   };
 
   const renderContent = () => {
@@ -135,7 +190,9 @@ const AssetDialog = ({
         );
       return (
         <>
-          <p>Confirm remove these assets?</p>
+          <Typography variant="subtitle1" color="error.main">
+            Confirm remove these assets?
+          </Typography>
           {children.length > 0 ? (
             children.map((c) => (
               <div
@@ -171,7 +228,9 @@ const AssetDialog = ({
     if (type === "remove_types" && !showConfirm) {
       return (
         <>
-          <p>Confirm remove the following asset types?</p>
+          <Typography variant="subtitle1" color="error.main">
+            Confirm remove the following asset types?
+          </Typography>
           {selectedAsset.type === "all" ? (
             selectedAsset.assetTypes.map((typeId) => {
               const row = (allRows || []).find((r) => r.uniqueAssetTypeCode === typeId);
@@ -260,6 +319,7 @@ const AssetDialog = ({
             name="Asset_Type"
             value={formData.Asset_Type || ""}
             onChange={onChange}
+            disabled={type === "edit"}
             required
           >
             {assetTypes.map((type) => (
@@ -276,7 +336,7 @@ const AssetDialog = ({
             name="Asset_Name"
             value={formData.Asset_Name || ""}
             onChange={onChange}
-            required
+          // required
           />
           <TextField
             fullWidth
@@ -285,6 +345,7 @@ const AssetDialog = ({
             name="asset_type_unique_id"
             value={formData.asset_type_unique_id || ""}
             onChange={onChange}
+            disabled={type === "edit"}
             required
           />
           <TextField
@@ -349,9 +410,9 @@ const AssetDialog = ({
             margin="normal"
             label="Installation Date"
             name="installation_date"
-            type="date"
-            value={formData.installation_date || ""}
-            onChange={onChange}
+            type="datetime-local"
+            value={formatForDateTimeLocal(formData.installation_date)}
+            onChange={handleChange}
             InputLabelProps={{ shrink: true }}
           />
           <TextField
@@ -367,9 +428,9 @@ const AssetDialog = ({
             margin="normal"
             label="Warranty Start Date"
             name="warranty_start_date"
-            type="date"
-            value={formData.warranty_start_date || ""}
-            onChange={onChange}
+            type="datetime-local"
+            value={formatForDateTimeLocal(formData.warranty_start_date)}
+            onChange={handleChange}
             InputLabelProps={{ shrink: true }}
           />
           <TextField
@@ -377,9 +438,9 @@ const AssetDialog = ({
             margin="normal"
             label="Warranty End Date"
             name="warranty_end_date"
-            type="date"
-            value={formData.warranty_end_date || ""}
-            onChange={onChange}
+            type="datetime-local"
+            value={formatForDateTimeLocal(formData.warranty_end_date)}
+            onChange={handleChange}
             InputLabelProps={{ shrink: true }}
           />
           <TextField
@@ -425,7 +486,9 @@ const AssetDialog = ({
       } else {
         return (
           <>
-            <p>Confirm remove this asset?</p>
+            <Typography variant="subtitle1" color="error.main">
+              Confirm remove this asset?  
+            </Typography>
             <div>
               <strong>{selectedAsset?.uniqueAssetID || "Unknown"}</strong> —{" "}
               {selectedAsset?.assetType || "Unknown"}
