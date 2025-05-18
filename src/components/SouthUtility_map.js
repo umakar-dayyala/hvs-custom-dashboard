@@ -25,6 +25,7 @@ const imageBounds = [[0, 0], [775, 825]];
 // Sensor positions
 const sensorPositions = {
 
+    //SENSOR NAMES are not updated
     41: [185, 175],     // AP4C - 1 > DONE  
     1161: [190, 180],    // AP4C - 2 > DONE  
     2207: [165, 180],   // FCAD - 3 >  DONE
