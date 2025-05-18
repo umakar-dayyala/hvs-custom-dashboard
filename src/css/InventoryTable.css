@@ -9,6 +9,15 @@
     width: 100%;
   }
   
+  .commentCell {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: 200px;
+    word-wrap: break-word;
+    line-height: 1.4;
+  }
+  
   .tableContainer {
     overflow: auto;
     max-height: calc(100vh - 120px);

@@ -49,7 +49,7 @@ const InventoryDashboard = () => {
   const assetTypes = [
     "VRM", "WRM", "PRM", "AGM", "AP4CF", "IBAC", "MAB", "WM", "FCAD", "AAM",
     "FTIR", "APC", "DO", "PCAD", "GCMS", "RCM", "LRGS", "LDGS", "OM", "ASU",
-    "BAT", "FIS", "ANCM", "ATR", "OTH", "Sensor"
+    "BAT", "FIS", "ANCM", "ATR", "Area Gamma Monitor","FPD based CWA Detector", "OTH", "Sensor"
   ];
 
   const assetLocations = [
@@ -279,7 +279,7 @@ const InventoryDashboard = () => {
         // Validate required fields
         const requiredFields = {
           'Asset Type': formData.Asset_Type,
-          'Asset Location': formData.Asset_Location,
+          // 'Asset Location': formData.Asset_Location,
           'Asset Status': formData.Asset_Status,
         };
 
@@ -303,7 +303,7 @@ const InventoryDashboard = () => {
           asset_unique_id: formData.asset_unique_id || '',
           asset_type: formData.Asset_Type,
           asset_quantity: 1,
-          asset_name: formData.Asset_Name,
+          asset_name: formData.Asset_Name || '',
           asset_manufacterer: formData.Asset_Manufacturer || '',
           asset_serial_number: formData.Asset_Serial_Number || '',
           asset_location: formData.Asset_Location,
