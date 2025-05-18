@@ -25,18 +25,18 @@ const imageBounds = [[0, 0], [775, 825]];
 // Sensor positions
 const sensorPositions = {
 
-    41: [530, 130],     // AP4C - 1 > DONE
-    1161: [620, 415],     // AP4C - 2 > DONE
-    2207: [620, 400],   // FCAD - 3 >DONE
-    42: [496, 749],     // AP4C - 4 > DONE
-    57: [470, 740],   // IBAC - 5 > DONE
-    125: [210, 695],      // AP4C - 6 > DONE
-    43: [220, 690],    // MAB - 7 > DONE
-    1164: [120, 410],     // AP4C - 8 > DONE
-    5: [210, 90],      // AP4C - 9
-    2208: [215, 688],  // FCAD - x > DONE
-    126: [200, 100],   // FCAD - y
-    44: [210, 100],   // IBAC - z (IBAC-IBAC), pseudo device_id
+    41: [185, 175],     // AP4C - 1 > DONE  
+    1161: [190, 180],    // AP4C - 2 > DONE  
+    2207: [165, 180],   // FCAD - 3 >  DONE
+    42: [175, 185],     // AP4C - 4 >  DONE 
+    57: [175, 190],   // IBAC - 5 >   DONE
+    125: [190, 185],      // AP4C - 6 > DONE  
+    43: [550, 610],    // MAB - 7 > DONE  
+    1164: [530, 615],     // AP4C - 8 >  DONE 
+    5: [525, 610],      // AP4C - 9 DONE
+    2208: [530, 605],  // FCAD - x >   
+    126: [540, 602],   // FCAD - y
+    44: [550, 602],   // IBAC - z (IBAC-IBAC), pseudo device_id
     
   };
   
