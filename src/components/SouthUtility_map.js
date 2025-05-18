@@ -115,7 +115,7 @@ const createGateIcon = (label) =>
   });
 
 const FloorPlanMap = ({ sensorData = [] }) => {
-  console.log("Terrace Opened:");
+  console.log("SOUTH UTILITY Opened:");
   const navigate = useNavigate();
 
   const handleClick = (sensor) => {
