@@ -24,36 +24,23 @@ const imageBounds = [[0, 0], [775, 825]];
 
 // Sensor positions
 const sensorPositions = {
-  1159: [395, 113],
-  49: [400, 123],
-  15: [533, 163],
-  3: [598, 492],
-  146: [598, 486],
-  65: [592, 481],
-  2187: [588, 478],
-  2186: [620, 373],
-  33: [585, 502],
-  34: [352, 755],
-  53: [359, 745],
-  113: [350, 745],
-  145: [580, 499],
-  35: [340, 755],
-  66: [340, 745],
-  2188: [330, 745],
-  2189: [245, 565],
-  36: [135, 457],
-  2190: [139, 463],
-  90: [146, 470],
-  67: [156, 466],
-  37: [140, 450],
-  50: [146, 445],
-  2191: [117, 322],
-  38: [379, 113],
-  2192: [233, 140],
-  69: [185, 207],
-  3183: [190, 211],
-  68: [605, 263],
+
+    //SENSOR NAMES are not updated
+    46: [560, 160],     // AP4C - a >  
+    45: [565, 168],     // AP4C - b >  
+    1165: [565, 180],   // FCAD - c > 
+    1149: [552, 160],      // AP4C - d >  
+    127: [550, 166],   // IBAC - e >  
+    2209: [545, 172],      // AP4C - f >  
+    52: [196, 590],    // MAB - g >  
+    2210: [205, 585],     // AP4C - h >  
+    47: [210, 585],      // AP4C - i
+    1166: [215, 589],  // FCAD - j >  
+    12:[215, 593],   // FCAD - k
+    48: [210, 593],   // IBAC - l 
+
 };
+  
 
 // Gate label positions
 const gatePositions = {
@@ -128,7 +115,8 @@ const createGateIcon = (label) =>
     iconAnchor: [30, 10],
   });
 
-const UGFFloorMap = ({ sensorData = [] }) => {
+const FloorPlanMap = ({ sensorData = [] }) => {
+  console.log("NORTH UTILITY Opened:");
   const navigate = useNavigate();
 
   const handleClick = (sensor) => {
@@ -147,17 +135,7 @@ const UGFFloorMap = ({ sensorData = [] }) => {
       minZoom={-2}
       maxZoom={2}
     >
-      <ImageOverlay url="/UGF_map.png" bounds={imageBounds} />
-
-      {/* Gate markers
-      {Object.entries(gatePositions).map(([key, position]) => (
-        <Marker
-          key={key}
-          position={position}
-          icon={createGateIcon(key.replace(/([A-Z])/g, ' $1').toUpperCase())}
-          interactive={false}
-        />
-      ))} */}
+      <ImageOverlay url="/NU_map.png" bounds={imageBounds} />
 
       {/* Sensor markers */}
        {Array.isArray(sensorData) && sensorData.map((entry) => {
@@ -185,6 +163,7 @@ const UGFFloorMap = ({ sensorData = [] }) => {
                 <p><strong>Status:</strong> {sensor.status}</p>
                 <p><strong>Zone:</strong> {sensor.zone}</p>
                 <p><strong>Location:</strong> {sensor.location}</p>
+                <p><strong>Device ID:</strong> {sensor.device_id}</p>
               </div>
             </Popup>
           </Marker>
@@ -194,4 +173,4 @@ const UGFFloorMap = ({ sensorData = [] }) => {
   );
 };
 
-export default UGFFloorMap;
+export default FloorPlanMap;

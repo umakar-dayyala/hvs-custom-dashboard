@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Divider } from "@mui/material";
@@ -26,6 +27,12 @@ import Loader from "../components/Loader";  // Import the Loader component
 import FloorWiseStatusGrid from "../components/FloorWiseStatusGrid";
 import FloorWiseAlarmPanel from "../components/FloorWiseAlarmPanel";
 import FloorPlanMap from "../components/FloorPlanMap";
+import UGFFloorMap from "../components/UGFFloorMap";
+import LGFFloorMap from "../components/LGFFloorMap";
+import TerraceMap from "../components/TerraceMap";
+import FirstFloorMap from "../components/FirstFloorMap";
+import SouthUtilityMap from "../components/SouthUtility_map";
+import NorthUtilityMap from "../components/NorthUtility_map";
 import FloorWiseNotificationPanal from "../components/FloorWiseNotificationPanal";
 import SummaryCards from "../components/SummaryCards";
 
@@ -46,6 +53,7 @@ const FloorWiseDashboard = () => {
   const [sensorTypeData, setSensorTypeData] = useState([]);
   const [sensorNameData, setSensorNameData] = useState([]);
   const [sensorStatusData, setSensorStatusData] = useState([]);
+  const [utilityView, setUtilityView] = useState("north"); // Default to "North"
 
   // New loading state
   const [loading, setLoading] = useState(true);
@@ -63,7 +71,11 @@ const FloorWiseDashboard = () => {
     sensor: [],
     sensorStatus: [],
   };
-
+  const handleUtilityViewChange = (event, newView) => {
+    if (newView !== null) {
+      setUtilityView(newView);
+    }
+  };
   const [filters, setFilters] = useState(defaultFilters);
 
   const formatFilter = (filterArray) =>
@@ -340,13 +352,14 @@ const FloorWiseDashboard = () => {
             <Box width="100%">
               <FloorSummary data={sensorSummary} sensorCounts={sensorCounts} />
             </Box>
-            <Box display="flex" justifyContent="flex-start" mb={1} ml={4} mt={2}>
+            <Box display="flex" justifyContent="flex-start" gap={2} mb={1} ml={4} mt={3}>
+
               <ToggleButtonGroup
                 value={view}
                 exclusive
-                onChange={floor === "Upper Ground Floor" ? handleViewChange : () => { }}
+                onChange={handleViewChange}
                 aria-label="View Toggle"
-                disabled={floor !== "Upper Ground Floor"}  // Disable for other floors
+                disabled={!["Upper Ground Floor", "Lower Ground Floor", "First Floor", "Terrace", "Utility Blocks"].includes(floor)}
               >
                 <ToggleButton value="map" aria-label="Map View">
                   Map View
@@ -355,16 +368,55 @@ const FloorWiseDashboard = () => {
                   Grid View
                 </ToggleButton>
               </ToggleButtonGroup>
+              {/* Utility Floor Toggle (North/South) */}
+              {floor === "Utility Blocks" && (
+                <ToggleButtonGroup
+                  value={utilityView}
+                  exclusive
+                  onChange={handleUtilityViewChange}
+                  aria-label="Utility Floor View Toggle"
+                >
+                  <ToggleButton value="north" aria-label="North View">
+                    North
+                  </ToggleButton>
+                  <ToggleButton value="south" aria-label="South View">
+                    South
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              )}
             </Box>
             <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
               {/* Floor Plan Map on the left */}
+              {/* <Box flex="1.5" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
+                {view === "map" ? (
+                  <LGFFloorMap sensorData={formatTestData} />
+                  // <FloorPlanMap sensorData={formatTestData} />
+                ) : (
+                  <FloorWiseStatusGrid sensorData={floorSummaryData} />
+                )}
+              </Box> */}
               <Box flex="1.5" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
-                {view === "grid" ? (
-                  <FloorPlanMap sensorData={floorSummaryData} />
+                {view === "map" && ["Upper Ground Floor", "Lower Ground Floor", "First Floor", "Terrace", "Utility Blocks"].includes(floor) ? (
+                  floor === "Utility Blocks" ? (
+                    utilityView === "north" ? (
+                      <NorthUtilityMap sensorData={floorSummaryData} />
+                    ) : (
+                      <SouthUtilityMap sensorData={floorSummaryData} />
+                    )
+                  ) : floor === "Upper Ground Floor" ? (
+                    <UGFFloorMap sensorData={floorSummaryData} />
+                  ) : floor === "Lower Ground Floor" ? (
+                    <LGFFloorMap sensorData={floorSummaryData} />
+                  ) : floor === "Terrace" ? (
+                    <TerraceMap sensorData={floorSummaryData} />
+                  ) : floor === "First Floor" ? (
+                    <FirstFloorMap sensorData={floorSummaryData} />
+                  ) : null
                 ) : (
                   <FloorWiseStatusGrid sensorData={floorSummaryData} />
                 )}
               </Box>
+
 
               {/* Alarm + Notification Panels on the right, stacked vertically */}
               <Box

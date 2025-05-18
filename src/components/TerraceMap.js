@@ -149,10 +149,10 @@ const FloorPlanMap = ({ sensorData = [] }) => {
       minZoom={-2}
       maxZoom={2}
     >
-      <ImageOverlay url="/Terrace_map.png" bounds={imageBounds} />
+      <ImageOverlay url="/Terrace_PNG.png" bounds={imageBounds} />
 
       {/* Sensor markers */}
-      {sensorData.map((entry) => {
+      {Array.isArray(sensorData) && sensorData.map((entry) => {
         const sensor = entry.s_no;
         const position = sensorPositions[sensor.device_id];
         if (!position) return null;
