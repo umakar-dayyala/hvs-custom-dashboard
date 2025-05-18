@@ -127,7 +127,7 @@ const SummaryCards = () => {
             p: 2,
             borderRadius: 2,
             border: "1px solid #ddd",
-            borderTop: `5px solid ${data?.cbrn_alarms > 0 ? "red" : "#28a745"}`,
+            borderTop: `5px solid ${data?.unhealthy_sensors > 0 ? "#ff9933" : "#28a745"}`,
             minHeight: 120,
           }}
         >
