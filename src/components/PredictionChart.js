@@ -89,7 +89,7 @@ const PredictionChart = ({ intensityData }) => {
               justifyContent="space-between"
               alignItems="center"
             >
-              <HvTypography variant="title2">Predictive Analytics</HvTypography>
+              
               <Box display="flex" alignItems="center" gap={1}>
                 <HvTypography variant="label">Enable</HvTypography>
                 <Switch

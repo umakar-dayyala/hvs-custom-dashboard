@@ -27,6 +27,23 @@ export const fetchMABParamChartData = async (deviceId, fromTime, toTime) => {
 };
 
 
+export const fetchASUData = async (deviceId) => {
+  try {
+    const url = `${API_BASE_URL}/getAsm`;
+    const params = {
+      param_device_id: deviceId,
+    };
+    const response = await axios.get(url, { params });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching bio param chart data:", error);
+    throw error;
+  }
+};
+
+
+
+
 export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
   try {
       const url = `${API_BASE_URL}/getMabChartAnomaly`;
