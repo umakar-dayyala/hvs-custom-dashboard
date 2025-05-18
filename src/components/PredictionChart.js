@@ -1,22 +1,28 @@
+import React, { useState, useMemo } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Box,
+  Paper,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { styled } from "@mui/material/styles";
+import { tableCellClasses } from "@mui/material/TableCell";
 import {
   HvCard,
   HvCardContent,
   HvTypography,
-  HvToggleButton,
 } from "@hitachivantara/uikit-react-core";
-import { Box, Switch } from "@mui/material";
-import React, { useState } from "react";
 
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-
-// Styled components for Material-UI table
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+// ── styled table cells/rows ──────────────────────────────────────────
+const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#000",
     color: "#fff",
@@ -28,106 +34,111 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: "#f7f7f7",
-  },
-  "&:nth-of-type(even)": {
-    backgroundColor: "#ffffff",
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
+const StyledTableRow = styled(TableRow)(() => ({
+  "&:nth-of-type(odd)": { backgroundColor: "#f7f7f7" },
+  "&:nth-of-type(even)": { backgroundColor: "#fff" },
+  "&:last-child td, &:last-child th": { border: 0 },
 }));
 
+// ── main component ──────────────────────────────────────────────────
 const PredictionChart = ({ intensityData }) => {
-  const [enabled, setEnabled] = useState(true); // toggle state
+  const [enabled, setEnabled] = useState(true);       // switch state
   const isEmpty =
     !intensityData || Object.keys(intensityData).length === 0;
 
-  return (
-    <Box>
-      <HvCard
-        bgcolor="white"
-        style={{
-          height: "500px",
-          borderRadius: "0px",
-          boxShadow:
-            "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-        }}
-        statusColor="red"
-      >
-        <HvCardContent>
-          {/* Title and Toggle Row */}
-          <Box
-            p={2}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <HvTypography variant="title2">Predictive Analytics</HvTypography>
-            <Box display="flex" alignItems="center" gap={1}>
-              <HvTypography variant="label">Enable</HvTypography>
-              <Switch
-                checked={enabled}
-                onChange={() => setEnabled((prev) => !prev)}
-                color="primary"
-              />
-            </Box>
-          </Box>
+  // accordion expansion defaults to !isEmpty
+  const [expanded, setExpanded] = useState(!isEmpty);
 
-          {enabled ? (
-            isEmpty ? (
+  const rows = useMemo(
+    () =>
+      Object.entries(intensityData || {}).map(([k, v]) => (
+        <StyledTableRow key={k}>
+          <StyledTableCell component="th" scope="row">
+            {k}
+          </StyledTableCell>
+          <StyledTableCell align="right">{v}</StyledTableCell>
+        </StyledTableRow>
+      )),
+    [intensityData]
+  );
+
+  return (
+    <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <HvTypography variant="title3" >
+          Predictive Analytics
+        </HvTypography>
+      </AccordionSummary>
+
+      <AccordionDetails>
+        <HvCard
+          bgcolor="white"
+          style={{
+            height: "500px",
+            borderRadius: 0,
+            boxShadow:
+              "0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19)",
+          }}
+          statusColor="red"
+        >
+          <HvCardContent style={{ height: "100%" }}>
+            {/* title + switch row */}
+            <Box
+              p={2}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <HvTypography variant="title2">Predictive Analytics</HvTypography>
+              <Box display="flex" alignItems="center" gap={1}>
+                <HvTypography variant="label">Enable</HvTypography>
+                <Switch
+                  checked={enabled}
+                  onChange={() => setEnabled((p) => !p)}
+                  color="primary"
+                />
+              </Box>
+            </Box>
+
+            {enabled ? (
+              isEmpty ? (
+                <Box
+                  flex={1}
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  height="100%"
+                >
+                  <HvTypography variant="title3">No data Available</HvTypography>
+                </Box>
+              ) : (
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ width: "100%", overflowX: "auto" }}
+                >
+                  <Table sx={{ minWidth: "100%" }}>
+                    <TableBody>{rows}</TableBody>
+                  </Table>
+                </TableContainer>
+              )
+            ) : (
               <Box
                 flex={1}
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
+                height="100%"
               >
                 <HvTypography variant="title3">
-                  No data Available
+                  Predictive Analytics is disabled.
                 </HvTypography>
               </Box>
-            ) : (
-              <TableContainer
-                component={Paper}
-                elevation={0}
-                style={{ width: "100%", overflowX: "auto" }}
-              >
-                <Table
-                  sx={{ minWidth: "100%" }}
-                  aria-label="customized table"
-                >
-                  <TableBody>
-                    {Object.entries(intensityData).map(([key, value]) => (
-                      <StyledTableRow key={key}>
-                        <StyledTableCell component="th" scope="row">
-                          {key}
-                        </StyledTableCell>
-                        <StyledTableCell align="right">
-                          {value}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )
-          ) : (
-            <Box
-              flex={1}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <HvTypography variant="title3">
-                Predictive Analytics is disabled.
-              </HvTypography>
-            </Box>
-          )}
-        </HvCardContent>
-      </HvCard>
-    </Box>
+            )}
+          </HvCardContent>
+        </HvCard>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
