@@ -1,52 +1,43 @@
-import React from "react";
-import "../css/DetectorParams.css"; // Import your CSS file here
+import React, { useState, forwardRef, useImperativeHandle } from "react";
+import { paramCatalog } from "../utils/paramCatalog";
+import "../css/DetectorParams.css";   // keep your existing CSS
 
-const labels = [
-  ["Det 1 Stat", "Det 2 BG High"],
-  ["Det 2 Stat", "Det 2 BG Low"],
-  ["Det 1 BG High", "Det 2 Alarm"],
-  ["Det 1 BG Low", "DATE TIME"],
-  ["Det 1 Alarm"],
-];
+/* Expose getPayload() to parent via ref */
+const DetectorParams = forwardRef((_, ref) => {
+  const [draft, setDraft] = useState({});          // { id: newValue }
 
-const AGMlabels = [
-    ["Det 1 Stat", "Det 2 BG High"],
-    ["Det 2 Stat"],
-    
-  ];
+  /* public method for parent */
+  useImperativeHandle(ref, () => ({
+    getPayload: () => draft
+  }));
 
-  const PRMlabels = [
-    ["Det 1 Stat", "Det 2 BG High"],
-    ["Det 2 Stat", "Det 2 BG Low"]
-  ];
+  const handleChange = (id, value) =>
+    setDraft((prev) => ({ ...prev, [id]: value }));
 
-const DetectorParams = (sensor) => {
   return (
     <div className="param-container">
       <div className="header-row-config">
-        <div></div>
-        <div>Current Value</div>
-        <div>New Value</div>
-        <div></div>
-        <div>Current Value</div>
-        <div>New Value</div>
+        <div></div><div>Current</div><div>New</div>
+        <div></div><div>Current</div><div>New</div>
       </div>
 
-      {labels.map((row, rowIndex) => (
-        <React.Fragment key={rowIndex}>
-          {row.map((label, colIndex) => (
-            <React.Fragment key={colIndex}>
-              <div className="label">{label}</div>
-              <input type="text" style={{border:"2px solid black"}}/>
-              <input type="text" style={{border:"2px solid black"}} />
-            </React.Fragment>
-          ))}
+      {paramCatalog.map(({ id, label }) => (
+        <React.Fragment key={id}>
+          <div className="label">{label}</div>
+
+          {/* TODO: plug real current value here */}
+          <input type="text"  disabled
+          style={{ border: "2px solid black" }}/>
+
+          <input
+            type="text"
+            style={{ border: "2px solid black" }}
+            onChange={(e) => handleChange(id, e.target.value)}
+          />
         </React.Fragment>
       ))}
-
-     
     </div>
   );
-};
+});
 
 export default DetectorParams;

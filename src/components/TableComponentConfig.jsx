@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { css, keyframes } from "@emotion/css";
 import {
   HvButton,
@@ -22,6 +22,7 @@ import {
 import { Add, Close, Filters } from "@hitachivantara/uikit-react-icons";
 import WriteConfigurationModal from "./ConfigModal";
 import "../css/configurationPage.css";
+import { fetchConfigurationData } from '../service/ConfigurationPageService';
 
 const slide = keyframes({
   "0%": { maxHeight: 0 },
@@ -81,56 +82,77 @@ const classes = {
   }),
 };
 
-const sampleData = [
-  { device_id: "dev-001", floor: "1F", zone: "Zone 1", location: "Garud Dwar", type: "Biological", sensor: "MAB" },
-  { device_id: "dev-002", floor: "2F", zone: "Zone 2", location: "Hans Dwar", type: "Radiological", sensor: "AGM" },
-  { device_id: "dev-003", floor: "1F", zone: "Zone 2 (PMO)", location: "Terrace", type: "Biological", sensor: "IBAC" },
-  { device_id: "dev-004", floor: "3F", zone: "Zone 3", location: "PMO", type: "Radiological", sensor: "PRM" },
-  { device_id: "dev-005", floor: "2F", zone: "Zone 4", location: "shardul dwar", type: "Radiological", sensor: "VRM" },
-  { device_id: "dev-006", floor: "1F", zone: "Zone 5", location: "reception", type: "Radiological", sensor: "WRM" },
-  { device_id: "dev-006", floor: "1F", zone: "Zone 6", location: "south utility", type: "Chemical", sensor: "AP4C" },
-];
-
-const generateFilterOptions = (data, field) => {
-  const uniqueValues = [...new Set(data.map(item => item[field]))];
-  return uniqueValues.map(value => ({
-    id: value,
-    name: value
-  }));
-};
-
-const filters = [
-  {
-    id: "floor",
-    name: "Floor",
-    data: generateFilterOptions(sampleData, "floor")
-  },
-  {
-    id: "zone",
-    name: "Zone",
-    data: generateFilterOptions(sampleData, "zone")
-  },
-  {
-    id: "type",
-    name: "Type",
-    data: generateFilterOptions(sampleData, "type")
-  }
-];
-
 export const SearchableTable = () => {
   const filterRef = useRef(null);
   const [selectedFilters, setSelectedFilters] = useState();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const[selectedSensor, setSelectedSensor] = useState(null);
+  const [selectedSensor, setSelectedSensor] = useState(null);
+  const [tableData, setTableData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [ipAddress, setIpAddress] = useState(null);
+  const[port,setPort]=useState(null);
+  const[type,setType]=useState(null);
 
-  const openModal = (deviceId,location,sensor) => {
-    setSelectedDeviceId(deviceId);
-    setSelectedLocation(location);
-    setSelectedSensor(sensor);
-    setModalOpen(true);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchConfigurationData();
+        const processedData = response.data.map(item => ({
+          staticPort: item.staticPort,
+          static_type_flag: item.static_type_flag,
+          staticIp: item.staticIp,
+          device_id: item.device_id,
+          floor: item.floor,
+          zone: item.zone,
+          location: item.location,
+          type: item.sensor_type,
+          sensor: item.sensor,
+          action: item.action
+        }));
+        setTableData(processedData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Generate filter options based on the actual API data
+  const filters = useMemo(() => {
+    if (tableData.length === 0) return [];
+    
+    return [
+      {
+        id: "floor",
+        name: "Floor",
+        data: [...new Set(tableData.map(item => item.floor))].map(value => ({
+          id: value,
+          name: value
+        }))
+      },
+      {
+        id: "zone",
+        name: "Zone",
+        data: [...new Set(tableData.map(item => item.zone))].map(value => ({
+          id: value,
+          name: value
+        }))
+      },
+      {
+        id: "type",
+        name: "Type",
+        data: [...new Set(tableData.map(item => item.type))].map(value => ({
+          id: value,
+          name: value
+        }))
+      }
+    ];
+  }, [tableData]);
 
   const columns = useMemo(() => [
     {
@@ -170,7 +192,7 @@ export const SearchableTable = () => {
         <HvButton
           variant="primaryGhost"
           className={classes.actionButton}
-          onClick={() => openModal(row.original.device_id, row.original.location,row.original.sensor)}
+          onClick={() => openModal(row.original.device_id, row.original.location, row.original.sensor,row.original.staticIp,row.original.staticPort,row.original.static_type_flag)}
         >
           Write Configuration
         </HvButton>
@@ -178,6 +200,16 @@ export const SearchableTable = () => {
       disableFilters: true,
     },
   ], []);
+
+  const openModal = (deviceId, location, sensor,ipAddress,port,static_type_flag) => {
+    setIpAddress(ipAddress);
+    setPort(port);
+    setType(static_type_flag);
+    setSelectedDeviceId(deviceId);
+    setSelectedLocation(location);
+    setSelectedSensor(sensor);
+    setModalOpen(true);
+  };
 
   const processedFilters = useMemo(() => {
     if (!selectedFilters) return undefined;
@@ -196,7 +228,7 @@ export const SearchableTable = () => {
         },
       }));
     });
-  }, [selectedFilters]);
+  }, [selectedFilters, filters]);
 
   const {
     getTableProps,
@@ -211,7 +243,7 @@ export const SearchableTable = () => {
   } = useHvData(
     {
       columns,
-      data: sampleData,
+      data: tableData,
       initialState: {
         filters: [],
       },
@@ -260,6 +292,10 @@ export const SearchableTable = () => {
     }).filter(Boolean) || [];
     setAllFilters?.(newFilters);
   };
+
+  if (loading) {
+    return <div>Loading data...</div>;
+  }
 
   return (
     <>
@@ -356,13 +392,13 @@ export const SearchableTable = () => {
             </HvTableBody>
           </HvTable>
         </HvTableContainer>
-        {page.length > 0 && (
+        {tableData.length > 0 && (
           <HvPagination
             {...getHvPaginationProps?.()}
             className={classes.pagination}
             labels={{
               pageSizePrev: "",
-              pageSizeEntryName: `of ${sampleData.length}`,
+              pageSizeEntryName: `of ${tableData.length}`,
             }}
           />
         )}
@@ -374,6 +410,9 @@ export const SearchableTable = () => {
         deviceId={selectedDeviceId}
         location={selectedLocation}
         sensor={selectedSensor}
+        ip={ipAddress}
+        sensor_port={port}
+        static_type_flag={type}
       />
     </>
   );
