@@ -26,6 +26,12 @@ import Loader from "../components/Loader";  // Import the Loader component
 import FloorWiseStatusGrid from "../components/FloorWiseStatusGrid";
 import FloorWiseAlarmPanel from "../components/FloorWiseAlarmPanel";
 import FloorPlanMap from "../components/FloorPlanMap";
+import UGFFloorMap from "../components/UGFFloorMap";
+import LGFFloorMap from "../components/LGFFloorMap";
+import TerraceMap from "../components/TerraceMap";
+import FirstFloorMap from "../components/FirstFloorMap";
+import SouthUtilityMap from "../components/SouthUtility_map";
+import NorthUtilityMap from "../components/NorthUtility_map";
 import FloorWiseNotificationPanal from "../components/FloorWiseNotificationPanal";
 import SummaryCards from "../components/SummaryCards";
 
@@ -317,6 +323,38 @@ const FloorWiseDashboard = () => {
 
   // Safely format the data
   const formattedSensorsData = transformSensorData(floorSummaryData || []);
+  const formatTestData = [
+    {"s_no":{"s_no":1,"device_id":46,"alarm_status":"No Alarm","zone":"1","location":"At Makar Dwar (Left side)","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.393","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":2,"device_id":45,"alarm_status":"Alarm","zone":"1","location":"At Makar Dwar (Right side)","detector_type":"Radiation","detector":"AGM","status":"Active","last_updated":"2025-05-14 15:55:48.400","alarm_start_timestamp":"2025-05-14T15:55:48.400Z"}},
+    {"s_no":{"s_no":3,"device_id":1165,"alarm_status":"No Alarm","zone":"2","location":"Near Control Room","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.410","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":4,"device_id":1149,"alarm_status":"No Alarm","zone":"2","location":"Behind Main Gate","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.420","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":5,"device_id":127,"alarm_status":"No Alarm","zone":"2","location":"Hans Dwar (Right side)","detector_type":"Biological","detector":"IBAC","status":"Active","last_updated":"2025-05-14 15:55:48.430","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":6,"device_id":2209,"alarm_status":"No Alarm","zone":"3","location":"Zone 3 Entrance","detector_type":"Chemical","detector":"AP4C","status":"Active","last_updated":"2025-05-14 15:55:48.440","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":7,"device_id":52,"alarm_status":"Alarm","zone":"3","location":"Zone 3 Hallway","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.450","alarm_start_timestamp":"2025-05-14T15:55:48.450Z"}},
+    {"s_no":{"s_no":8,"device_id":2210,"alarm_status":"Alarm","zone":"3","location":"Zone 3 Hallway","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.460","alarm_start_timestamp":"2025-05-14T15:55:48.460Z"}},
+    {"s_no":{"s_no":9,"device_id":47,"alarm_status":"No Alarm","zone":"4","location":"West Wing Corridor","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.470","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":10,"device_id":1166,"alarm_status":"No Alarm","zone":"4","location":"West Wing Corridor","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.480","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":11,"device_id":12,"alarm_status":"Alarm","zone":"4","location":"South Gate","detector_type":"Radiation","detector":"AGM","status":"Active","last_updated":"2025-05-14 15:55:48.490","alarm_start_timestamp":"2025-05-14T15:55:48.490Z"}},
+    {"s_no":{"s_no":12,"device_id":48,"alarm_status":"No Alarm","zone":"3","location":"At Garuda Dwar (Right side)","detector_type":"Biological","detector":"MAB","status":"Active","last_updated":"2025-05-14 15:55:48.500","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":13,"device_id":41,"alarm_status":"No Alarm","zone":"4","location":"South Wing","detector_type":"Radiation","detector":"AGM","status":"Active","last_updated":"2025-05-14 15:55:48.510","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":14,"device_id":1161,"alarm_status":"No Alarm","zone":"4","location":"South Wing","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.520","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":15,"device_id":2207,"alarm_status":"No Alarm","zone":"4","location":"Utility Room","detector_type":"Chemical","detector":"AP4C","status":"Active","last_updated":"2025-05-14 15:55:48.530","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":16,"device_id":42,"alarm_status":"Alarm","zone":"4","location":"Utility Room","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.540","alarm_start_timestamp":"2025-05-14T15:55:48.540Z"}},
+    {"s_no":{"s_no":17,"device_id":57,"alarm_status":"No Alarm","zone":"4","location":"Utility Room","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.550","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":18,"device_id":125,"alarm_status":"No Alarm","zone":"4","location":"South Exit","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.560","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":19,"device_id":43,"alarm_status":"Alarm","zone":"4","location":"Server Room","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.570","alarm_start_timestamp":"2025-05-14T15:55:48.570Z"}},
+    {"s_no":{"s_no":20,"device_id":1164,"alarm_status":"No Alarm","zone":"4","location":"Server Room","detector_type":"Biological","detector":"IBAC","status":"Active","last_updated":"2025-05-14 15:55:48.580","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":21,"device_id":5,"alarm_status":"No Alarm","zone":"4","location":"Server Room","detector_type":"Chemical","detector":"AP4C","status":"Active","last_updated":"2025-05-14 15:55:48.590","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":22,"device_id":2208,"alarm_status":"No Alarm","zone":"4","location":"Server Room","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.600","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":23,"device_id":126,"alarm_status":"No Alarm","zone":"4","location":"Server Room","detector_type":"Radiation","detector":"AGM","status":"Active","last_updated":"2025-05-14 15:55:48.610","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":24,"device_id":44,"alarm_status":"No Alarm","zone":"4","location":"Server Room","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.620","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":25,"device_id":1176,"alarm_status":"No Alarm","zone":"5","location":"Zone 5 Hallway","detector_type":"Radiation","detector":"PRM","status":"Active","last_updated":"2025-05-14 15:55:48.630","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":26,"device_id":1172,"alarm_status":"Alarm","zone":"5","location":"Zone 5 Hallway","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.640","alarm_start_timestamp":"2025-05-14T15:55:48.640Z"}},
+    {"s_no":{"s_no":27,"device_id":69,"alarm_status":"Alarm","zone":"RS Chamber","location":"Inside RS Chamber","detector_type":"Chemical","detector":"AP4C-F","status":"Active","last_updated":"2025-05-14 15:55:48.389","alarm_start_timestamp":"2025-05-14T15:55:48.389Z"}},
+    {"s_no":{"s_no":28,"device_id":1146,"alarm_status":"No Alarm","zone":"5","location":"Storage Area","detector_type":"Chemical","detector":"FCAD","status":"Active","last_updated":"2025-05-14 15:55:48.650","alarm_start_timestamp":null}},
+    {"s_no":{"s_no":29,"device_id":68,"alarm_status":"No Alarm","zone":"5","location":"Storage Area","detector_type":"Chemical","detector":"AP4C","status":"Active","last_updated":"2025-05-14 15:55:48.660","alarm_start_timestamp":null}}
+  ]
+ 
 
   return (
     <Box>
@@ -341,13 +379,12 @@ const FloorWiseDashboard = () => {
               <FloorSummary data={sensorSummary} sensorCounts={sensorCounts} />
             </Box>
             <Box display="flex" justifyContent="flex-start" mb={1} ml={4} mt={2}>
-              <ToggleButtonGroup
-                value={view}
-                exclusive
-                onChange={floor === "Upper Ground Floor" ? handleViewChange : () => { }}
-                aria-label="View Toggle"
-                disabled={floor !== "Upper Ground Floor"}  // Disable for other floors
-              >
+                <ToggleButtonGroup
+                  value={view}
+                  exclusive
+                  onChange={handleViewChange}
+                  aria-label="View Toggle"
+                >
                 <ToggleButton value="map" aria-label="Map View">
                   Map View
                 </ToggleButton>
@@ -358,13 +395,34 @@ const FloorWiseDashboard = () => {
             </Box>
             <Box display="flex" flexDirection={{ base: "column", md: "row" }}>
               {/* Floor Plan Map on the left */}
-              <Box flex="1.5" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
-                {view === "grid" ? (
-                  <FloorPlanMap sensorData={floorSummaryData} />
+              {/* <Box flex="1.5" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
+                {view === "map" ? (
+                  <LGFFloorMap sensorData={formatTestData} />
+                  // <FloorPlanMap sensorData={formatTestData} />
                 ) : (
                   <FloorWiseStatusGrid sensorData={floorSummaryData} />
                 )}
-              </Box>
+              </Box> */}
+                <Box flex="1.5" bg="white" p={4} borderRadius="lg" boxShadow="lg" minW="300px">
+                  {view === "map" ? (
+                    floor === "Upper Ground Floor" ? (
+                      <UGFFloorMap sensorData={floorSummaryData} />
+                    ) : floor === "Lower Ground Floor" ? (
+                      <LGFFloorMap sensorData={formatTestData} />
+                    ) : floor === "Terrace" ? (
+                      <TerraceMap sensorData={formatTestData} />
+                    ) : floor === "First Floor" ? (
+                      <FirstFloorMap sensorData={formatTestData} />
+                    ) : floor === "Utility Blocks" ? (
+                      <NorthUtilityMap sensorData={formatTestData} />
+                    ) : (
+                      <FloorPlanMap sensorData={floorSummaryData} />
+                    )
+                  ) : (
+                    <FloorWiseStatusGrid sensorData={floorSummaryData} />
+                  )}
+                </Box>
+
 
               {/* Alarm + Notification Panels on the right, stacked vertically */}
               <Box
