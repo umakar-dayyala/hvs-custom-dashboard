@@ -138,7 +138,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
       <ImageOverlay url="/SU_map.png" bounds={imageBounds} />
 
       {/* Sensor markers */}
-      {sensorData.map((entry) => {
+       {Array.isArray(sensorData) && sensorData.map((entry) => {
         const sensor = entry.s_no;
         const position = sensorPositions[sensor.device_id];
         if (!position) return null;
