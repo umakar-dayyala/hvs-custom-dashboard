@@ -25,35 +25,21 @@ const imageBounds = [[0, 0], [775, 825]];
 // Sensor positions
 const sensorPositions = {
 
-    72: [395, 113],     // AP4C - a
-    73: [110, 100],     // AP4C - b
-    2202: [120, 100],   // FCAD - c
-    74: [130, 100],     // AP4C - d
-    1148: [140, 100],   // IBAC - e
-    75: [150, 100],     // AP4C - f
-    122: [160, 100],    // MAB - g
-    76: [170, 100],     // AP4C - h
-    77: [180, 100],     // AP4C - i
-    2203: [190, 100],   // FCAD - j
-    2204: [200, 100],   // FCAD - k
-    9990: [210, 100],   // IBAC - l (IBAC-IBAC), pseudo device_id
-    78: [220, 100],     // AP4C - m
-    79: [230, 100],     // AP4C - n
-    123: [240, 100],    // MAB - o
-    1147: [250, 100],   // IBAC - p
-    2205: [260, 100],   // FCAD - q
-    2206: [270, 100],   // FCAD - r
-    1160: [280, 100],   // AP4C - s & w (same device_id used for both)
-    1145: [290, 100],   // IBAC - t
-    124: [300, 100],    // MAB - u
-    1146: [310, 100],   // IBAC - v
-
-    1170: [320, 100],   // AAM (81) - 1
-    1169: [330, 100],   // AAM (85) - 2
-    1172: [340, 100],   // ASB - 3
-    1175: [350, 100],   // ASB - 4
-    1176: [360, 100],   // ASB - 5
-  };
+  2193: [495, 153],     // AP4C - 1 > DONE
+  2194: [410, 153],      // AP4C - 2 > DONE
+  2196: [480, 560],   // FCAD - 3 >DONE
+  2197: [240, 560],     // AP4C - 4 > DONE
+  2198: [210, 138],   // IBAC - 5 > DONE
+  2195: [628, 330],     // AP4C - 6 > DONE
+  51: [628, 335],   // MAB - 7 > DONE
+  2199: [540, 430],     // AP4C - 8 > DONE
+  2200: [190, 410],     // AP4C - 9 > DONE
+  2201: [360, 153],   // FCAD - a > DONE
+  39: [540, 440],   // FCAD - b >DONE
+  40: [185, 410],   // IBAC - c > DONE
+  70: [640, 225],     // AP4C - d >DONE
+  71: [135, 170],     // AP4C - e > DONE
+};
   
 
 // Gate label positions
@@ -131,6 +117,7 @@ const createGateIcon = (label) =>
 
 const FirstFloorMap = ({ sensorData = [] }) => {
   const navigate = useNavigate();
+  console.log("FIRST FLOOR MAP Opened:");
 
   const handleClick = (sensor) => {
     const route = routeName(sensor.detector);
@@ -148,17 +135,8 @@ const FirstFloorMap = ({ sensorData = [] }) => {
       minZoom={-2}
       maxZoom={2}
     >
-      <ImageOverlay url="/LGF_map.png" bounds={imageBounds} />
+      <ImageOverlay url="/First_Floor_map.png" bounds={imageBounds} />
 
-      {/* Gate markers */}
-      {Object.entries(gatePositions).map(([key, position]) => (
-        <Marker
-          key={key}
-          position={position}
-          icon={createGateIcon(key.replace(/([A-Z])/g, ' $1').toUpperCase())}
-          interactive={false}
-        />
-      ))}
 
       {/* Sensor markers */}
       {sensorData.map((entry) => {
