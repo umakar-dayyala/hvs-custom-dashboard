@@ -160,7 +160,7 @@ const UGFFloorMap = ({ sensorData = [] }) => {
       ))} */}
 
       {/* Sensor markers */}
-      {sensorData.map((entry) => {
+       {Array.isArray(sensorData) && sensorData.map((entry) => {
         const sensor = entry.s_no;
         const position = sensorPositions[sensor.device_id];
         if (!position) return null;
