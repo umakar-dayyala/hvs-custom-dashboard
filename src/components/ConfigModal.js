@@ -9,7 +9,7 @@ import DetectorParams from "../components/DetectorParams";
 import { sendParams } from "../service/ConfigurationPageService";
 
 const WriteConfigurationModal = ({
-  open, onClose, deviceId, location, sensor,ip,sensor_port,static_type_flag
+  open, onClose, deviceId, location, sensor, ip, sensor_port
 }) => {
   const detectorRef = useRef();
 
@@ -22,18 +22,20 @@ const WriteConfigurationModal = ({
       type: 2,
       device_id: deviceId,
       ip_address: ip || "10.42.12.34",
-      port: sensor_port ,
+      port: sensor_port,
       transaction_id: Date.now().toString(),
       data
     };
 
-    try {
-      await sendParams(cmd);
-      onClose();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to set parameters");
-    }
+    // try {
+    //   await sendParams(cmd);
+    //   onClose();
+    // } catch (err) {
+    //   console.error(err);
+    //   alert("Failed to set parameters");
+    // }
+
+    console.log("📦 Command payload that would be sent:", cmd);
   };
 
   return (
@@ -45,7 +47,11 @@ const WriteConfigurationModal = ({
         <p>Location: <strong>{location}</strong></p>
         <p>Sensor: <strong>{sensor?.name || sensor}</strong></p>
 
-        <DetectorParams ref={detectorRef} />
+        <DetectorParams
+          ref={detectorRef}
+          deviceId={deviceId}
+          sensorName={sensor}          // `sensor` already holds "agm", "vrm", etc.
+        />
       </HvDialogContent>
 
       <HvDialogActions>

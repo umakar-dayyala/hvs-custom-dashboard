@@ -21,3 +21,16 @@ export const fetchConfigurationData = async () => {
 export const sendParams = (cmd) =>
   axios.post("/mqtt/send", cmd);
 
+
+export const fetchDetectorParameters = async (device_id, sensor_name) => {
+  const url = `http://localhost:5000/api/config/getSensorParameters`;
+  const body = { device_id, sensor_name };
+
+  try {
+    const { data } = await axios.post(url, body);
+    return data;                          // the JSON you showed
+  } catch (err) {
+    console.error("Error fetching detector parameters:", err);
+    throw err;
+  }
+};
