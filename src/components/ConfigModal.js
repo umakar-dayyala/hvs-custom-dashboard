@@ -12,6 +12,7 @@ const WriteConfigurationModal = ({
   open, onClose, deviceId, location, sensor, ip, sensor_port
 }) => {
   const detectorRef = useRef();
+  console.log("sensor", sensor);
 
   const handleSet = async () => {
     /* 1. Get { id: newValue } */
@@ -23,6 +24,7 @@ const WriteConfigurationModal = ({
       device_id: deviceId,
       ip_address: ip || "10.42.12.34",
       port: sensor_port,
+      sensor_name: sensor,
       transaction_id: Date.now().toString(),
       data
     };
