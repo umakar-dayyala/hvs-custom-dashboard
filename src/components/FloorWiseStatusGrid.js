@@ -11,9 +11,23 @@ import alertRadiation  from "../assets/rRadiological.svg";
 import greyBio     from "../assets/greyBio.svg";
 import greyChemical from "../assets/greyChem.svg";
 import greyRadio    from "../assets/greyRadio.svg";
+import aBio from "../assets/aBiological.svg";
+import aChemical from "../assets/aChemical.svg";
+import aRadiation from "../assets/aRadiological.svg";
+import { routeName } from "../utils/RouteUtils";
 
 /* ---------- helpers ---------- */
 const getSensorIcon = (type, status, alarmStatus) => {
+  console.log(alarmStatus);
+  if (alarmStatus === "Alarm") {
+    console.log("Alarm   "+type);
+    switch (type) {
+      case "Chemical":   return alertChemical;
+      case "Biological": return alertBiological;
+      case "Radiation":  return alertRadiation;
+      default:           return null;
+    }
+  }
   if (status === "Inactive" || status === "Disconnected") {
     switch (type) {
       case "Chemical":   return greyChemical;
@@ -22,11 +36,11 @@ const getSensorIcon = (type, status, alarmStatus) => {
       default:           return null;
     }
   }
-  if (alarmStatus === "Alarm") {
+  if (status === "Fault") {
     switch (type) {
-      case "Chemical":   return alertChemical;
-      case "Biological": return alertBiological;
-      case "Radiation":  return alertRadiation;
+      case "Chemical":   return aChemical;
+      case "Biological": return aBio;
+      case "Radiation":  return aRadiation;
       default:           return null;
     }
   }
@@ -38,17 +52,17 @@ const getSensorIcon = (type, status, alarmStatus) => {
   }
 };
 
-const routeName = (detector) => ({
-  AGM: "agmindividual",
-  "AP4C-F": "AP4CIndividual",
-  FCAD: "FCADIndividual",
-  PRM: "PRMIndividual",
-  VRM: "vrmIndividual",
-  IBAC: "ibacIndividual",
-  MAB: "MABIndividual",
-  AAM: "aamIndividual",
-  WRM: "wrmIndividual",
-}[detector] ?? null);
+// const routeName = (detector) => ({
+//   AGM: "agmindividual",
+//   "AP4C-F": "AP4CIndividual",
+//   FCAD: "FCADIndividual",
+//   PRM: "PRMIndividual",
+//   VRM: "vrmIndividual",
+//   IBAC: "ibacIndividual",
+//   MAB: "MABIndividual",
+//   AAM: "aamIndividual",
+//   WRM: "wrmIndividual",
+// }[detector] ?? null);
 
 /* ---------- leaf cell ---------- */
 const Cell = ({ sensors }) => {
@@ -59,12 +73,21 @@ const Cell = ({ sensors }) => {
     if (route) navigate(`/${route}?device_id=${sensor.device_id}`);
   };
 
-  const statusColor = (status) => ({
-    Active: "#43A047",
-    Fault : "#FFD54F",
-    Inactive: "rgb(128,128,128)",
-    Disconnected: "rgb(128,128,128)",
-  }[status] ?? "#F5F5F5");
+  const statusColor = (status, alarm_status) => {
+    if (alarm_status === "Alarm") {
+      return "#FF0000"; // or "#FF0000" if you want hex
+    }
+  
+    const colors = {
+      Active: "#43A047",          // green
+      Fault: "#FFD54F",           // yellow
+      Inactive: "rgb(128,128,128)",
+      Disconnected: "rgb(128,128,128)",
+    };
+  
+    return colors[status] ?? "#F5F5F5"; // default fallback color
+  };
+  
 
   if (!sensors?.length)
     return <Box height={80} border="1px solid #eee" bgcolor="#F5F5F5" />;
@@ -86,7 +109,7 @@ const Cell = ({ sensors }) => {
           width="100%"
           px={0.5}
           py={0.25}
-          bgcolor={statusColor(s.status)}
+          bgcolor={statusColor(s.status,s.alarm_status)}
           sx={{ cursor: "pointer" }}
           onClick={() => handleClick(s)}
         >
