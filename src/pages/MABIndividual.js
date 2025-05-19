@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
-import { HvButton, HvStack, HvDialog } from '@hitachivantara/uikit-react-core';
+import { HvStack } from '@hitachivantara/uikit-react-core';
 import OutlierChart from '../components/OutlierChart';
 import AnomalyChart from '../components/AnomalyChart';
 import { Box } from '@mui/material';
@@ -12,29 +12,20 @@ import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
 import PredictionChart from '../components/PredictionChart';
 import IntensityChart from '../components/IntensityChart';
-import Breadcrumbs from '../components/Breadcrumbs';
-import ToggleButtons from '../components/ToggleButtons';
+import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
+import Connectivitydata from '../components/Connectivitydata';
 import {
   fetchMABParamChartData,
   fetchAnomalyChartData,
   fetchOutlierChartData,
+  fetchASUData,
 } from "../service/MABSensorService";
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from "dayjs";
-import ConfirmationModal from '../components/ConfirmationModal';
 import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aBiological.svg";
 import greyBio from "../assets/greyBio.svg";
-import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
-import Connectivitydata from '../components/Connectivitydata';
-
-// Constants
-const AsmData = {
-  "fan_status": "OK",
-  "pump_status": "OK",
-  "cyclone_fluid": "OK",
-}
 
 export const MABIndividual = React.memo(() => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -55,6 +46,12 @@ export const MABIndividual = React.memo(() => {
   });
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 
+  // State to hold ASU data (replacing dummy AsmData)
+  const [asmData, setAsmData] = useState({
+    fan_status: "OK",
+    pump_status: "OK",
+    cyclone_fluid: "OK",
+  });
 
   // Time range states initialized as null
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
@@ -79,7 +76,7 @@ export const MABIndividual = React.memo(() => {
     return `'${dayjs(date).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   }, []);
 
-  // WebSocket connection
+  // WebSocket connection for live streaming data
   useEffect(() => {
     if (!deviceId) return;
 
@@ -100,6 +97,37 @@ export const MABIndividual = React.memo(() => {
         eventSource.close();
         console.log("WebSocket closed");
       }
+    };
+  }, [deviceId]);
+
+  // Fetch ASU Data every 10 seconds
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchASU = async () => {
+      if (!deviceId) return;
+      try {
+        const response = await fetchASUData(deviceId);
+        // Expecting response.data to be an array with one object
+        if (isMounted && response?.data && response.data.length > 0) {
+          const asu = response.data[0];
+          setAsmData({
+            fan_status: asu.fan_status ?? "N/A",
+            pump_status: asu.pump_status ?? "N/A",
+            cyclone_fluid: asu.cyclone_fluid ?? "N/A",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching ASU data:", error);
+      }
+    };
+
+    fetchASU();
+    const interval = setInterval(fetchASU, 10000); // 10 seconds
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
     };
   }, [deviceId]);
 
@@ -187,10 +215,6 @@ export const MABIndividual = React.memo(() => {
     }
   }, [outlierRange, fetchData]);
 
-
-
-
-
   // Memoized layout values based on toggle state
   const chartLayout = useMemo(() => {
     return toggleState === "Operator" ? "100%" : "33.33%";
@@ -216,8 +240,6 @@ export const MABIndividual = React.memo(() => {
                 <span>Last Live Data fetched time: {LastFetchLiveData}</span>
               )}
             </Box>
-
-
           </div>
         </div>
 
@@ -241,7 +263,10 @@ export const MABIndividual = React.memo(() => {
               />
               <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
             </HvStack>
-            <IndividualParameters paramsData={param} notifications={notifications} AsmData={AsmData} />
+
+            {/* Pass the actual asmData instead of dummy data */}
+            <IndividualParameters paramsData={param} notifications={notifications} AsmData={asmData} />
+
             <Box mt={2}>
               <PlotlyDataChart
                 bioParamChartData={mabParamChartData}
@@ -261,6 +286,7 @@ export const MABIndividual = React.memo(() => {
                 lastFetchTime={lastFetchTimes.anomaly}
               />
             </Box>
+
             <Box width={"50%"}>
               <OutlierChart
                 outlierChartData={outlierChartData}

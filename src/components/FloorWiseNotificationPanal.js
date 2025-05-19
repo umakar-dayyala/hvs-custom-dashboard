@@ -12,27 +12,27 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 // Sample hardcoded notifications
 const notifications = [
-  {
-    id: 1,
-    title: "Sensor Calibration Due",
-    description: "Sensor A12 in Zone 3 needs calibration.",
-    type: "Maintenance",
-    time: "2025-05-13T08:30:00",
-  },
-  {
-    id: 2,
-    title: "New Sensor Added",
-    description: "Sensor B09 has been added to Floor 2.",
-    type: "Update",
-    time: "2025-05-12T15:10:00",
-  },
-  {
-    id: 3,
-    title: "Connection Lost",
-    description: "Sensor D04 in Zone 5 is offline.",
-    type: "Alert",
-    time: "2025-05-13T06:45:00",
-  },
+  // {
+  //   id: 1,
+  //   title: "Sensor Calibration Due",
+  //   description: "Sensor A12 in Zone 3 needs calibration.",
+  //   type: "Maintenance",
+  //   time: "2025-05-13T08:30:00",
+  // },
+  // {
+  //   id: 2,
+  //   title: "New Sensor Added",
+  //   description: "Sensor B09 has been added to Floor 2.",
+  //   type: "Update",
+  //   time: "2025-05-12T15:10:00",
+  // },
+  // {
+  //   id: 3,
+  //   title: "Connection Lost",
+  //   description: "Sensor D04 in Zone 5 is offline.",
+  //   type: "Alert",
+  //   time: "2025-05-13T06:45:00",
+  // },
 ];
 
 // Helper to calculate how long ago something happened

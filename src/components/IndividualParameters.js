@@ -68,251 +68,438 @@ const notificationContainerStyle = {
   overflowY: "auto",
 };
 
-const IndividualParameters = memo(({ paramsData, notifications = [], toggleState, AsmData }) => {
-  console.log("ASM Data", AsmData);
-  const memoizedCapitalize = useCallback((str) => {
-    if (!str) return '';
-    return str
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  }, []);
 
-  // Memoized derived values
-  const noData = useMemo(() => !paramsData || !paramsData.length, [paramsData]);
-  const displayData = useMemo(() => noData ? defaultCards : paramsData[0], [noData, paramsData]);
-  // const isVRM = useMemo(() => window.location.href.includes("vrm") || window.location.href.includes("VRM"), []);
-  // const isPRM = useMemo(() => window.location.href.includes("prm") || window.location.href.includes("PRM"), []);
-  // const isAGM = useMemo(() => window.location.href.includes("agm") || window.location.href.includes("AGM"), []);
 
-  // const getFilteredParameters = useCallback((parameters, sectionTitle) => {
-  //   if (toggleState === "Operator" && parameters && sectionTitle === "System Settings") {
-  //     if (isVRM) return Object.fromEntries(Object.entries(parameters).slice(0, 3));
-  //     if (isPRM) return Object.fromEntries(Object.entries(parameters).slice(0, 2));
-  //     if (isAGM) return Object.fromEntries(Object.entries(parameters).slice(0, 4));
-  //   }
-  //   return parameters;
-  // }, [toggleState, isVRM, isPRM, isAGM]);
+const IndividualParameters = memo(
+  ({ paramsData, notifications = [], toggleState, AsmData }) => {
+    /* ───── helpers ───── */
 
-  const getBackgroundColor = (key, value) => {
-  const green = "#008000";
+    const memoizedCapitalize = useCallback(
+      (str) =>
+        !str
+          ? ""
+          : str
+              .split("_")
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" "),
+      []
+    );
+
+    const noData = useMemo(() => !paramsData || !paramsData.length, [paramsData]);
+    const displayData = useMemo(
+      () => (noData ? defaultCards : paramsData[0]),
+      [noData, paramsData]
+    );
+
+    const getBackgroundColor = (status, faultValue) => {
+  const green  = "#008000";
   const yellow = "#ffbf00";
-  const red = "#ff0000";
+  const red    = "#ff0000";
 
-  const statusMap = {
-    "Detector Ready": (v) => {
-      const val = String(v).toLowerCase();
-      return val === "false" || val === "ready" ? green : yellow;
-    },
-    "Device Fault": (v) => {
-      const val = String(v).toLowerCase();
-      return val === "no fault" || val === "okay" ? green : yellow;
-    },
-    "Mother Board Controller Status": (v) =>{
-      const val = String(v).toLowerCase();
-      return val === "clear" || val === "ok" ? green : yellow;
-    },
+  const statusStr = String(status).toLowerCase();
+  const faultStr  = String(faultValue).toLowerCase();
 
-     "Lack Of Hydrogen": (v) =>{
-      const val = String(v).toLowerCase();
-      return val === "no need" || val === "no" ? green : yellow;
-    },
+  /* ---- fault first ---- */
+  if (faultStr === "fault" || faultStr === "true") return yellow;
 
-   "Laser Current": (v) => {
-  const val = String(v).toLowerCase();
-  return val === "no fault" || parseFloat(v) > 0 ? green : yellow;
-}
-,
+  /* ---- clear / no-fault / ok ---- */
+  if (
+    faultStr === "no fault" ||        // ← ADD THIS
+    statusStr === "false"  ||
+    statusStr === "no fault" ||
+    statusStr === "ok"      ||
+    statusStr === "clear"
+  )
+    return green;
 
-    "Power Supply Too Low": (v) =>{
-      const val = String(v).toLowerCase();
-      return val === "false" || val === "no"  ? green : yellow;
-    },
-
-    
-
-    "Power Supply Too Low": (v) => String(v).toLowerCase() === "false" ? green : yellow,
-    "Algorithm Alarm Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
-    "Pressure": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
-    "Laser Power": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
-    "Background Light Monitor": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
-    "Low Battery": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
-    "DET 01 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
-    "System Error": (v) => String(v).toLowerCase() === "no fault" ? green : yellow,
-    "DET 02 Status": (v) => String(v).toLowerCase() === "no alarm" ? green : yellow,
-    "Purge": (v) => String(v).toLowerCase() === "not required" ? green : yellow,
-    "Maintenance Required": (v) => String(v).toLowerCase() === "not requested" ? green : yellow,
-    "Test Mode in Progress": (v) => String(v).toLowerCase() === "on" ? green : yellow,
-    "Low Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
-    "RTC Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
-    "Detector Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
-    "High Voltage Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
-    "SD card Status": (v) => String(v).toLowerCase() === "ok" ? green : yellow,
-    // "Mother Board Controller Status": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
-    "Hydrogen Lack": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
-    "Device Defect": (v) => String(v).toLowerCase() === "clear" ? green : yellow,
-    "Maintenance Request": (v) => String(v).toLowerCase() === "Not Requested" ? green : yellow,
-    "Waiting": (v) => String(v).toLowerCase() === "false" ? green : yellow,
-    "Waking State": (v) => String(v).toLowerCase() === "false" ? green : yellow,
-    "Test Mode": (v) => String(v).toLowerCase() === "na" ? green : yellow,
-
-  };
-
-  const normalizedValue = String(value).toLowerCase();
-  return statusMap[key] ? statusMap[key](value) : (normalizedValue === "true" ? green : yellow);
+  /* ---- anything else = warning ---- */
+  return yellow;
 };
 
 
+    /* ───── renderers ───── */
 
- const renderNotificationRow = useCallback(({ index, style }) => {
-  const notification = notifications[index];
-  return (
-    <StyledTableRow
-      style={{
-        ...style,
-        display: 'flex',
-        justifyContent: 'space-between',
-        width: '100%',
-        fontSize: '18px',
-      }}
-    >
-      <StyledTableCell style={{ flex: 7, wordBreak: 'break-word' }}>
-        {notification.label}
-      </StyledTableCell>
-      <StyledTableCell style={{ flex: 3, textAlign: 'right' }}>
-        {notification.value}
-      </StyledTableCell>
-    </StyledTableRow>
-  );
-}, [notifications]);
-
-
-  const renderParameterGroup = useCallback((groupTitle, subParams) => (
-    <div key={groupTitle} style={parameterGroupStyle}>
-      <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
-        {groupTitle}
-      </div>
-      {groupTitle === "Chemical Alarms" || groupTitle === "Chemical Alarm" || groupTitle === "Radiation Alarms" || groupTitle === "Radiation Alarm" || groupTitle === "Biological Alarm" || groupTitle === "Biological Alarms" ? (
-        <div style={{ padding: "1rem" }}>
-          <div
+    const renderNotificationRow = useCallback(
+      ({ index, style }) => {
+        const n = notifications[index];
+        return (
+          <StyledTableRow
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(12rem, 1fr))",
-              gap: "1rem 1.5rem",
-
+              ...style,
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              fontSize: "18px",
             }}
           >
-            {Object.keys(subParams).map((paramKey) => {
-              const isAlarm = subParams[paramKey] > 0;
-              const color = isAlarm ? "red" : "green";
-              return (
-                <div
-                  key={paramKey}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "1rem",
-                      height: "1rem",
-                      backgroundColor: color,
-                      borderRadius: "50%",
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span style={{ fontSize: "18px" }}>{paramKey}</span>
-                </div>
-              );
-            })}
+            <StyledTableCell style={{ flex: 7, wordBreak: "break-word" }}>
+              {n.label}
+            </StyledTableCell>
+            <StyledTableCell style={{ flex: 3, textAlign: "right" }}>
+              {n.value}
+            </StyledTableCell>
+          </StyledTableRow>
+        );
+      },
+      [notifications]
+    );
+
+    const renderParameterGroup = useCallback(
+      (groupTitle, subParams) => (
+        <div key={groupTitle} style={parameterGroupStyle}>
+          <div
+            style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}
+          >
+            {groupTitle}
           </div>
-        </div>
 
-
-
-      ) : groupTitle === "Chemical Parameters" || groupTitle === "Radiation Parameter" || groupTitle === "Radiation Parameters" || groupTitle === "Biological Parameters" ? (
-        <MemoizedLivePlot data={subParams} />
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px", paddingLeft: "10px" }}>
-          {Object.entries(subParams).map(([label, value]) => (
-            <div key={label} style={{ fontSize: "18px" }}>
-              {label}: {value}
+          {/* Alarm bubble grid */}
+          {[
+            "Chemical Alarms",
+            "Chemical Alarm",
+            "Radiation Alarms",
+            "Radiation Alarm",
+            "Biological Alarm",
+            "Biological Alarms",
+          ].includes(groupTitle) ? (
+            <div style={{ padding: "1rem" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(12rem, 1fr))",
+                  gap: "1rem 1.5rem",
+                }}
+              >
+                {Object.keys(subParams).map((k) => {
+                  const isAlarm = subParams[k] > 0;
+                  const color = isAlarm ? "red" : "green";
+                  return (
+                    <div
+                      key={k}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "1rem",
+                          height: "1rem",
+                          backgroundColor: color,
+                          borderRadius: "50%",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span style={{ fontSize: "18px" }}>{k}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  ), []);
-
-  const renderTableRow = useCallback((key, value) => (
-    <StyledTableRow key={key}>
-      <StyledTableCell component="th" scope="row">
-        {memoizedCapitalize(key)}
-      </StyledTableCell>
-      <StyledTableCell align="right">
-        {typeof value === "object" ? (
-          Object.keys(value).map((subKey) => (
-            <div key={subKey}>
-              <strong>{memoizedCapitalize(subKey)}:</strong> {value[subKey]}
+          ) : /* live-plot groups */ [
+              "Chemical Parameters",
+              "Radiation Parameter",
+              "Radiation Parameters",
+              "Concentrations",
+              "Biological Parameters",
+            ].includes(groupTitle) ? (
+            <MemoizedLivePlot data={subParams} />
+          ) : (
+            /* simple key/value list */
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                paddingLeft: "10px",
+              }}
+            >
+              {Object.entries(subParams).map(([label, value]) => (
+                <div key={label} style={{ fontSize: "18px" }}>
+                  {label}: {value}
+                </div>
+              ))}
             </div>
+          )}
+        </div>
+      ),
+      []
+    );
+
+    const renderTableRow = useCallback(
+      (k, v) => (
+        <StyledTableRow key={k}>
+          <StyledTableCell component="th" scope="row">
+            {memoizedCapitalize(k)}
+          </StyledTableCell>
+          <StyledTableCell align="right">
+            {typeof v === "object" ? (
+              Object.entries(v).map(([subK, subV]) => (
+                <div key={subK}>
+                  <strong>{memoizedCapitalize(subK)}:</strong> {subV}
+                </div>
+              ))
+            ) : (
+              v
+            )}
+          </StyledTableCell>
+        </StyledTableRow>
+      ),
+      [memoizedCapitalize]
+    );
+
+    const renderSectionTitle = useCallback(
+      (t) => memoizedCapitalize(t),
+      [memoizedCapitalize]
+    );
+
+    /* ───── card style ───── */
+
+    const cardStyle = {
+      borderRadius: "0px",
+      boxShadow:
+        "0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19)",
+    };
+
+    /* ===================== JSX ===================== */
+
+    return (
+      <div className="parameter-container">
+        {noData ? (
+          /* Placeholder cards */
+          defaultCards.map((c, i) => (
+            <HvCard
+              key={i}
+              className="parameter-card"
+              elevation={0}
+              statusColor="grey"
+              style={cardStyle}
+            >
+              <HvCardContent className="parameter-content">
+                <HvTypography variant="title2" className="section-title">
+                  {c.title}
+                </HvTypography>
+                <HvTypography variant="body1" align="center">
+                  {c.value}
+                </HvTypography>
+              </HvCardContent>
+            </HvCard>
           ))
         ) : (
-          value
-        )}
-      </StyledTableCell>
-    </StyledTableRow>
-  ), [memoizedCapitalize]);
+          <>
+            {/* ------- dynamic sections ------- */}
+            {Object.keys(displayData).map((sectionTitle) => {
+              const parameters = displayData[sectionTitle];
 
-  const renderSectionTitle = useCallback((title) => memoizedCapitalize(title), [memoizedCapitalize]);
+              return (
+                <HvCard
+                  key={sectionTitle}
+                  className="parameter-card"
+                  elevation={0}
+                  statusColor="red"
+                  style={cardStyle}
+                >
+                  <HvCardContent className="parameter-content">
+                    <HvTypography variant="title2" className="section-title">
+                      {renderSectionTitle(sectionTitle)}
+                    </HvTypography>
 
-  const cardStyle = {
-    borderRadius: "0px",
-    boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-  };
+                    {/* --- switch per section --- */}
+                    {[
+                      "Radiation_Parameters",
+                      "Radiation_Readings",
+                      "Biological_Parameters",
+                      "Chemical Alarms",
+                      "Radiation Alarm",
+                      "Concentrations",
+                    ].includes(sectionTitle) ? (
+                      <div
+                        style={{
+                          padding: "10px 0",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "12px",
+                        }}
+                      >
+                        {sectionTitle === "Concentrations" ? (
+                          <MemoizedLivePlot data={parameters} />
+                        ) : (
+                          Object.entries(parameters).map(
+                            ([groupTitle, sub]) =>
+                              renderParameterGroup(groupTitle, sub)
+                          )
+                        )}
+                      </div>
+                    ) : sectionTitle === "System Settings" ? (
+                      /* ---------- system settings ---------- */
+                      <div style={{ padding: "10px 0" }}>
+                        <TableContainer
+                          component={Paper}
+                          elevation={0}
+                          style={{
+                            width: "100%",
+                            overflowX: "auto",
+                            marginBottom: "16px",
+                          }}
+                        >
+                          <Table
+                            sx={{ minWidth: "100%" }}
+                            aria-label="system-settings-table"
+                          >
+                            <TableBody>
+                              {Object.entries(parameters)
+                                .filter(([_, v]) => isNaN(Number(v)))
+                                .map(([k, v]) => (
+                                  <StyledTableRow key={k}>
+                                    <StyledTableCell
+                                      component="th"
+                                      scope="row"
+                                      style={{ width: "60%" }}
+                                    >
+                                      <div style={{ padding: "8px 0" }}>{k}</div>
+                                    </StyledTableCell>
+                                    <StyledTableCell
+                                      align="right"
+                                      style={{ width: "40%" }}
+                                    >
+                                      <div style={{ padding: "8px 0" }}>{v}</div>
+                                    </StyledTableCell>
+                                  </StyledTableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
 
-  const fontSizes = {
-  sectionTitle: "20px",
-  tableCell: "16px",
-  parameterName: "16px",
-  parameterValue: "16px",
-  notificationText: "16px",
-  cardTitle: "18px",
-  cardValue: "16px"
-};
+                        <MemoizedLivePlot
+                          data={Object.fromEntries(
+                            Object.entries(parameters)
+                              .filter(([_, v]) => !isNaN(Number(v)))
+                              .map(([k, v]) => [k, Number(v)])
+                          )}
+                        />
+                      </div>
+                    ) : ["Health Parameters", "Health_Parameters"].includes(
+                        sectionTitle
+                      ) ? (
+                      /* -------- Health Parameters ---------- */
+<TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
+  <Table sx={{ minWidth: "100%" }} aria-label="health-parameters-table">
+    <TableBody>
+      {Object.entries(parameters).map(([paramName, meta]) => {
+        // meta = { "<paramName> Status": "...", "Fault Value": "...", ... }
+        const status =
+          meta[`${paramName} Status`] ??
+          meta[Object.keys(meta).find((k) => k.toLowerCase().includes("status"))];
 
-  return (
-    <div className="parameter-container">
-      {noData ? (
-        defaultCards.map((card, index) => (
-          <HvCard
-            key={index}
-            className="parameter-card"
-            elevation={0}
-            statusColor="grey"
-            style={cardStyle}
-          >
-            <HvCardContent className="parameter-content">
-              <HvTypography variant="title2" className="section-title">
-                {card.title}
-              </HvTypography>
-              <HvTypography variant="body1" align="center">
-                {card.value}
-              </HvTypography>
-            </HvCardContent>
-          </HvCard>
-        ))
-      ) : (
-        <>
-          {Object.keys(displayData).map((sectionTitle) => {
-            let parameters = displayData[sectionTitle];
-            // parameters = getFilteredParameters(parameters, sectionTitle, toggleState);
+        const fault = meta["Fault Value"];
 
-            return (
+        return (
+          <StyledTableRow key={paramName}>
+            {/* label column */}
+            <StyledTableCell component="th" scope="row" style={{ width: "60%" }}>
+              {paramName.replace(/_/g, " ")}
+            </StyledTableCell>
+
+            {/* value chip */}
+            <StyledTableCell align="right" style={{ width: "40%" }}>
+              <div
+                style={{
+                  backgroundColor: getBackgroundColor(status, fault),
+                  color: "white",
+                  borderRadius: "6px",
+                  padding: "4px 12px",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  minWidth: "70px",
+                  display: "inline-block",
+                }}
+              >
+                {status}
+              </div>
+            </StyledTableCell>
+          </StyledTableRow>
+        );
+      })}
+    </TableBody>
+  </Table>
+</TableContainer>
+
+                    ) : (
+                      /* ---------- generic table ---------- */
+                      <TableContainer
+                        component={Paper}
+                        elevation={0}
+                        style={{ width: "100%", overflowX: "auto" }}
+                      >
+                        <Table
+                          sx={{ minWidth: "100%" }}
+                          aria-label="generic-table"
+                        >
+                          <TableBody>
+                            {Object.entries(parameters).map(([k, v]) =>
+                              renderTableRow(k, v)
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </HvCardContent>
+                </HvCard>
+              );
+            })}
+
+            {/* ------- Notifications card ------- */}
+            <HvCard
+              className="parameter-card"
+              elevation={0}
+              statusColor="red"
+              style={cardStyle}
+            >
+              <HvCardContent>
+                <HvTypography variant="title2" className="section-title">
+                  Notifications
+                </HvTypography>
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  style={notificationContainerStyle}
+                >
+                  <Table
+                    sx={{ minWidth: "100%" }}
+                    aria-label="notifications-table"
+                  >
+                    <TableBody>
+                      {notifications.length ? (
+                        <TableRow>
+                          <TableCell colSpan={4}>
+                            <List
+                              height={550}
+                              itemCount={notifications.length}
+                              itemSize={150}
+                              width="100%"
+                            >
+                              {renderNotificationRow}
+                            </List>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <StyledTableRow>
+                          <StyledTableCell colSpan={2} align="center">
+                            ✅ All good. No active alarms.
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </HvCardContent>
+            </HvCard>
+
+            {/* ------- optional ASM section ------- */}
+            {AsmData && (
               <HvCard
-                key={sectionTitle}
                 className="parameter-card"
                 elevation={0}
                 statusColor="red"
@@ -320,202 +507,34 @@ const IndividualParameters = memo(({ paramsData, notifications = [], toggleState
               >
                 <HvCardContent className="parameter-content">
                   <HvTypography variant="title2" className="section-title">
-                    {renderSectionTitle(sectionTitle)}
+                    ASM Data
                   </HvTypography>
-                  {["Radiation_Parameters", "Radiation_Readings", "Biological_Parameters", "Chemical Alarms", "Radiation Alarm"].includes(sectionTitle) ? (
-                    <div style={{ padding: "10px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
-                      {Object.entries(parameters).map(([groupTitle, subParams]) =>
-                        renderParameterGroup(groupTitle, subParams)
-                      )}
-                    </div>
-                  ) : sectionTitle === "System Settings" ? (
-                    <div style={{ padding: "10px 0" }}>
-                      <TableContainer
-                        component={Paper}
-                        elevation={0}
-                        style={{ width: "100%", overflowX: "auto", marginBottom: "16px" }}
-                      >
-                        <Table sx={{ minWidth: "100%" }} aria-label="system-settings-table">
-                          <TableBody>
-                            {Object.entries(parameters)
-                              .filter(([_, value]) => isNaN(Number(value)))
-                              .map(([key, value]) => (
-                                <StyledTableRow key={key}>
-                                  <StyledTableCell component="th" scope="row" style={{ width: '60%' }}>
-                                    <div style={{ padding: '8px 0' }}>
-                                      {key}
-                                    </div>
-                                  </StyledTableCell>
-                                  <StyledTableCell align="right" style={{ width: '40%' }}>
-                                    <div style={{ padding: '8px 0' }}>
-                                      {value}
-                                    </div>
-                                  </StyledTableCell>
-                                </StyledTableRow>
-                              ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                      
-                      {/* Live Plot for numeric values */}
-                      <MemoizedLivePlot
-                        data={Object.fromEntries(
-                          Object.entries(parameters)
-                            .filter(([_, value]) => !isNaN(Number(value)))
-                            .map(([key, value]) => [key, Number(value)])
-                        )}
-                      />
-                    </div>
-                  )  : sectionTitle === "Health Parameters" || sectionTitle === "Health_Parameters" ? (
-                    <TableContainer
-                      component={Paper}
-                      elevation={0}
-                      style={{ width: "100%", overflowX: "auto" }}
-                    >
-                      <Table sx={{ minWidth: "100%" }} aria-label="health-parameters-table">
-                        <TableBody>
-                          {Object.entries(parameters).map(([key, value], index) => (
-                            <StyledTableRow key={key}>
-                              <StyledTableCell component="th" scope="row" style={{ width: '60%' }}>
-                                <div style={{ 
-                                  display: 'flex', 
-                                  alignItems: 'center',
-                                  padding: '8px 0'
-                                }}>
-                                  <span
-                                    style={{
-                                      // backgroundColor: "#ddd",
-                                      borderRadius: "6px",
-                                      padding: "4px 10px",
-                                      fontSize: "18px",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                  >
-                                    {key}
-                                  </span>
-                                </div>
-                              </StyledTableCell>
-                              <StyledTableCell align="right" style={{ width: '40%' }}>
-                                <div
-                                  style={{
-                                    backgroundColor: getBackgroundColor(key, value),
-                                    color: "white",
-                                    borderRadius: "6px",
-                                    padding: "4px 12px",
-                                    fontWeight: "bold",
-                                    textAlign: "center",
-                                    minWidth: "90px",
-                                    display: 'inline-block'
-                                  }}
-                                >
-                                  {value}
-                                </div>
-                              </StyledTableCell>
-                            </StyledTableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  ) :
-                    (
-                      <TableContainer
-                        component={Paper}
-                        elevation={0}
-                        style={{ width: "100%", overflowX: "auto" }}
-                      >
-                        <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                          <TableBody>
-                            {Object.entries(parameters).map(([key, value]) => (
-                              renderTableRow(key, value)
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    )}
+                  <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    style={{ width: "100%", overflowX: "auto" }}
+                  >
+                    <Table sx={{ minWidth: "100%" }} aria-label="asm-table">
+                      <TableBody>
+                        {Object.entries(AsmData).map(([k, v]) => (
+                          <StyledTableRow key={k}>
+                            <StyledTableCell component="th" scope="row">
+                              {k}
+                            </StyledTableCell>
+                            <StyledTableCell align="right">{v}</StyledTableCell>
+                          </StyledTableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </HvCardContent>
               </HvCard>
-            );
-          })}
-
-          <HvCard
-            className="parameter-card"
-            elevation={0}
-            statusColor="red"
-            style={cardStyle}
-          >
-            <HvCardContent >
-              <HvTypography variant="title2" className="section-title">
-                Notifications
-              </HvTypography>
-              <TableContainer
-                component={Paper}
-                elevation={0}
-                style={notificationContainerStyle}
-              >
-                <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                  <TableBody>
-                    {notifications.length > 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <List
-                            height={550}
-                            itemCount={notifications.length}
-                            itemSize={150}
-                            width="100%"
-                          >
-                            {renderNotificationRow}
-                          </List>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <StyledTableRow>
-                        <StyledTableCell colSpan={2} align="center">
-                          No notifications available
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </HvCardContent>
-          </HvCard>
-          {AsmData && (
-            <HvCard
-              className="parameter-card"
-              elevation={0}
-              statusColor="red"
-              style={cardStyle}
-            >
-              <HvCardContent className="parameter-content">
-                <HvTypography variant="title2" className="section-title">
-                  ASM Data
-                </HvTypography>
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  style={{ width: "100%", overflowX: "auto" }}
-                >
-                  <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                    <TableBody>
-                      {Object.entries(AsmData).map(([key, value]) => (
-                        <StyledTableRow key={key}>
-                          <StyledTableCell component="th" scope="row">
-                            {key}
-                          </StyledTableCell>
-                          <StyledTableCell align="right">{value}</StyledTableCell>
-                        </StyledTableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </HvCardContent>
-            </HvCard>
-          )}
-        </>
-      )}
-
-    </div>
-  );
-});
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+);
 
 export default IndividualParameters;

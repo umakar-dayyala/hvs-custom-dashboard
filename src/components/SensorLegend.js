@@ -5,8 +5,8 @@ import "../css/SensorLegend.css"; // Import the CSS file
 const SensorLegend = () => {
   const legends = [
     { color: "#29991D", label: "Active Sensor" },
-    { color: "#FF9933", label: "Faulty Sensors" },
-    { color: "#FF1F1F", label: "Alert & Alarm" },
+    { color: "#FF9933", label: "Unhealthy Sensors" },
+    { color: "#FF1F1F", label: "CBRN Alarm" },
   ];
 
   return (

@@ -35,6 +35,9 @@ import InventoryDashboard from "./pages/InventoryDashboard";
 import { FcadIndividual } from "./pages/FcadIndividual";
 import { AamIndividual } from "./pages/AamIndividual";
 import SensorEventHistory from "./pages/SensorEventHistory";
+import OxygenMonitor from "./pages/OxygenMonitor";
+
+
 // import FloatingNotificationButton from "./components/FloatingNotificationButton";
 
 
@@ -81,13 +84,13 @@ const App = () => {
               <Route path="/fcadIndividual" element={<FcadIndividual/>}/>
               <Route path="/aamIndividual" element={<AamIndividual/>}/> 
               {/* <Route path="/chartDemo" element={<ChartDemo/>} /> */}
-              <Route path="/weather" element={<WeatherDashboard />} />
-              <Route path="/Weatherv2" element={<Weatherv2 />} />
+              {/* <Route path="/weather" element={<WeatherDashboard />} /> */}
+              <Route path="/Weather" element={<Weatherv2 />} />
               <Route path="/floorwisealarms" element={<FloorWiseAlarms />} />
               <Route path="/configurationPage" element={<ConfigurationPage />} />
               <Route path="/inventory" element={<InventoryDashboard />} />
               <Route path="/sensorEventHistory" element={<SensorEventHistory />} />
-             
+              <Route path="/OxygenMonitoring" element={<OxygenMonitor />} />
             </Routes>
           </HvContainer>
         </Router>

@@ -1,90 +1,114 @@
-import { HvCard, HvCardContent, HvTypography } from '@hitachivantara/uikit-react-core'
-import { Box } from '@mui/material'
-import React from 'react'
+import React, { useState, useMemo } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { styled } from "@mui/material/styles";
+import { tableCellClasses } from "@mui/material/TableCell";
+import {
+  HvCard,
+  HvCardContent,
+  HvTypography,
+} from "@hitachivantara/uikit-react-core";
 
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
+// ── styled table cells/rows ──────────────────────────────────────────
+const StyledTableCell = styled(TableCell)(() => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#000",
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    color: "#000",
+  },
+}));
 
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+const StyledTableRow = styled(TableRow)(() => ({
+  "&:nth-of-type(odd)": { backgroundColor: "#f7f7f7" },
+  "&:nth-of-type(even)": { backgroundColor: "#fff" },
+  "&:last-child td, &:last-child th": { border: 0 },
+}));
 
+// ── main component ──────────────────────────────────────────────────
+const Imagedata = ({ connectivityData }) => {
+  const isEmpty =
+    !connectivityData || Object.keys(connectivityData).length === 0;
 
+  const [expanded, setExpanded] = useState(!isEmpty);
 
-// Styled components for Material-UI table
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: "#000", // Black header
-      color: "#fff", // White text
-      fontWeight: "bold",
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      color: "#000", // Black text for values
-    },
-  }));
-  
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-      backgroundColor: "#f7f7f7", // Light gray background for odd rows
-    },
-    "&:nth-of-type(even)": {
-      backgroundColor: "#ffffff", // White background for even rows
-    },
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
-  
- 
+  const rows = useMemo(
+    () =>
+      Object.entries(connectivityData || {}).map(([key, value]) => (
+        <StyledTableRow key={key}>
+          <StyledTableCell component="th" scope="row">
+            {key}
+          </StyledTableCell>
+          <StyledTableCell align="right">{value}</StyledTableCell>
+        </StyledTableRow>
+      )),
+    [connectivityData]
+  );
 
-  const Imagedata = ({ connectivityData }) => {
-    // Check if connectivityData is empty or undefined
-    const isEmpty = !connectivityData || Object.keys(connectivityData).length === 0;
-  
-    return (
-      <Box>
-        <HvCard
-          bgcolor="white"
-          style={{
-            height: "500px",
-            borderRadius: "0px",
-            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-          }}
-          statusColor="red"
-        >
-          <HvCardContent>
-            <Box p={2} >
-                            <HvTypography variant="title2">Images Data</HvTypography>
-                            </Box>
-  
-            {isEmpty ? (
-              <Box flex={1} display="flex" justifyContent="center" alignItems="center">
-              <HvTypography variant="title3" >No data Available</HvTypography>
-              </Box>
-            ) : (
-              <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
-                <Table sx={{ minWidth: "100%" }} aria-label="customized table">
-                  <TableBody>
-                    {Object.entries(connectivityData).map(([key, value]) => (
-                      <StyledTableRow key={key}>
-                        <StyledTableCell component="th" scope="row">
-                          {key}
-                        </StyledTableCell>
-                        <StyledTableCell align="right">{value}</StyledTableCell>
-                      </StyledTableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </HvCardContent>
-        </HvCard>
-      </Box>
-    );
-  };
-  
-  export default Imagedata;
-  
+  return (
+    <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <HvTypography variant="title3" sx={{ fontSize: "1.25rem" }}>
+          Images Data
+        </HvTypography>
+      </AccordionSummary>
+
+      <AccordionDetails>
+        <Box>
+          <HvCard
+            bgcolor="white"
+            style={{
+              height: "500px",
+              borderRadius: 0,
+              boxShadow:
+                "0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19)",
+            }}
+            statusColor="red"
+          >
+            <HvCardContent style={{ height: "100%" }}>
+              
+
+              {isEmpty ? (
+                <Box
+                  flex={1}
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  height="100%"
+                >
+                  <HvTypography variant="title3">No data Available</HvTypography>
+                </Box>
+              ) : (
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ width: "100%", overflowX: "auto" }}
+                >
+                  <Table sx={{ minWidth: "100%" }}>
+                    <TableBody>{rows}</TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </HvCardContent>
+          </HvCard>
+        </Box>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+export default Imagedata;

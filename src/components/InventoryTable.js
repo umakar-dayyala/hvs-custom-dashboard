@@ -185,9 +185,9 @@ const InventoryTable = ({
                                       <HvTableCell className="tableCell">{c.assetManufacturer || "—"}</HvTableCell>
                                       <HvTableCell className="tableCell">{c.assetSerialNumber || "—"}</HvTableCell>
                                       <HvTableCell className="tableCell">{c.asset_name || "—"}</HvTableCell>
-                                      <HvTableCell className="tableCell">{c.loggedBy}</HvTableCell>
+                                      <HvTableCell className="tableCell">{c.loggedBy || "_"}</HvTableCell>
                                       <HvTableCell className="tableCell">{c.logDate}</HvTableCell>
-                                      <HvTableCell className="tableCell">{c.location}</HvTableCell>
+                                      <HvTableCell className="tableCell">{c.location || "_"}</HvTableCell>
                                       <HvTableCell className="tableCell">
                                         <Box className={`statusBadge ${c.status === "Active" ? "activeStatus" : 
                                                                      c.status === "Inactive" ? "inactiveStatus" : 
@@ -197,7 +197,7 @@ const InventoryTable = ({
                                       </HvTableCell>
                                       <HvTableCell className="tableCell">
                                         <Tooltip title={c.comments || "No comments"} arrow>
-                                          <span className="cellContent">{c.comments || "—"}</span>
+                                          <span className="commentCell">{c.comments || "—"}</span>
                                         </Tooltip>
                                       </HvTableCell>
                                       <HvTableCell className="tableCell">
