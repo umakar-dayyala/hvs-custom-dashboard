@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react';
 // import { HamburgerIcon } from '@chakra-ui/icons';
 import EcilLogo from "../assets/ECIL_Logo.ico";
+import combinationLogo from "../assets/Combination_Logo.png";
 import VerticalDivider from './VerticalDivider';
 
 const Header = ({ onMenuToggle }) => {
@@ -36,13 +37,13 @@ const Header = ({ onMenuToggle }) => {
         />
         {/* ECIL Logo */}
         <img
-          src={EcilLogo}
+          src={combinationLogo}
           alt="ECIL Logo"
-          style={{ width: 'auto', height: '60px', marginRight: '15px',marginLeft: '20px' }}
+          style={{ width: 'auto', height: '90px', marginRight: '15px',marginLeft: '10px' }}
         />
 
-        <img src="/HVS_Hitachi_LOGO.png" alt="Logo" style={{ width: 'auto', height: '20px', marginRight: '5px' }} />
-        <Text size="sm"> Hitachi Visualization Suite</Text>
+        {/* <img src="/HVS_Hitachi_LOGO.png" alt="Logo" style={{ width: 'auto', height: '20px', marginRight: '5px' }} />
+        <Text size="sm"> Hitachi Visualization Suite</Text> */}
       </Box>
 
       <HStack spacing={2}>
