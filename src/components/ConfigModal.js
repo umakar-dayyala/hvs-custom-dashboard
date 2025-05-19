@@ -29,15 +29,15 @@ const WriteConfigurationModal = ({
       data
     };
 
-    // try {
-    //   await sendParams(cmd);
-    //   onClose();
-    // } catch (err) {
-    //   console.error(err);
-    //   alert("Failed to set parameters");
-    // }
+    try {
+      await sendParams(cmd);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to set parameters");
+    }
 
-    console.log("📦 Command payload that would be sent:", cmd);
+    // console.log("📦 Command payload that would be sent:", cmd);
   };
 
   return (

@@ -23,7 +23,7 @@ export const sendParams = (cmd) =>
 
 
 export const fetchDetectorParameters = async (device_id, sensor_name) => {
-  const url = `http://localhost:5000/api/config/getSensorParameters`;
+  const url = `${API_BASE_URL}/config/getSensorParameters`;
   const body = { device_id, sensor_name };
 
   try {
