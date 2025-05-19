@@ -28,8 +28,8 @@ const sensorPositions = {
     72: [530, 130],     // AP4C - a > DONE
     73: [620, 415],     // AP4C - b > DONE
     2202: [620, 400],   // FCAD - c >DONE
-    74: [496, 749],     // AP4C - d > DONE
-    1148: [470, 740],   // IBAC - e > DONE
+    74: [496, 579],     // AP4C - d > 
+    1148: [490, 570],   // IBAC - e > 
     75: [210, 695],      // AP4C - f > DONE
     122: [220, 690],    // MAB - g > DONE
     76: [120, 410],     // AP4C - h > DONE
