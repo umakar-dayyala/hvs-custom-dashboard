@@ -7,6 +7,7 @@ export const routeName = (detector) => {
       VRM: "vrmIndividual",
       IBAC: "ibacIndividual",
       MAB: "MABIndividual",
+      AAM: "aamIndividual",
     };
     return routes[detector] || null;
   };

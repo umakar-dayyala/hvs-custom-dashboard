@@ -46,6 +46,8 @@ const routeName = (detector) => ({
   VRM: "vrmIndividual",
   IBAC: "ibacIndividual",
   MAB: "MABIndividual",
+  AAM: "aamIndividual",
+  WRM: "wrmIndividual",
 }[detector] ?? null);
 
 /* ---------- leaf cell ---------- */
