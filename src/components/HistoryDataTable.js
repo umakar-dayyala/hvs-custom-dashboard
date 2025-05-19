@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import {
   HvTable,
   HvTableBody,
@@ -25,43 +25,55 @@ import { CSVLink } from "react-csv";
 const HistoryDataTable = ({ data }) => {
   const filterRef = useRef(null);
   const [selectedFilters, setSelectedFilters] = useState([]);
-  const [tableData, setTableData] = useState([]);
 
-  // Compute all columns from data
-  const allColumns = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    setTableData(data);
-    return Object.keys(data[0]);
-  }, [data]);
+  const allColumns = [
+    "device_id",
+    "health",
+    "connection",
+    "description",
+    "timestamp",
+    "datetime",
+    "sensor_name",
+    "sensor_type",
+    "sensor_status",
+  ];
 
-  // Initialize visibleColumns with all columns set to true
+  const initialVisibleColumns = {
+    device_id: true,
+    health: true,
+    connection: true,
+    description: true,
+    timestamp: true,
+    datetime: true,
+    sensor_name: true,
+    sensor_type: true,
+    sensor_status: true,
+  };
+
   const [visibleColumns, setVisibleColumns] = useState(() => {
-    const initialVisibility = {};
-    allColumns.forEach((col) => {
-      initialVisibility[col] = true;
-    });
-    return initialVisibility;
+    // Ensure initial state is correct
+    const savedColumns = { ...initialVisibleColumns };
+    console.log("Initial visibleColumns:", savedColumns);
+    return savedColumns;
   });
 
-  // Ensure visibleColumns is updated when allColumns changes
-  useMemo(() => {
-    setVisibleColumns((prev) => {
-      const newVisibility = { ...prev };
-      allColumns.forEach((col) => {
-        if (!(col in newVisibility)) {
-          newVisibility[col] = true; // Set new columns to visible by default
-        }
-      });
-      return newVisibility;
-    });
-  }, [allColumns]);
+  // Log visibleColumns on every render
+  useEffect(() => {
+    console.log("Current visibleColumns:", visibleColumns);
+  }, [visibleColumns]);
+
+  const displayedData = useMemo(() => data.slice(0, 50).map(item => ({
+    ...item,
+    connection: item.connection ? "True" : "False",
+    health: item.health ? "True" : "False",
+  })), [data]);
 
   const filters = useMemo(() => {
     const opts = {};
     allColumns.forEach((col) => {
       opts[col] = new Set();
     });
-    (data || []).forEach((row) => {
+    displayedData.forEach((row) => {
       allColumns.forEach((col) => {
         if (row[col] !== undefined && row[col] !== null) {
           opts[col].add(row[col]);
@@ -71,41 +83,46 @@ const HistoryDataTable = ({ data }) => {
     return allColumns.map((col) => ({
       id: col,
       name: col,
-      data: [...opts[col]].map((value) => ({ id: value, name: value })),
+      data: [...opts[col]].map((value) => ({ id: value, name: value.toString() })),
     }));
-  }, [allColumns, data]);
+  }, [displayedData]);
 
-  // Handle column visibility toggle
-  const handleColumnToggle = (column) => {
-    setVisibleColumns((prev) => ({
-      ...prev,
-      [column]: !prev[column],
-    }));
-  };
+  const handleColumnToggle = useCallback((column) => {
+    setVisibleColumns((prev) => {
+      const newState = {
+        ...prev,
+        [column]: !prev[column],
+      };
+      console.log(`Toggling column ${column}: ${prev[column]} -> ${!prev[column]}`);
+      return newState;
+    });
+  }, []);
 
-  // Compute visible columns
-  const visibleCols = useMemo(
-    () => allColumns.filter((col) => visibleColumns[col]),
-    [allColumns, visibleColumns]
-  );
+  const resetColumns = useCallback(() => {
+    setVisibleColumns({ ...initialVisibleColumns });
+    console.log("Reset visibleColumns to:", initialVisibleColumns);
+  }, []);
 
-  // Define table columns
+  const visibleCols = useMemo(() => {
+    const cols = allColumns.filter((col) => visibleColumns[col]);
+    console.log("Visible columns:", cols);
+    return cols;
+  }, [visibleColumns]);
+
   const columns = useMemo(
     () =>
       visibleCols.map((col) => ({
-        Header: col,
+        Header: col.replace(/_/g, " ").toUpperCase(),
         accessor: col,
+        Cell: ({ value }) => (value ?? "N/A"),
         filter: (rows, columnIds, filterValues) => {
           if (!filterValues?.length) return rows;
-          return rows.filter((r) =>
-            filterValues.includes(r.values[columnIds[0]])
-          );
+          return rows.filter((r) => filterValues.includes(r.values[columnIds[0]]));
         },
       })),
     [visibleCols]
   );
 
-  // Initialize table hooks
   const {
     getTableProps,
     getTableBodyProps,
@@ -118,7 +135,7 @@ const HistoryDataTable = ({ data }) => {
   } = useHvData(
     {
       columns,
-      data,
+      data: displayedData,
       initialState: { pageSize: 10, filters: [] },
     },
     useHvGlobalFilter,
@@ -126,50 +143,54 @@ const HistoryDataTable = ({ data }) => {
     useHvPagination
   );
 
-  // Handle filter changes
-  const handleFilters = (_, value) => {
-    setSelectedFilters(value || []);
-    const hvFilters = (value || []).flatMap((vals, idx) => {
-      if (!vals?.length) return [];
-      return [
-        {
-          id: filters[idx].id,
-          value: vals,
-        },
-      ];
-    });
-    setAllFilters(hvFilters);
-  };
+  const handleFilters = useCallback(
+    (_, value) => {
+      setSelectedFilters(value || []);
+      const hvFilters = (value || []).flatMap((vals, idx) => {
+        if (!vals?.length) return [];
+        return [
+          {
+            id: filters[idx].id,
+            value: vals,
+          },
+        ];
+      });
+      setAllFilters(hvFilters);
+    },
+    [filters, setAllFilters]
+  );
 
   return (
     <>
-      {/* Column Toggle Section */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "4px",
-        marginTop: "6px",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "4px",
+          marginTop: "6px",
+        }}
+      >
         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
           {allColumns.map((col) => (
             <label key={col} style={{ display: "flex", alignItems: "center" }}>
               <HvCheckBox
                 checked={visibleColumns[col] ?? true}
                 onChange={() => handleColumnToggle(col)}
-                disabled={false} 
+                disabled={false}
               />
-              <span>{col}</span>
+              <span>{col.replace(/_/g, " ").toUpperCase()}</span>
             </label>
           ))}
         </div>
-          <CSVLink data={tableData} filename={"sensor-event-history.csv"}>
+        <div style={{ display: "flex", gap: "8px" }}>
+          {/* <Button onClick={resetColumns}>Reset Columns</Button> */}
+          <CSVLink data={data} filename={"sensor-event-history.csv"}>
             <Button variant="outlined">Export to CSV</Button>
           </CSVLink>
-        
+        </div>
       </div>
 
-      {/* Table Section with Search and Filters */}
       <HvTableSection
         title={<HvTypography variant="title4">History Data</HvTypography>}
         actions={

@@ -2,12 +2,41 @@ import React, { useEffect, useState } from "react";
 import FilterComponent from "../components/HistoryFilter";
 import DataTableComponent from "../components/HistoryDataTable";
 import { getSensorEventHistory } from "../service/HistoryService";
-import { Button } from "@mui/material";
-import { CSVLink } from "react-csv";
 import Breadcrumbs from "../components/Breadcrumbs";
+import { Box, Typography } from "@mui/material";
+import dayjs from "dayjs";
+
 const SensorEventHistory = () => {
   const [filters, setFilters] = useState({});
   const [tableData, setTableData] = useState([]);
+  const [error, setError] = useState(null);
+
+  const areFiltersEqual = (a, b) => {
+    if (a.deviceId !== b.deviceId || a.sensorType !== b.sensorType) {
+      return false;
+    }
+    const aNames = a.sensorNames || [];
+    const bNames = b.sensorNames || [];
+    if (aNames.length !== bNames.length || !aNames.every((val, i) => val === bNames[i])) {
+      return false;
+    }
+    const aLocations = a.sensorLocation || [];
+    const bLocations = b.sensorLocation || [];
+    if (aLocations.length !== bLocations.length || !aLocations.every((val, i) => val === bLocations[i])) {
+      return false;
+    }
+    const aDateRange = a.dateRange || [null, null];
+    const bDateRange = b.dateRange || [null, null];
+    const isDateRangeEqual =
+      (aDateRange[0] === null && bDateRange[0] === null ||
+        (aDateRange[0] && bDateRange[0] && aDateRange[0].isSame(bDateRange[0]))) &&
+      (aDateRange[1] === null && bDateRange[1] === null ||
+        (aDateRange[1] && bDateRange[1] && aDateRange[1].isSame(bDateRange[1])));
+    if (!isDateRangeEqual) {
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
     fetchData(filters);
@@ -16,14 +45,30 @@ const SensorEventHistory = () => {
   const fetchData = async (filters) => {
     try {
       const data = await getSensorEventHistory(filters);
+      console.log("Fetched table data:", data.map(item => ({
+        device_id: item.device_id,
+        sensor_status: item.sensor_status,
+        sensor_type: item.sensor_type,
+        sensor_name: item.sensor_name,
+        description: item.description,
+        connection: item.connection,
+        health: item.health,
+        timestamp: item.timestamp,
+        datetime: item.datetime,
+      })));
       setTableData(data);
+      setError(null);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setTableData([]);
+      setError("No data found for the selected filters. Try adjusting the filters.");
     }
   };
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    if (!areFiltersEqual(filters, newFilters)) {
+      setFilters(newFilters);
+    }
   };
 
   return (
@@ -32,18 +77,16 @@ const SensorEventHistory = () => {
         <Breadcrumbs />
       </div>
       <div style={{ padding: "20px" }}>
-
         <FilterComponent onFilterChange={handleFilterChange} />
-        {/* <div style={{ margin: "10px 0" }}>
-          <CSVLink data={tableData} filename={"sensor-event-history.csv"}>
-            <Button variant="outlined">Export to CSV</Button>
-          </CSVLink>
-        </div> */}
+        {error && (
+          <Box sx={{ color: "red", my: 2 }}>
+            <Typography>{error}</Typography>
+          </Box>
+        )}
         <DataTableComponent data={tableData} />
       </div>
     </>
   );
-
 };
 
 export default SensorEventHistory;
