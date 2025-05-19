@@ -52,17 +52,6 @@ const getSensorIcon = (type, status, alarmStatus) => {
   }
 };
 
-// const routeName = (detector) => ({
-//   AGM: "agmindividual",
-//   "AP4C-F": "AP4CIndividual",
-//   FCAD: "FCADIndividual",
-//   PRM: "PRMIndividual",
-//   VRM: "vrmIndividual",
-//   IBAC: "ibacIndividual",
-//   MAB: "MABIndividual",
-//   AAM: "aamIndividual",
-//   WRM: "wrmIndividual",
-// }[detector] ?? null);
 
 /* ---------- leaf cell ---------- */
 const Cell = ({ sensors }) => {
