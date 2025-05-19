@@ -1,10 +1,11 @@
 {
   "files": {
     "main.css": "/static/css/main.f238be34.css",
-    "main.js": "/static/js/main.fff92377.js",
+    "main.js": "/static/js/main.b04ef1a6.js",
     "static/js/360.ebba2d25.chunk.js": "/static/js/360.ebba2d25.chunk.js",
     "static/media/centralvista.png": "/static/media/centralvista.d8d26fa2a3be8ab2cb3e.png",
     "static/media/ECIL_Logo.ico": "/static/media/ECIL_Logo.9af2c8f1522b005f9f0e.ico",
+    "static/media/Combination_Logo.png": "/static/media/Combination_Logo.2480db023df4c6ea56ff.png",
     "static/media/successIcon.png": "/static/media/successIcon.f9b5896242da3c2bfbaa.png",
     "static/media/aBiological.svg": "/static/media/aBiological.44f72e432156b5cba49cabf49933502a.svg",
     "static/media/greyBio.svg": "/static/media/greyBio.f801ac71ab1d3485c053b62235a1ddd5.svg",
@@ -35,11 +36,11 @@
     "static/media/error-circle.svg": "/static/media/error-circle.3d3836db033f450ead848c757575a2e1.svg",
     "static/media/check-circle.svg": "/static/media/check-circle.a00dec72d85bc80bcefd824feff8d133.svg",
     "main.f238be34.css.map": "/static/css/main.f238be34.css.map",
-    "main.fff92377.js.map": "/static/js/main.fff92377.js.map",
+    "main.b04ef1a6.js.map": "/static/js/main.b04ef1a6.js.map",
     "360.ebba2d25.chunk.js.map": "/static/js/360.ebba2d25.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f238be34.css",
-    "static/js/main.fff92377.js"
+    "static/js/main.b04ef1a6.js"
   ]
 }
