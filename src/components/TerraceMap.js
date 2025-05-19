@@ -28,14 +28,14 @@ const sensorPositions = {
     72: [530, 130],     // AP4C - a > DONE
     73: [620, 415],     // AP4C - b > DONE
     2202: [620, 400],   // FCAD - c >DONE
-    74: [496, 579],     // AP4C - d > 
-    1148: [490, 570],   // IBAC - e > 
-    75: [210, 695],      // AP4C - f > DONE
-    122: [220, 690],    // MAB - g > DONE
+    74: [496, 579],     // AP4C - d > DONE
+    1148: [490, 570],   // IBAC - e > DONE
+    75: [210, 590],      // AP4C - f > 
+    122: [220, 580],    // MAB - g > 
     76: [120, 410],     // AP4C - h > DONE
-    77: [210, 90],      // AP4C - i
-    2203: [215, 688],  // FCAD - j > DONE
-    2204: [200, 100],   // FCAD - k
+    77: [210, 90],      // AP4C - i >DONE
+    2203: [215, 575],  // FCAD - j > 
+    2204: [200, 100],   // FCAD - k > DONE
     9990: [210, 100],   // IBAC - l (IBAC-IBAC), pseudo device_id
     78: [410, 310],     // AP4C - m >DONE
     79: [410, 270],      // AP4C - n > DONE
@@ -50,7 +50,7 @@ const sensorPositions = {
 
     1170: [310, 190],   // AAM (81) - 1 >DONE
     1169: [410, 190],   // AAM (85) - 2 > DONE
-    1172: [225, 685],   // ASB - 3 >DONE
+    1172: [225, 585],   // ASB - 3 >
     1175: [420, 305],   // ASB - 4 > DONE
     1176: [330, 290],   // ASB - 5 > DONE
   };
