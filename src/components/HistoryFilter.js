@@ -7,10 +7,10 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Checkbox,
-  ListItemText,
   OutlinedInput,
   Autocomplete,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -21,14 +21,15 @@ import { getSensorTypes, getSensorNamesByType, getSensorLocations, getHistDevice
 const HistoryFilter = ({ onFilterChange }) => {
   const [deviceId, setDeviceId] = useState(null);
   const [sensorType, setSensorType] = useState("");
-  const [sensorNames, setSensorNames] = useState([]);
-  const [sensorLocation, setSensorLocation] = useState([]);
+  const [sensorName, setSensorName] = useState(""); // Changed to single string
+  const [sensorLocation, setSensorLocation] = useState(""); // Changed to single string
   const [dateRange, setDateRange] = useState([null, null]);
   const [deviceIds, setDeviceIds] = useState([]);
   const [sensorTypes, setSensorTypes] = useState([]);
   const [sensorNamesByType, setSensorNamesByType] = useState({});
   const [sensorLocations, setSensorLocations] = useState([]);
   const [error, setError] = useState(null);
+  const [validationError, setValidationError] = useState(null);
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -37,7 +38,6 @@ const HistoryFilter = ({ onFilterChange }) => {
         setDeviceIds(deviceIds.length > 0 ? deviceIds : []);
 
         const types = await getSensorTypes();
-        console.log("Fetched sensor types:", types);
         setSensorTypes(types.length > 0 ? types : []);
 
         const namesByType = {};
@@ -49,12 +49,14 @@ const HistoryFilter = ({ onFilterChange }) => {
             console.warn(`Failed to fetch sensor names for ${type}:`, err);
           }
         }
-        console.log("Sensor names by type:", namesByType);
         setSensorNamesByType(namesByType);
 
-        const locations = await getSensorLocations(sensorNames.length > 0 ? sensorNames : null);
-        console.log("Setting sensor locations:", locations);
-        setSensorLocations(locations.length > 0 ? locations : []);
+        if (sensorName) {
+          const locations = await getSensorLocations([sensorName]); // Pass single sensorName as array
+          setSensorLocations(locations.length > 0 ? locations : []);
+        } else {
+          setSensorLocations([]);
+        }
         setError(null);
       } catch (error) {
         console.error("Error fetching filter options:", error);
@@ -62,79 +64,122 @@ const HistoryFilter = ({ onFilterChange }) => {
       }
     };
     fetchFilterOptions();
-  }, [sensorNames]);
+  }, [sensorName]); 
 
-  const validateOneMonthRange = ([start, end]) => {
-    if (!start || !end) return true;
-    return dayjs(end).diff(start, "month") <= 1;
+  const validateSevenDayRange = ([start, end]) => {
+    if (!start || !end) return true; // Will be caught by required validation
+    return dayjs(end).diff(start, "day") <= 7;
   };
 
   const handleApply = () => {
+    setValidationError(null); // Clear previous validation errors
+
     if (!deviceId && !sensorType) {
-      alert("Please select either Device ID or Sensor Type.");
+      setValidationError("Please select either Device ID or Sensor Type.");
       return;
     }
 
-    if (!sensorNames.length) {
-      alert("Please select at least one Sensor Name.");
+    if (sensorType) {
+      if (!sensorName) {
+        setValidationError("Please select a Sensor Name.");
+        return;
+      }
+      if (!sensorLocation) {
+        setValidationError("Please select a Location.");
+        return;
+      }
+    }
+
+    if (!dateRange[0] || !dateRange[1]) {
+      setValidationError("Date range is required. Please select both Start and End dates.");
       return;
     }
 
-    if (!sensorLocation.length) {
-      alert("Please select at least one Location.");
-      return;
-    }
-
-    if (!validateOneMonthRange(dateRange)) {
-      alert("Date range must be within one month.");
+    if (!validateSevenDayRange(dateRange)) {
+      setValidationError("Date range must be within 7 days.");
       return;
     }
 
     const filters = {
       deviceId: deviceId || null,
       sensorType: sensorType || null,
-      sensorNames,
-      sensorLocation,
+      sensorNames: sensorType ? [sensorName] : [], // Wrap single sensorName in array for consistency
+      sensorLocation: sensorType ? [sensorLocation] : [], // Wrap single sensorLocation in array
       dateRange,
     };
 
+    setValidationError(null); // Clear validation error on successful validation
     onFilterChange(filters);
+  };
+
+  const handleDeviceIdChange = (event, newValue) => {
+    setDeviceId(newValue);
+    setSensorType("");
+    setSensorName(""); // Reset to empty string
+    setSensorLocation(""); // Reset to empty string
+    setValidationError(null); // Clear validation error on change
+  };
+
+  const handleSensorTypeChange = (e) => {
+    setSensorType(e.target.value);
+    setDeviceId(null);
+    setSensorName(""); // Reset to empty string
+    setSensorLocation(""); // Reset to empty string
+    setValidationError(null); // Clear validation error on change
+  };
+
+  const handleCloseSnackbar = () => {
+    setValidationError(null); // Clear validation error when closing Snackbar
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, position: "relative" }}>
+        <Snackbar
+          open={!!validationError}
+          autoHideDuration={5000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          sx={{ width: "100%", top: 0 }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ width: "100%", maxWidth: 600 }}
+          >
+            {validationError}
+          </Alert>
+        </Snackbar>
+
         {error && (
-          <Box sx={{ color: "red", mb: 2 }}>
-            {error}
+          <Box sx={{ width: "100%", mb: 2 }}>
+            <Alert severity="error">{error}</Alert>
           </Box>
         )}
+
         <Autocomplete
           options={deviceIds}
           getOptionLabel={(option) => option.toString()}
           value={deviceId}
-          onChange={(event, newValue) => {
-            setDeviceId(newValue);
-            setSensorNames([]);
-            setSensorLocation([]);
-          }}
+          onChange={handleDeviceIdChange}
           renderInput={(params) => (
             <TextField {...params} label="Device ID" sx={{ minWidth: 180 }} />
           )}
           freeSolo={false}
+          disabled={!!sensorType}
         />
 
         <FormControl sx={{ minWidth: 180 }}>
           <InputLabel>Sensor Type</InputLabel>
           <Select
             value={sensorType}
-            onChange={(e) => {
-              setSensorType(e.target.value);
-              setSensorNames([]);
-              setSensorLocation([]);
-            }}
+            onChange={handleSensorTypeChange}
             label="Sensor Type"
+            disabled={!!deviceId}
           >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
             {sensorTypes.map((type) => (
               <MenuItem key={type} value={type}>
                 {type}
@@ -143,20 +188,47 @@ const HistoryFilter = ({ onFilterChange }) => {
           </Select>
         </FormControl>
 
-        {(deviceId || sensorType) && (
+        {sensorType && (
           <FormControl sx={{ minWidth: 200 }}>
             <InputLabel>Sensor Name</InputLabel>
             <Select
-              multiple
-              value={sensorNames}
-              onChange={(e) => setSensorNames(e.target.value)}
+              value={sensorName}
+              onChange={(e) => {
+                setSensorName(e.target.value);
+                setSensorLocation(""); 
+                setValidationError(null); // Clear validation error on change
+              }}
               input={<OutlinedInput label="Sensor Name" />}
-              renderValue={(selected) => selected.join(", ")}
             >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
               {(sensorNamesByType[sensorType] || []).map((name) => (
                 <MenuItem key={name} value={name}>
-                  <Checkbox checked={sensorNames.includes(name)} />
-                  <ListItemText primary={name} />
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
+        {sensorType && (
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel>Sensor Location</InputLabel>
+            <Select
+              value={sensorLocation}
+              onChange={(e) => {
+                setSensorLocation(e.target.value);
+                setValidationError(null); // Clear validation error on change
+              }}
+              input={<OutlinedInput label="Sensor Location" />}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {sensorLocations.map((loc) => (
+                <MenuItem key={loc} value={loc}>
+                  {loc}
                 </MenuItem>
               ))}
             </Select>
@@ -164,35 +236,20 @@ const HistoryFilter = ({ onFilterChange }) => {
         )}
 
         {(deviceId || sensorType) && (
-          <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Sensor Location</InputLabel>
-            <Select
-              multiple
-              value={sensorLocation}
-              onChange={(e) => setSensorLocation(e.target.value)}
-              input={<OutlinedInput label="Sensor Location" />}
-              renderValue={(selected) => selected.join(", ")}
-            >
-              {sensorLocations.map((loc) => (
-                <MenuItem key={loc} value={loc}>
-                  <Checkbox checked={sensorLocation.includes(loc)} />
-                  <ListItemText primary={loc} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <DateRangePicker
+            startText="Start"
+            endText="End"
+            value={dateRange}
+            onChange={(newRange) => {
+              setDateRange(newRange);
+              setValidationError(null); // Clear validation error on change
+            }}
+            calendars={1}
+            disableFuture
+            maxDate={dayjs().add(30, "day")}
+            sx={{ minWidth: 250 }}
+          />
         )}
-
-        <DateRangePicker
-          startText="Start"
-          endText="End"
-          value={dateRange}
-          onChange={(newRange) => setDateRange(newRange)}
-          calendars={1}
-          disableFuture
-          maxDate={dayjs().add(30, "day")}
-          sx={{ minWidth: 250 }}
-        />
 
         <Button
           variant="contained"

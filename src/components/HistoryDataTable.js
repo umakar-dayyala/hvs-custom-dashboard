@@ -23,10 +23,13 @@ import { Button } from "@mui/material";
 import { CSVLink } from "react-csv";
 
 const HistoryDataTable = ({ data }) => {
+  console.log("Data received in HistoryDataTable:", data);
   const filterRef = useRef(null);
   const [selectedFilters, setSelectedFilters] = useState([]);
+  const [isViewAll, setIsViewAll] = useState(false);
 
-  const allColumns = [
+  // Default columns to show in toggles and table by default
+  const defaultColumns = [
     "device_id",
     "health",
     "connection",
@@ -38,35 +41,66 @@ const HistoryDataTable = ({ data }) => {
     "sensor_status",
   ];
 
-  const initialVisibleColumns = {
-    device_id: true,
-    health: true,
-    connection: true,
-    description: true,
-    timestamp: true,
-    datetime: true,
-    sensor_name: true,
-    sensor_type: true,
-    sensor_status: true,
-  };
+  // Derive all columns dynamically from the first data item
+  const allColumns = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    return Object.keys(data[0]).filter((key) => key !== "id"); // Exclude 'id' if not needed
+  }, [data]);
 
-  const [visibleColumns, setVisibleColumns] = useState(() => {
-    // Ensure initial state is correct
-    const savedColumns = { ...initialVisibleColumns };
-    console.log("Initial visibleColumns:", savedColumns);
-    return savedColumns;
-  });
+  // Initialize visible columns to default columns only
+  const initialVisibleColumns = useMemo(() => {
+    const initial = {};
+    allColumns.forEach((col) => {
+      initial[col] = defaultColumns.includes(col); // Only default columns are true
+    });
+    return initial;
+  }, [allColumns]);
 
-  // Log visibleColumns on every render
+  const [visibleColumns, setVisibleColumns] = useState(initialVisibleColumns);
+
+  // Reset to default columns when data changes (new filter applied)
+  useEffect(() => {
+    console.log("Resetting visibleColumns to default due to data change");
+    setVisibleColumns(initialVisibleColumns);
+    setIsViewAll(false); // Reset View All state
+  }, [data, initialVisibleColumns]);
+
   useEffect(() => {
     console.log("Current visibleColumns:", visibleColumns);
   }, [visibleColumns]);
 
-  const displayedData = useMemo(() => data.slice(0, 50).map(item => ({
-    ...item,
-    connection: item.connection ? "True" : "False",
-    health: item.health ? "True" : "False",
-  })), [data]);
+  // Handle "View" button toggle
+  const handleViewToggle = useCallback(() => {
+    setIsViewAll((prev) => {
+      const newIsViewAll = !prev;
+      setVisibleColumns((prevColumns) => {
+        const newState = { ...prevColumns };
+        if (newIsViewAll) {
+          allColumns.forEach((col) => {
+            newState[col] = true; // Show all columns in table
+          });
+          console.log("View All columns:", newState);
+        } else {
+          allColumns.forEach((col) => {
+            newState[col] = defaultColumns.includes(col); // Reset to default columns
+          });
+          console.log("Reset visibleColumns to:", newState);
+        }
+        return newState;
+      });
+      return newIsViewAll;
+    });
+  }, [allColumns, defaultColumns]);
+
+  const displayedData = useMemo(
+    () =>
+      data.slice(0, 50).map((item) => ({
+        ...item,
+        connection: item.connection ? "True" : "False",
+        health: item.health ? "True" : "False",
+      })),
+    [data]
+  );
 
   const filters = useMemo(() => {
     const opts = {};
@@ -82,10 +116,10 @@ const HistoryDataTable = ({ data }) => {
     });
     return allColumns.map((col) => ({
       id: col,
-      name: col,
+      name: col.replace(/_/g, " ").toUpperCase(),
       data: [...opts[col]].map((value) => ({ id: value, name: value.toString() })),
     }));
-  }, [displayedData]);
+  }, [displayedData, allColumns]);
 
   const handleColumnToggle = useCallback((column) => {
     setVisibleColumns((prev) => {
@@ -98,16 +132,11 @@ const HistoryDataTable = ({ data }) => {
     });
   }, []);
 
-  const resetColumns = useCallback(() => {
-    setVisibleColumns({ ...initialVisibleColumns });
-    console.log("Reset visibleColumns to:", initialVisibleColumns);
-  }, []);
-
   const visibleCols = useMemo(() => {
     const cols = allColumns.filter((col) => visibleColumns[col]);
     console.log("Visible columns:", cols);
     return cols;
-  }, [visibleColumns]);
+  }, [visibleColumns, allColumns]);
 
   const columns = useMemo(
     () =>
@@ -172,10 +201,10 @@ const HistoryDataTable = ({ data }) => {
         }}
       >
         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-          {allColumns.map((col) => (
+          {defaultColumns.map((col) => (
             <label key={col} style={{ display: "flex", alignItems: "center" }}>
               <HvCheckBox
-                checked={visibleColumns[col] ?? true}
+                checked={visibleColumns[col] ?? false}
                 onChange={() => handleColumnToggle(col)}
                 disabled={false}
               />
@@ -184,7 +213,6 @@ const HistoryDataTable = ({ data }) => {
           ))}
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
-          {/* <Button onClick={resetColumns}>Reset Columns</Button> */}
           <CSVLink data={data} filename={"sensor-event-history.csv"}>
             <Button variant="outlined">Export to CSV</Button>
           </CSVLink>
@@ -195,6 +223,9 @@ const HistoryDataTable = ({ data }) => {
         title={<HvTypography variant="title4">History Data</HvTypography>}
         actions={
           <>
+            <Button onClick={handleViewToggle}>
+              {isViewAll ? "Reset View" : "View All"}
+            </Button>
             <HvInput
               type="search"
               placeholder="Search all columns"
@@ -233,24 +264,32 @@ const HistoryDataTable = ({ data }) => {
               ))}
             </HvTableHead>
             <HvTableBody {...getTableBodyProps()}>
-              {page.map((row) => {
-                prepareRow(row);
-                return (
-                  <HvTableRow
-                    {...row.getRowProps()}
-                    key={row.getRowProps().key}
-                  >
-                    {row.cells.map((cell) => (
-                      <HvTableCell
-                        {...cell.getCellProps()}
-                        key={cell.getCellProps().key}
-                      >
-                        {cell.render("Cell")}
-                      </HvTableCell>
-                    ))}
-                  </HvTableRow>
-                );
-              })}
+              {page.length === 0 ? (
+                <HvTableRow>
+                  <HvTableCell colSpan={columns.length} style={{ textAlign: "center" }}>
+                    No data available
+                  </HvTableCell>
+                </HvTableRow>
+              ) : (
+                page.map((row) => {
+                  prepareRow(row);
+                  return (
+                    <HvTableRow
+                      {...row.getRowProps()}
+                      key={row.getRowProps().key}
+                    >
+                      {row.cells.map((cell) => (
+                        <HvTableCell
+                          {...cell.getCellProps()}
+                          key={cell.getCellProps().key}
+                        >
+                          {cell.render("Cell")}
+                        </HvTableCell>
+                      ))}
+                    </HvTableRow>
+                  );
+                })
+              )}
             </HvTableBody>
           </HvTable>
         </HvTableContainer>

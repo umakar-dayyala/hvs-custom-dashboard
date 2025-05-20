@@ -3,13 +3,15 @@ import FilterComponent from "../components/HistoryFilter";
 import DataTableComponent from "../components/HistoryDataTable";
 import { getSensorEventHistory } from "../service/HistoryService";
 import Breadcrumbs from "../components/Breadcrumbs";
+import Loader from "../components/Loader";
 import { Box, Typography } from "@mui/material";
-import dayjs from "dayjs";
+// import dayjs from "dayjs";
 
 const SensorEventHistory = () => {
   const [filters, setFilters] = useState({});
   const [tableData, setTableData] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const areFiltersEqual = (a, b) => {
     if (a.deviceId !== b.deviceId || a.sensorType !== b.sensorType) {
@@ -28,9 +30,9 @@ const SensorEventHistory = () => {
     const aDateRange = a.dateRange || [null, null];
     const bDateRange = b.dateRange || [null, null];
     const isDateRangeEqual =
-      (aDateRange[0] === null && bDateRange[0] === null ||
+      ((aDateRange[0] === null && bDateRange[0] === null) ||
         (aDateRange[0] && bDateRange[0] && aDateRange[0].isSame(bDateRange[0]))) &&
-      (aDateRange[1] === null && bDateRange[1] === null ||
+      ((aDateRange[1] === null && bDateRange[1] === null) ||
         (aDateRange[1] && bDateRange[1] && aDateRange[1].isSame(bDateRange[1])));
     if (!isDateRangeEqual) {
       return false;
@@ -39,10 +41,13 @@ const SensorEventHistory = () => {
   };
 
   useEffect(() => {
-    fetchData(filters);
+    if (Object.keys(filters).length > 0) {
+      fetchData(filters);
+    }
   }, [filters]);
 
   const fetchData = async (filters) => {
+    setLoading(true);
     try {
       const data = await getSensorEventHistory(filters);
       console.log("Fetched table data:", data.map(item => ({
@@ -62,6 +67,8 @@ const SensorEventHistory = () => {
       console.error("Error fetching data:", error);
       setTableData([]);
       setError("No data found for the selected filters. Try adjusting the filters.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,12 +85,13 @@ const SensorEventHistory = () => {
       </div>
       <div style={{ padding: "20px" }}>
         <FilterComponent onFilterChange={handleFilterChange} />
+        {loading && <Loader />}
         {error && (
           <Box sx={{ color: "red", my: 2 }}>
             <Typography>{error}</Typography>
           </Box>
         )}
-        <DataTableComponent data={tableData} />
+        {!loading && <DataTableComponent data={tableData} />}
       </div>
     </>
   );

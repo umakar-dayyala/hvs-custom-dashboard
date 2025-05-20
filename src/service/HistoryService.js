@@ -11,33 +11,26 @@ export const getSensorEventHistory = async (filters) => {
       throw new Error("Device ID or Sensor Type is required");
     }
 
-    if (!filters.sensorNames?.length) {
-      throw new Error("At least one Sensor Name is required");
-    }
-
-    if (!filters.sensorLocation?.length) {
-      throw new Error("At least one Location is required");
-    }
-
-    if (filters.deviceId) {
+    if (filters.sensorType) {
+      if (!filters.sensorNames?.length) {
+        throw new Error("Sensor Name is required");
+      }
+      if (!filters.sensorLocation?.length) {
+        throw new Error("Location is required");
+      }
+      params.sensorType = filters.sensorType;
+      params.sensorName = filters.sensorNames[0]; // Use single value
+      params.location = filters.sensorLocation[0]; // Use single value
+    } else if (filters.deviceId) {
       params.deviceId = filters.deviceId;
     }
 
-    if (filters.sensorType) {
-      params.sensorType = filters.sensorType;
+    if (!filters.dateRange || !filters.dateRange[0] || !filters.dateRange[1]) {
+      throw new Error("Start and End dates are required");
     }
 
-    params.sensorName = filters.sensorNames[0];
-    params.location = filters.sensorLocation[0];
-
-    if (filters.dateRange && filters.dateRange[0] && filters.dateRange[1]) {
-      params.startTime = filters.dateRange[0].format("YYYY-MM-DD HH:mm:ss.000");
-      params.endTime = filters.dateRange[1].format("YYYY-MM-DD HH:mm:ss.000");
-    } else {
-      const endTime = dayjs();
-      params.startTime = endTime.subtract(30, "day").format("YYYY-MM-DD HH:mm:ss.000");
-      params.endTime = endTime.format("YYYY-MM-DD HH:mm:ss.000");
-    }
+    params.startTime = filters.dateRange[0].format("YYYY-MM-DD HH:mm:ss.000");
+    params.endTime = filters.dateRange[1].format("YYYY-MM-DD HH:mm:ss.000");
 
     console.log("Fetching historical data with params:", params);
     const response = await axios.get(`${BASE_URL}/getHistoricalData`, { params });
