@@ -246,7 +246,7 @@ const HistoryFilter = ({ onFilterChange }) => {
             }}
             calendars={1}
             disableFuture
-            maxDate={dayjs().add(30, "day")}
+            maxDate={dayjs().subtract(1, "day")}
             sx={{ minWidth: 250 }}
           />
         )}

@@ -8,6 +8,8 @@ export const routeName = (detector) => {
       IBAC: "ibacIndividual",
       MAB: "MABIndividual",
       AAM: "aamIndividual",
+      WRM: "wrmIndividual",
+      "Oxygen Monitor": "OxygenMonitoring",
     };
     return routes[detector] || null;
   };

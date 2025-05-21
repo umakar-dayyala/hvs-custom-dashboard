@@ -136,7 +136,7 @@ const FloorWiseAlarmPanel = ({ sensorData }) => {
                   </Box>
                 </Box>
                 <Typography variant="body2">
-                  {alarm_description || `Alert detected in ${location || "unknown"} - Zone ${zone || "?"}`}
+                  {alarm_description || `Alarm detected in ${location || "unknown"} - Zone ${zone || "?"}`}
                 </Typography>
               </Box>
             );
