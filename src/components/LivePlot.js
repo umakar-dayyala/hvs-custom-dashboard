@@ -50,7 +50,7 @@ const LivePlot = ({ data }) => {
       y: points.map((p) => p.y),
       type: "scatter",
       mode: "lines+markers",
-      name: `${label} (${latestY})`,
+      name: `${label} : ${latestY}`,
       uid: sanitizedUid,
       visible: isVisible === false ? "legendonly" : true,
     };
@@ -99,7 +99,7 @@ const LivePlot = ({ data }) => {
           }}
         />
       ) : (
-        <p>No data to plot yet...</p>
+        <p>No data to plot ...</p>
       )}
     </div>
   );

@@ -6,7 +6,7 @@ const SensorLegend = () => {
   const legends = [
     { color: "#29991D", label: "Active Sensor" },
     { color: "#FF9933", label: "Unhealthy Sensors" },
-    { color: "#FF1F1F", label: "CBRN Alarm" },
+    { color: "#FF1F1F", label: "CBRN Alarms" },
   ];
 
   return (

@@ -49,7 +49,8 @@ export const AP4CIndividual = React.memo(() => {
     outlier: null
   });
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
-  
+  const [intensityData, setIntensityData] = useState({});
+
   // Time range states initialized as null
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
@@ -78,6 +79,7 @@ export const AP4CIndividual = React.memo(() => {
     if (!deviceId) return;
 
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+      console.log("Received data:", data);
       if (err) {
         console.error("Error receiving data:", err);
       } else {
@@ -85,7 +87,10 @@ export const AP4CIndividual = React.memo(() => {
         setParamsData(data.parametersData);
         setParam(data.parametersData);
         setNotifications(data.Notifications);
-        setLastFetchLiveData(data.lastfetched.time); 
+        setLastFetchLiveData(data.lastfetched.time);
+        setIntensityData(data["Intensity Data"]);
+
+       
       }
     });
 
@@ -193,7 +198,7 @@ export const AP4CIndividual = React.memo(() => {
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <BreadCrumbsIndividual locationDetails={locationDetails}/>
+        <BreadCrumbsIndividual locationDetails={locationDetails} />
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Box style={{ whiteSpace: "nowrap" }}>
             {LastFetchLiveData && (
@@ -206,14 +211,14 @@ export const AP4CIndividual = React.memo(() => {
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI 
-              kpiData={kpiData} 
-              ricon={chemicon} 
-              gicon={gchemicon} 
-              rbell={rbell}  
-              amberBell={amberBell} 
-              greenBell={greenBell} 
-              aicon={aicon} 
+            <IndividualKPI
+              kpiData={kpiData}
+              ricon={chemicon}
+              gicon={gchemicon}
+              rbell={rbell}
+              amberBell={amberBell}
+              greenBell={greenBell}
+              aicon={aicon}
               greyIcon={greyChem}
               dummyKpiData={DUMMY_KPI_DATA}
             />
@@ -251,7 +256,10 @@ export const AP4CIndividual = React.memo(() => {
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} gap={2}>
           <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <IntensityChart />
+            <IntensityChart
+  intensityData={intensityData}
+/>
+
           </Box>
           <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Corelation />
