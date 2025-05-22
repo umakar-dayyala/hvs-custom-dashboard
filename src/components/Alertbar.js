@@ -49,7 +49,7 @@ const Alertbar = ({ setLocationDetailsforbreadcrumb }) => {
           <span style={{ color: "orange",fontSize:"30px" }}>●</span> Health & Analytics Alert
         </HvTypography>
         <HvTypography variant="title3">
-          <span style={{ color: "red" ,fontSize:"30px"}}>●</span> CBRN Alarm
+          <span style={{ color: "red" ,fontSize:"30px"}}>●</span> Alarm
         </HvTypography>
       </div>
     </div>
