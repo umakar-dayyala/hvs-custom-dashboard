@@ -1,7 +1,7 @@
 import axios from "axios";
 
 //const API_BASE_URL = "http://10.131.19.205:5000/api";
-const API_BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api`
+const API_BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api`
 
 export const getSensorData = async () => {
   try {

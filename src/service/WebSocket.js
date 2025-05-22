@@ -1,5 +1,5 @@
 //const Live_stream_url = `http://10.131.19.202:4000/sse`; // SSE endpoint
-const Live_stream_url = `http://${process.env.REACT_APP_STREAM_IP}:${process.env.REACT_APP_STREAM_PORT}/sse`; 
+const Live_stream_url = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_STREAM_IP}:${process.env.REACT_APP_STREAM_PORT}/sse`; 
 export const getLiveStreamingDataForSensors = (device_id, callback) => {
 
     // console.log("device_id web socket: ", device_id);
