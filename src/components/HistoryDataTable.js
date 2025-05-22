@@ -19,7 +19,7 @@ import {
   useHvFilters,
 } from "@hitachivantara/uikit-react-core";
 import { Filters } from "@hitachivantara/uikit-react-icons";
-import { Button } from "@mui/material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, TextField } from "@mui/material";
 import { CSVLink } from "react-csv";
 
 const HistoryDataTable = ({ data }) => {
@@ -27,6 +27,9 @@ const HistoryDataTable = ({ data }) => {
   const filterRef = useRef(null);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isViewAll, setIsViewAll] = useState(false);
+  const [openColumnDialog, setOpenColumnDialog] = useState(false);
+  const [tempVisibleColumns, setTempVisibleColumns] = useState({});
+  const [columnSearch, setColumnSearch] = useState("");
 
   // Default columns to show in toggles and table by default
   const defaultColumns = [
@@ -91,6 +94,42 @@ const HistoryDataTable = ({ data }) => {
       return newIsViewAll;
     });
   }, [allColumns, defaultColumns]);
+
+  // Handle opening the column selection dialog
+  const handleOpenColumnDialog = () => {
+    setTempVisibleColumns({ ...visibleColumns }); // Copy current visible columns to temp state
+    setColumnSearch(""); // Reset search when opening dialog
+    setOpenColumnDialog(true);
+  };
+
+  // Handle closing the column selection dialog
+  const handleCloseColumnDialog = () => {
+    setOpenColumnDialog(false);
+    setColumnSearch(""); // Reset search when closing dialog
+  };
+
+  // Handle applying column selections from dialog
+  const handleApplyColumns = () => {
+    setVisibleColumns({ ...tempVisibleColumns });
+    setOpenColumnDialog(false);
+    setColumnSearch(""); // Reset search after applying
+  };
+
+  // Handle column toggle in dialog
+  const handleTempColumnToggle = (column) => {
+    setTempVisibleColumns((prev) => ({
+      ...prev,
+      [column]: !prev[column],
+    }));
+  };
+
+  // Filter columns based on search input
+  const filteredColumns = useMemo(() => {
+    if (!columnSearch) return allColumns;
+    return allColumns.filter((col) =>
+      col.toLowerCase().includes(columnSearch.toLowerCase())
+    );
+  }, [allColumns, columnSearch]);
 
   const displayedData = useMemo(
     () =>
@@ -211,6 +250,7 @@ const HistoryDataTable = ({ data }) => {
               <span>{col.replace(/_/g, " ").toUpperCase()}</span>
             </label>
           ))}
+          <Button onClick={handleOpenColumnDialog}>All Columns</Button>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
           <CSVLink data={data} filename={"sensor-event-history.csv"}>
@@ -218,6 +258,42 @@ const HistoryDataTable = ({ data }) => {
           </CSVLink>
         </div>
       </div>
+
+      <Dialog open={openColumnDialog} onClose={handleCloseColumnDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>Select Columns</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Search Columns"
+            value={columnSearch}
+            onChange={(e) => setColumnSearch(e.target.value)}
+            fullWidth
+            margin="normal"
+            placeholder="Type to filter columns..."
+          />
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "400px", overflowY: "auto" }}>
+            {filteredColumns.length > 0 ? (
+              filteredColumns.map((col) => (
+                <FormControlLabel
+                  key={col}
+                  control={
+                    <Checkbox
+                      checked={tempVisibleColumns[col] ?? false}
+                      onChange={() => handleTempColumnToggle(col)}
+                    />
+                  }
+                  label={col.replace(/_/g, " ").toUpperCase()}
+                />
+              ))
+            ) : (
+              <HvTypography>No columns match your search.</HvTypography>
+            )}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseColumnDialog}>Cancel</Button>
+          <Button onClick={handleApplyColumns} variant="contained">Apply</Button>
+        </DialogActions>
+      </Dialog>
 
       <HvTableSection
         title={<HvTypography variant="title4">History Data</HvTypography>}

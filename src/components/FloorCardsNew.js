@@ -60,6 +60,7 @@ const FloorCards = ({ floorData }) => {
   }, [floorData, setValue]);
 
   const goToFloor = (floor) => navigate("floorwise?floor=" + floor);
+  console.log("Floor new Data:", floorData);
 
   return (
     <Box mt={2}>
@@ -98,7 +99,7 @@ const FloorCards = ({ floorData }) => {
               enabled: true,
               formatter: (val, { seriesIndex }) => {
                 const sensorCounts = [
-                  (floor.activeSensors || 0) - (floor.unhealthySensors || 0),
+                  floor.activeSensors ||0,
                   inActiveSensor || 0,
                   floor.unhealthySensors || 0,
                   totalAlarms || 0,
@@ -125,7 +126,7 @@ const FloorCards = ({ floorData }) => {
           };
 
           const chartSeries = [
-            (floor.activeSensors || 0) - (floor.unhealthySensors || 0),
+            floor.activeSensors || 0,
             inActiveSensor || 0,
             floor.unhealthySensors || 0,
             totalAlarms || 0,
