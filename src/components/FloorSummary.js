@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import { HvTypography } from "@hitachivantara/uikit-react-core";
 import VerticalDivider from "./VerticalDivider";
 
+
 // Import SVG icons
 import totalZonesIcon from "../assets/greyDirection.svg";
 import totalSensorsIcon from "../assets/greyLocation.svg";
@@ -14,6 +15,7 @@ import rBiologicalIcon from "../assets/rBiological.svg";
 import rChemicalIcon from "../assets/rChemical.svg";
 import activeSensorsIcon from "../assets/onlineWifi.svg";
 import inactiveSensorsIcon from "../assets/rWifiIcon.svg";
+import WarningIcon from "@mui/icons-material/Warning";
 
 // Sensor type to icon mapping
 const getSensorIcon = (type, count) => {
@@ -139,7 +141,8 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
             </Box>
             {/* Unhealthy Sensors */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-              <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={30} height={30} />
+              {/* <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={30} height={30} /> */}
+              <WarningIcon color="warning" />
               <HvTypography variant="title3">
                 Unhealthy <HvTypography variant="label1">{floor.unhealthy_sensors}</HvTypography>
               </HvTypography>
