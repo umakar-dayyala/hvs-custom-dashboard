@@ -14,7 +14,7 @@ import { Add, Remove, Upload, Download } from "@mui/icons-material";
 import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
 import AssetDialog from "../components/AssetDialog";
-import ExcelUploadHandler from "../components/ExcelUploadHandler"; // Added import
+import ExcelUploadHandler from "../components/ExcelUploadHandler";
 import { getInventoryData, addAsset, editAsset, removeAsset, uploadAssetsBulk } from "../service/InventoryService";
 import Loader from "../components/Loader";
 
