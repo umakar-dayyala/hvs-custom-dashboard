@@ -254,7 +254,7 @@ const HistoryDataTable = ({ data }) => {
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
           <CSVLink data={data} filename={"sensor-event-history.csv"}>
-            <Button variant="outlined">Export to CSV</Button>
+            {/* <Button variant="outlined">Export to CSV</Button> */}
           </CSVLink>
         </div>
       </div>

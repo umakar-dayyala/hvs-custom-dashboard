@@ -14,7 +14,8 @@ import { Add, Remove, Upload, Download } from "@mui/icons-material";
 import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
 import AssetDialog from "../components/AssetDialog";
-import { getInventoryData, addAsset, editAsset, removeAsset } from "../service/InventoryService";
+import ExcelUploadHandler from "../components/ExcelUploadHandler"; // Added import
+import { getInventoryData, addAsset, editAsset, removeAsset, uploadAssetsBulk } from "../service/InventoryService";
 import Loader from "../components/Loader";
 
 const InventoryDashboard = () => {
@@ -67,6 +68,11 @@ const InventoryDashboard = () => {
     location: "",
     status: "",
   });
+
+  const handleShowNotification = (msg, sev = "success") =>
+    setNotification({ open: true, message: msg, severity: sev });
+  const handleCloseNotification = () =>
+    setNotification((n) => ({ ...n, open: false }));
 
   useEffect(() => {
     (async () => {
@@ -198,11 +204,6 @@ const InventoryDashboard = () => {
     });
     setSelectedIds([]);
   };
-
-  const handleShowNotification = (msg, sev = "success") =>
-    setNotification({ open: true, message: msg, severity: sev });
-  const handleCloseNotification = () =>
-    setNotification((n) => ({ ...n, open: false }));
 
   const handleDialogSubmit = async (data) => {
     setLoading(true);
@@ -343,13 +344,6 @@ const InventoryDashboard = () => {
     setFilters((f) => ({ ...f, [name]: value }));
   };
 
-  const handleUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleShowNotification(`Uploading file: ${file.name}`);
-    }
-  };
-
   const handleDownload = () => {
     const allAssets = allRows.flatMap(row => row.children);
     const headers = [
@@ -428,10 +422,13 @@ const InventoryDashboard = () => {
             <IconButton onClick={handleDownload} disabled={loading}>
               <Download />
             </IconButton>
-            <Button component="label" variant="outlined" startIcon={<Upload />} disabled={loading}>
-              Upload
-              <input hidden type="file" onChange={handleUpload} />
-            </Button>
+            <ExcelUploadHandler
+              setLoading={setLoading}
+              handleShowNotification={handleShowNotification}
+              getInventoryData={getInventoryData}
+              setAllRows={setAllRows}
+              disabled={loading}
+            />
           </Stack>
           <Stack direction="row" spacing={2}>
             <TextField

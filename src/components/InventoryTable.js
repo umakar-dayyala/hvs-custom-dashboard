@@ -11,13 +11,13 @@ import {
 } from "@hitachivantara/uikit-react-core";
 import { IconButton, Tooltip, Box } from "@mui/material";
 import { Add, Remove, Edit, ExpandMore, ExpandLess } from "@mui/icons-material";
-import "../css/InventoryTable.css"; 
+import "../css/InventoryTable.css";
 
 const InventoryTable = ({
   data,
   filters = {},
   selectedIds = [],
-  onSelectRow = () => {},
+  onSelectRow = () => { },
   onDialogOpen,
   openRow,
   onExpand,
@@ -114,8 +114,8 @@ const InventoryTable = ({
                       </HvTableCell>
                       <HvTableCell className="tableCell">
                         <Box display="flex" alignItems="center">
-                          {isExp ? 
-                            <ExpandLess className="expandIcon" style={{ color: "#1976d2" }} /> : 
+                          {isExp ?
+                            <ExpandLess className="expandIcon" style={{ color: "#1976d2" }} /> :
                             <ExpandMore className="expandIcon" color="action" />
                           }
                           <Box ml={1} className="cellContent">
@@ -132,8 +132,8 @@ const InventoryTable = ({
                       <HvTableCell className="tableCell">
                         <Box className="actionCell">
                           <Tooltip title="Add Item" arrow placement="top">
-                            <IconButton 
-                              size="small" 
+                            <IconButton
+                              size="small"
                               className={`iconButton addButton`}
                               onClick={(e) => { e.stopPropagation(); onDialogOpen("add", p); }}
                             >
@@ -141,8 +141,8 @@ const InventoryTable = ({
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Remove Item" arrow placement="top">
-                            <IconButton 
-                              size="small" 
+                            <IconButton
+                              size="small"
                               className={`iconButton removeButton`}
                               onClick={(e) => { e.stopPropagation(); onDialogOpen("remove", p); }}
                             >
@@ -150,8 +150,8 @@ const InventoryTable = ({
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Edit Item" arrow placement="top">
-                            <IconButton 
-                              size="small" 
+                            <IconButton
+                              size="small"
                               className={`iconButton editButton`}
                               onClick={(e) => { e.stopPropagation(); onDialogOpen("edit", p); }}
                             >
@@ -210,18 +210,18 @@ const InventoryTable = ({
                                       <HvTableCell className="tableCell">
                                         <Box className="actionCell">
                                           <Tooltip title="Remove Asset" arrow placement="top">
-                                            <IconButton 
-                                              size="small" 
-                                              className="iconButton removeButton" 
+                                            <IconButton
+                                              size="small"
+                                              className="iconButton removeButton"
                                               onClick={() => onDialogOpen("remove", c)}
                                             >
                                               <Remove fontSize="small" />
                                             </IconButton>
                                           </Tooltip>
                                           <Tooltip title="Edit Asset" arrow placement="top">
-                                            <IconButton 
-                                              size="small" 
-                                              className="iconButton editButton" 
+                                            <IconButton
+                                              size="small"
+                                              className="iconButton editButton"
                                               onClick={() => onDialogOpen("edit", c)}
                                             >
                                               <Edit fontSize="small" />

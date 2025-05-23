@@ -106,7 +106,7 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
               <img src={totalZonesIcon} alt="Total Zones Icon" width={30} height={30} />
               <HvTypography variant="title3">
-                Total Zones <HvTypography variant="label1">{floor.total_zones}</HvTypography>
+                Zones <HvTypography variant="label1">{floor.total_zones}</HvTypography>
               </HvTypography>
               <VerticalDivider />
             </Box>
@@ -115,7 +115,7 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
               <img src={totalSensorsIcon} alt="Total Locations Icon" width={30} height={30} />
               <HvTypography variant="title3">
-                Total Locations <HvTypography variant="label1">{floor.total_location}</HvTypography>
+                Locations <HvTypography variant="label1">{floor.total_location}</HvTypography>
               </HvTypography>
               <VerticalDivider />
             </Box>
@@ -134,6 +134,13 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
               <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={30} height={30} />
               <HvTypography variant="title3">
                 Inactive Sensors <HvTypography variant="label1">{floor.inactive_sensors + floor.disconnected_sensors}</HvTypography>
+              </HvTypography>
+            </Box>
+            {/* Unhealthy Sensors */}
+            <Box display="flex" alignItems="center" gap={0.5} ml={1}>
+              <img src={inactiveSensorsIcon} alt="Inactive Sensors Icon" width={30} height={30} />
+              <HvTypography variant="title3">
+                Unhealthy Sensors <HvTypography variant="label1">{floor.unhealthy_sensors}</HvTypography>
               </HvTypography>
             </Box>
           </Box>

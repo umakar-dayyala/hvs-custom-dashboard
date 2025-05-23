@@ -149,6 +149,50 @@ export const removeAsset = async (asset) => {
   }
 };
 
+// Bulk upload assets
+export const uploadAssetsBulk = async (payload) => {
+  try {
+    console.log('Sending bulk payload to /insertInventoryRecordsBulk:', JSON.stringify(payload, null, 2));
+    const response = await fetch(`${API_BASE_URL}/insertInventoryRecordsBulk`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseBody = await response.text();
+    console.log('Received response from /insertInventoryRecordsBulk:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+      body: responseBody,
+    });
+
+    if (!response.ok) {
+      console.error('Server error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: responseBody,
+      });
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${responseBody}`);
+    }
+
+    const result = JSON.parse(responseBody);
+    if (!result.success) {
+      console.error('Server indicated failure:', result);
+      throw new Error('Failed to upload assets: ' + (result.error || 'Unknown error'));
+    }
+
+    console.log('Successfully uploaded assets:', result.data);
+    return result.data;
+  } catch (error) {
+    console.error('Error uploading assets:', error);
+    throw error;
+  }
+};
+
+
 /*
 // Retained but commented out unused functions for reference
 let assets = [
