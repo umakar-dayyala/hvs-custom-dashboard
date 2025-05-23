@@ -53,33 +53,39 @@ const LivePlot = ({ data }) => {
       name: `${label} : ${latestY}`,
       uid: sanitizedUid,
       visible: isVisible === false ? "legendonly" : true,
+      customdata: Array(points.length).fill(label), // Include label in every point
     };
   });
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       {traces.length ? (
         <Plot
           data={traces}
           layout={{
-            
             xaxis: { title: "Time", showticklabels: false },
             yaxis: { title: "Value" },
-            showlegend: true, // <-- Add this line
+            showlegend: true,
             legend: {
-  orientation: "h",        // horizontal layout
-  x: 0,
-  y: -0.1,                 // below the chart
-  xanchor: "left",
-  yanchor: "top",
-  traceorder: "normal",
-            // uniform width
-  tracegroupgap: 10,       // spacing between rows
-},
+              orientation: "h",
+              x: 0,
+              y: -0.1,
+              xanchor: "left",
+              yanchor: "top",
+              traceorder: "normal",
+              tracegroupgap: 10,
+            },
             autosize: true,
             margin: { t: 50, r: 30, b: 40, l: 50 },
           }}
-          
           config={{
             displayModeBar: false,
             useResizeHandler: true,
@@ -87,8 +93,9 @@ const LivePlot = ({ data }) => {
           style={{ width: "100%", height: "100%" }}
           onLegendClick={(event) => {
             const index = event.curveNumber;
-            const label = traces[index].name.split(" (")[0];
-            const newVisibility = traces[index].visible === true ? "legendonly" : true;
+            const label = traces[index].customdata[0]; // Use customdata to get the label
+            const newVisibility =
+              traces[index].visible === true ? "legendonly" : true;
 
             setVisibilityMap((prev) => ({
               ...prev,

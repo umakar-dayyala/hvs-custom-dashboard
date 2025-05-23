@@ -396,7 +396,7 @@ useEffect(() => {
                           >
                           <TableBody>
   {Object.entries(parameters)
-    .filter(([k]) => !["HV (High Voltage)", "Exhaust Pressure"].includes(k)) // exclude plotted values
+    .filter(([k]) => !["HV (High Voltage)", "Exhaust Pressure","O2 AL1 Set Point","CO2 AL1 Set Point","CO AL1 Set Point","O2 AL2 Set Point","CO2 AL2 Set Point"].includes(k)) // exclude plotted values
     .map(([k, v]) => (
       <StyledTableRow key={k}>
         <StyledTableCell
