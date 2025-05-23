@@ -112,7 +112,7 @@ const IndividualParameters = memo(
     /* ───── helpers ───── */
     const listContainerRef = useRef(null);
     const [listHeight, setListHeight] = useState(500); // Default height
-    const [cardStatusColor, setCardStatusColor] = useState("green");
+    // const [cardStatusColor, setCardStatusColor] = useState("green");
 
     useEffect(() => {
       if (!listContainerRef.current) return;
@@ -236,7 +236,7 @@ const IndividualParameters = memo(
                 {Object.keys(subParams).map((k) => {
                   const isAlarm = subParams[k] > 0;
                   const color = isAlarm ? "red" : "green";
-                  setCardStatusColor(color);
+                  // setCardStatusColor(color);
                   return (
                     <div
                       key={k}
