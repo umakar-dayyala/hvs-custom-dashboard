@@ -99,7 +99,7 @@ const IntensityChart = ({ intensityData = {} }) => {
               >
                 <Typography fontWeight="bold">Concentration Alert</Typography>
                 <Typography fontSize="0.875rem" mb={1}>
-                  Chemical concentration exceeds normal levels
+                   concentration exceeds normal levels
                 </Typography>
               </Box>
 
@@ -112,7 +112,7 @@ const IntensityChart = ({ intensityData = {} }) => {
               >
                 <Typography fontWeight="bold">Instant Alert</Typography>
                 <Typography fontSize="0.875rem" mb={1}>
-                  Chemical concentration requires immediate attention
+                   concentration requires immediate attention
                 </Typography>
               </Box>
 
@@ -174,7 +174,7 @@ const IntensityChart = ({ intensityData = {} }) => {
               pb={1}
             >
               <Typography sx={{ width: "30%", fontWeight: "bold" }}>
-                Chemical
+                Parameters
               </Typography>
               <Typography
                 sx={{
