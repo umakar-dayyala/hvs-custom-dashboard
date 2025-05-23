@@ -8,6 +8,7 @@ const Alertbar = ({ setLocationDetailsforbreadcrumb }) => {
   const [zone, setZone] = useState("-");
   const [location, setLocation] = useState("-");
   const [sensorType, setSensorType] = useState("-");
+  const[deviceId, setDeviceId] = useState(null);
 
   const queryParams = new URLSearchParams(window.location.search);
   const device_id = queryParams.get("device_id");
@@ -20,6 +21,7 @@ const Alertbar = ({ setLocationDetailsforbreadcrumb }) => {
         setZone(response?.data?.zone || "-");
         setLocation(response?.data?.location || "-");
         setSensorType(response?.data?.sensorType || "-");
+        setDeviceId(device_id);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -38,7 +40,8 @@ const Alertbar = ({ setLocationDetailsforbreadcrumb }) => {
         <HvTypography variant="title3">Floor: {floor} |</HvTypography>
         <HvTypography variant="title3">Zone: {zone} |</HvTypography>
         <HvTypography variant="title3">Location: {location} |</HvTypography>
-        <HvTypography variant="title3">Sensor: {sensorType}</HvTypography>
+        <HvTypography variant="title3">Sensor: {sensorType} |</HvTypography>
+        <HvTypography variant="title3">Device Id: {deviceId}</HvTypography>
       </Box>
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -49,7 +52,7 @@ const Alertbar = ({ setLocationDetailsforbreadcrumb }) => {
           <span style={{ color: "orange",fontSize:"30px" }}>●</span> Health & Analytics Alert
         </HvTypography>
         <HvTypography variant="title3">
-          <span style={{ color: "red" ,fontSize:"30px"}}>●</span> Alarm
+          <span style={{ color: "red" ,fontSize:"30px"}}>●</span> CBRN Alarms
         </HvTypography>
       </div>
     </div>

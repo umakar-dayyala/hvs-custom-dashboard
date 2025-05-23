@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Get API Base URL from environment variables
-const API_BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/ibac`
+const API_BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/ibac`
 
 export const fetchBioParamChartData = async (deviceId, fromTime, toTime) => {
   try {

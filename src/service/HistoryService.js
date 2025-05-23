@@ -1,7 +1,7 @@
 import axios from "axios";
 import dayjs from "dayjs";
  
-const BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/historical`;
+const BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/historical`;
  
 export const getSensorEventHistory = async (filters) => {
   try {

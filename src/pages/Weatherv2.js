@@ -16,6 +16,8 @@ import locationImg from "../assets/location.png";
 import WindRoseChart from "../components/WindRoseChart";
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import GaugeChart from "react-gauge-chart";
+import BreadCrumbsIndividual from "../components/BreadCrumbsIndividual";
+import Alertbar from "../components/Alertbar";
 
 /* ---------- static meta for each KPI ---------- */
 const weatherMetaMap = {
@@ -43,6 +45,15 @@ const weatherMetaMap = {
 
 const Weatherv2 = () => {
 
+  const [locationDetails, setUdatedLocationDetails] = useState({
+        floor: 'default',
+        zone: 'default',
+        location: 'default',
+        sensorType: 'default'
+      });
+
+  const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
+
   /* ---------- inside component ---------- */
 const deviceId = new URLSearchParams(window.location.search).get("device_id");
 
@@ -68,10 +79,21 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
       const pkt = data.parametersData?.[0] ?? {};
       setKpiData(pkt.kpiData ?? {});
       setDirData(pkt["Direction Data"] ?? []);
+      setLastFetchLiveData(pkt.lastfetched.time); 
     });
 
     return () => es?.close();
-  }, []);                                                      // Hook #5
+  }, []);     
+  
+  const setLocationDetails=(floor,zone,location,sensorType) => {
+    setUdatedLocationDetails({
+      floor: floor || locationDetails.floor,
+      zone: zone || locationDetails.zone,
+      location: location || locationDetails.location,
+      sensorType: sensorType || locationDetails.sensorType
+    });
+    
+  }// Hook #5
 
   /* ---------- convert kpiData ➜ array ---------- */
   const stats = useMemo(                                       // Hook #6
@@ -107,6 +129,19 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
   return (
     <Box p={2} width="100%">
       {/* ----- IG-6 Weather Card (full-width) ----- */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <BreadCrumbsIndividual locationDetails={locationDetails}/>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <Box style={{ whiteSpace: "nowrap" }}>
+            {LastFetchLiveData && (
+              <span>Last Live Data fetched time: {LastFetchLiveData}</span>
+            )}
+          </Box>
+          
+        </div>
+        
+      </div>
+      <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
       <HvGrid container>
         <HvGrid item xs={12}>
           <HvCard

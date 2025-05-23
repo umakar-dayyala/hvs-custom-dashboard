@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback, memo } from "react";
+import React, { useEffect, useState, useMemo, useCallback, memo, useRef } from "react";
 import {
   HvCard,
   HvCardContent,
@@ -41,6 +41,26 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const excludedFromPlot = [
+  "Scaling Factor",
+  "Alarm Level",
+  "Min Level",
+  "Max Level",
+  "Callibration Factor",
+  "Audio Off Time",
+  "CPS",
+  "Baudrate",
+  "Instrument ID",
+  "Instrument Address",
+  "Gateway",
+  "IP Address",
+  "Laser PD",
+  "Background Light Monitor",
+  "V Power Supply",
+  
+
+];
+
 // Memoized components
 const MemoizedLivePlot = memo(LivePlot);
 // const MemoizedPlot = memo(Plot);
@@ -64,15 +84,30 @@ const parameterGroupStyle = {
 
 const notificationContainerStyle = {
   width: "100%",
-  maxHeight: "600px",
+  height: "100%", // Take up all available space
   overflowY: "auto",
 };
 
 
 
 const IndividualParameters = memo(
+  // Default height
   ({ paramsData, notifications = [], toggleState, AsmData }) => {
     /* ───── helpers ───── */
+    const listContainerRef = useRef(null);
+const [listHeight, setListHeight] = useState(500); // Default height
+
+useEffect(() => {
+  if (!listContainerRef.current) return;
+
+  const resizeObserver = new ResizeObserver((entries) => {
+    const { height } = entries[0].contentRect;
+    setListHeight(height - 40); // Subtract padding/header space
+  });
+
+  resizeObserver.observe(listContainerRef.current);
+  return () => resizeObserver.disconnect();
+}, []);
 
     const memoizedCapitalize = useCallback(
       (str) =>
@@ -120,29 +155,40 @@ const IndividualParameters = memo(
     /* ───── renderers ───── */
 
     const renderNotificationRow = useCallback(
-      ({ index, style }) => {
-        const n = notifications[index];
-        return (
-          <StyledTableRow
-            style={{
-              ...style,
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              fontSize: "18px",
-            }}
-          >
-            <StyledTableCell style={{ flex: 7, wordBreak: "break-word" }}>
-              {n.label}
-            </StyledTableCell>
-            <StyledTableCell style={{ flex: 3, textAlign: "right" }}>
-              {n.value}
-            </StyledTableCell>
-          </StyledTableRow>
-        );
-      },
-      [notifications]
+  ({ index, style }) => {
+    const n = notifications[index];
+    return (
+      <TableRow 
+        key={index}
+        style={{
+          ...style,
+          display: "flex",
+          alignItems: "center",
+          padding: "8px 16px",
+          borderBottom: "1px solid #e0e0e0",
+          fontSize: "14px",
+        }}
+      >
+        <TableCell style={{ flex: 1, padding: 0, border: "none" }}>
+          {n.label}
+        </TableCell>
+        <TableCell 
+          style={{ 
+            flex: 0.3, 
+            padding: 0, 
+            border: "none", 
+            textAlign: "right",
+            color: "#666",
+            fontSize: "12px"
+          }}
+        >
+          {n.value}
+        </TableCell>
+      </TableRow>
     );
+  },
+  [notifications]
+);
 
     const renderParameterGroup = useCallback(
       (groupTitle, subParams) => (
@@ -348,37 +394,42 @@ const IndividualParameters = memo(
                             sx={{ minWidth: "100%" }}
                             aria-label="system-settings-table"
                           >
-                            <TableBody>
-                              {Object.entries(parameters)
-                                .filter(([_, v]) => isNaN(Number(v)))
-                                .map(([k, v]) => (
-                                  <StyledTableRow key={k}>
-                                    <StyledTableCell
-                                      component="th"
-                                      scope="row"
-                                      style={{ width: "60%" }}
-                                    >
-                                      <div style={{ padding: "8px 0" }}>{k}</div>
-                                    </StyledTableCell>
-                                    <StyledTableCell
-                                      align="right"
-                                      style={{ width: "40%" }}
-                                    >
-                                      <div style={{ padding: "8px 0" }}>{v}</div>
-                                    </StyledTableCell>
-                                  </StyledTableRow>
-                                ))}
-                            </TableBody>
+                          <TableBody>
+  {Object.entries(parameters)
+    .filter(([k]) => !["HV (High Voltage)", "Exhaust Pressure"].includes(k)) // exclude plotted values
+    .map(([k, v]) => (
+      <StyledTableRow key={k}>
+        <StyledTableCell
+          component="th"
+          scope="row"
+          style={{ width: "60%" }}
+        >
+          <div style={{ padding: "8px 0" }}>{k}</div>
+        </StyledTableCell>
+        <StyledTableCell
+          align="right"
+          style={{ width: "40%" }}
+        >
+          <div style={{ padding: "8px 0" }}>{v}</div>
+        </StyledTableCell>
+      </StyledTableRow>
+    ))}
+</TableBody>
+
+
+
                           </Table>
                         </TableContainer>
 
                         <MemoizedLivePlot
-                          data={Object.fromEntries(
-                            Object.entries(parameters)
-                              .filter(([_, v]) => !isNaN(Number(v)))
-                              .map(([k, v]) => [k, Number(v)])
-                          )}
-                        />
+  data={Object.fromEntries(
+    Object.entries(parameters)
+      .filter(([k, v]) => {
+        return !excludedFromPlot.includes(k) && !isNaN(Number(v));
+      })
+      .map(([k, v]) => [k, Number(v)])
+  )}
+/>
                       </div>
                     ) : ["Health Parameters", "Health_Parameters"].includes(
                         sectionTitle
@@ -450,53 +501,93 @@ const IndividualParameters = memo(
               );
             })}
 
-            {/* ------- Notifications card ------- */}
-            <HvCard
-              className="parameter-card"
-              elevation={0}
-              statusColor="red"
-              style={cardStyle}
-            >
-              <HvCardContent>
-                <HvTypography variant="title2" className="section-title">
-                  Notifications
-                </HvTypography>
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  style={notificationContainerStyle}
+           
+{/* ------- Notifications card ------- */}
+<HvCard
+  className="parameter-card"
+  elevation={0}
+  statusColor="red"
+  style={{ ...cardStyle, flex: 1 }}
+>
+  <HvCardContent className="parameter-content" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <HvTypography variant="title2" className="section-title">
+      Notifications
+    </HvTypography>
+    
+    <div style={{ flex: 1, minHeight: 0 }}>
+      {notifications.length > 0 ? (
+        <div ref={listContainerRef} style={{ height: '100%' }}>
+          <TableContainer 
+            component={Paper} 
+            elevation={0}
+            style={{ 
+              width: '100%',
+              height: '100%',
+              
+            }}
+          >
+            <Table sx={{ minWidth: '100%' }} >
+              <TableBody>
+                <List
+                  height={listHeight}
+                  itemCount={notifications.length}
+                  itemSize={100}
+                  width="100%"
                 >
-                  <Table
-                    sx={{ minWidth: "100%" }}
-                    aria-label="notifications-table"
-                  >
-                    <TableBody>
-                      {notifications.length ? (
-                        <TableRow>
-                          <TableCell colSpan={4}>
-                            <List
-                              height={550}
-                              itemCount={notifications.length}
-                              itemSize={150}
-                              width="100%"
-                            >
-                              {renderNotificationRow}
-                            </List>
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        <StyledTableRow>
-                          <StyledTableCell colSpan={2} align="center">
-                            ✅ All good. No active alarms.
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </HvCardContent>
-            </HvCard>
-
+                  {({ index, style }) => {
+                    const n = notifications[index];
+                    return (
+                      <StyledTableRow 
+                        key={index}
+                        style={{
+                          ...style,
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <StyledTableCell 
+                          component="div" 
+                          style={{ 
+                            flex: 1, 
+                            padding: '8px 16px',
+                            fontSize: '18px'
+                          }}
+                        >
+                          {n.label}
+                        </StyledTableCell>
+                        <StyledTableCell 
+                          component="div"
+                          align="right"
+                          style={{ 
+                            flex: 0.3, 
+                            padding: '8px 16px',
+                            color: '#666',
+                            fontSize: '18px'
+                          }}
+                        >
+                          {n.value}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    );
+                  }}
+                </List>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      ) : (
+        <StyledTableRow style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <StyledTableCell colSpan={2} align="center" style={{ border: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', color: '#666' }}>
+              <img src={sIcon} alt="Success" style={{ height: "16px", marginRight: "8px" }} />
+              All good. No active alarms.
+            </div>
+          </StyledTableCell>
+        </StyledTableRow>
+      )}
+    </div>
+  </HvCardContent>
+</HvCard>
             {/* ------- optional ASM section ------- */}
             {AsmData && (
               <HvCard

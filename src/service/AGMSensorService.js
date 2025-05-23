@@ -1,7 +1,6 @@
 import axios from "axios";
 
-// Get API Base URL from environment variables
-const API_BASE_URL = `http://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api`
+const API_BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api`
 
 
 export const fetchAGMParamChartData = async (deviceId, fromTime, toTime) => {
@@ -38,12 +37,12 @@ export const fetchAnomalyChartData = async (deviceId, fromTime, toTime) => {
         param_end_date: `${toTime}`,
       };
   
-      console.log("Request URL:", url);
-      console.log("Request Params:", params);
+      // console.log("Request URL:", url);
+      // console.log("Request Params:", params);
   
       const response = await axios.get(url, { params });
   
-      console.log("Fetched anomaly chart data:"+JSON.stringify(response.data));
+      // console.log("Fetched anomaly chart data:"+JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       console.error("Error fetching anomaly chart data:", error);
@@ -61,11 +60,11 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
         param_end_date: `${toTime}`,
       };
   
-      console.log("Request URL:", url);
-      console.log("Request Params:", params);
+      // console.log("Request URL:", url);
+      // console.log("Request Params:", params);
   
       const response = await axios.get(url, { params });
-      console.log("Fetched bio param chart data:"+JSON.stringify(response.data));
+      // console.log("Fetched bio param chart data:"+JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       console.error("Error fetching outlier chart data:", error);
@@ -75,7 +74,7 @@ export const fetchOutlierChartData = async (deviceId, fromTime, toTime) => {
 
 
 export const getAGMSensordashboardData = async (device_id) => {
-  console.log("API getAGMSensordashboardData called with device_id:", device_id);
+  // console.log("API getAGMSensordashboardData called with device_id:", device_id);
   try {
     const url = `${API_BASE_URL}/latest-agm-sensor-data?device_id=${device_id}`;
     const response = await axios.get(url, {

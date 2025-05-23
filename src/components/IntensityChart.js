@@ -1,109 +1,215 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
+  Box,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+  Divider,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { styled } from "@mui/material/styles";
-import { tableCellClasses } from "@mui/material/TableCell";
-import {
-  HvCard,
-  HvCardContent,
-  HvTypography,
-} from "@hitachivantara/uikit-react-core";
+import { HvCard } from "@hitachivantara/uikit-react-core";
 
-// ── styled table cells/rows ──────────────────────────────────────────
-const StyledTableCell = styled(TableCell)(() => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#000",
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-    color: "#000",
-  },
-}));
+const IntensityChart = ({ intensityData = {} }) => {
+  const { alertData = {}, mostRecentAlert = {} } = intensityData;
+  const [selectedChemical, setSelectedChemical] = useState("All Parameters");
 
-const StyledTableRow = styled(TableRow)(() => ({
-  "&:nth-of-type(odd)": { backgroundColor: "#f7f7f7" },
-  "&:nth-of-type(even)": { backgroundColor: "#fff" },
-  "&:last-child td, &:last-child th": { border: 0 },
-}));
+  const chemicalList = ["All Parameters", ...Object.keys(alertData)];
 
-// ── main component ──────────────────────────────────────────────────
-const IntensityChart = ({ intensityData }) => {
-  const isEmpty =
-    !intensityData || Object.keys(intensityData).length === 0;
+  // ✅ Updated Logic: check for lowercase "alert"
+  const renderAlertCircle = (value, type) => {
+    const val = (value || "").toLowerCase().trim();
+    let color = "#ccc"; // default grey for "no alert"
 
-  // Accordion open state defaults to !isEmpty
-  const [expanded, setExpanded] = useState(!isEmpty);
+    if (val === "alert") {
+      if (type === "concentration") color = "#f9b233";
+      else if (type === "instant") color = "#f9423a";
+      else if (type === "critical") color = "#891c1c";
+    }
 
-  const rows = useMemo(
-    () =>
-      Object.entries(intensityData || {}).map(([key, value]) => (
-        <StyledTableRow key={key}>
-          <StyledTableCell component="th" scope="row">
-            {key}
-          </StyledTableCell>
-          <StyledTableCell align="right">{value}</StyledTableCell>
-        </StyledTableRow>
-      )),
-    [intensityData]
-  );
+    return (
+      <div
+        style={{
+          width: 16,
+          height: 16,
+          borderRadius: "50%",
+          backgroundColor: color,
+          margin: "auto",
+        }}
+      />
+    );
+  };
+
+  const renderAlertMatrix = () => {
+    const filteredData =
+      selectedChemical === "All Parameters"
+        ? alertData
+        : { [selectedChemical]: alertData[selectedChemical] };
+
+    return Object.entries(filteredData).map(([chemical, alerts]) => (
+      <Box
+        key={chemical}
+        display="flex"
+        justifyContent="space-between"
+        py={1}
+        borderBottom="1px solid #eee"
+      >
+        <Typography sx={{ width: "30%", textTransform: "capitalize" }}>
+          {chemical}
+        </Typography>
+        {["concentration", "instant", "critical"].map((type, idx) => (
+          <Box
+            key={idx}
+            sx={{ width: "22%", display: "flex", justifyContent: "center" }}
+          >
+            {renderAlertCircle(alerts?.[type], type)}
+          </Box>
+        ))}
+      </Box>
+    ));
+  };
 
   return (
-    <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+    <Accordion>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <HvTypography variant="title3" sx={{ fontSize: "1.25rem" }}>
-          Intensity Estimation
-        </HvTypography>
+        <Typography variant="h6" fontWeight="bold">
+          Intensity Data
+        </Typography>
       </AccordionSummary>
-
       <AccordionDetails>
         <HvCard
-          bgcolor="white"
           style={{
-            height: "500px",
-            borderRadius: 0,
-            boxShadow:
-              "0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19)",
+            height: "100%",
+            width: "100%",
+            backgroundColor: "white",
+            borderRadius: "0px",
           }}
-          statusColor="red"
         >
-          <HvCardContent style={{ height: "100%" }}>
-            {isEmpty ? (
+          {/* Summary Cards */}
+          <Box paddingTop={2}>
+            <Box display="flex" gap={2} flexWrap="wrap" m={2}>
               <Box
                 flex={1}
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                height="100%"
+                bgcolor="#fff3cd"
+                p={2}
+                borderRadius={2}
+                minWidth={250}
               >
-                <HvTypography variant="title3">
-                  No data Available
-                </HvTypography>
+                <Typography fontWeight="bold">Concentration Alert</Typography>
+                <Typography fontSize="0.875rem" mb={1}>
+                  Chemical concentration exceeds normal levels
+                </Typography>
               </Box>
-            ) : (
-              <TableContainer
-                component={Paper}
-                elevation={0}
-                sx={{ width: "100%", overflowX: "auto" }}
+
+              <Box
+                flex={1}
+                bgcolor="#f8d7da"
+                p={2}
+                borderRadius={2}
+                minWidth={250}
               >
-                <Table sx={{ minWidth: "100%" }}>
-                  <TableBody>{rows}</TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </HvCardContent>
+                <Typography fontWeight="bold">Instant Alert</Typography>
+                <Typography fontSize="0.875rem" mb={1}>
+                  Chemical concentration requires immediate attention
+                </Typography>
+              </Box>
+
+              <Box
+                flex={1}
+                bgcolor="#f5c6cb"
+                p={2}
+                borderRadius={2}
+                minWidth={250}
+              >
+                <Typography fontWeight="bold">Critical Alert</Typography>
+                <Typography fontSize="0.875rem" mb={1}>
+                  Dangerous level reached, evacuation may be necessary
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Most Recent Alert */}
+          {mostRecentAlert?.type?.toLowerCase() !== "no alert" && (
+            <Box m={2}>
+              <Typography variant="body2" fontWeight="bold">
+                Most Recent Alert:
+              </Typography>
+              <Typography variant="body2">
+                <strong>{mostRecentAlert.type}</strong> for{" "}
+                {mostRecentAlert.parameter} at {mostRecentAlert.time}
+              </Typography>
+            </Box>
+          )}
+
+          <Divider sx={{ my: 3 }} />
+
+          {/* Alert Matrix */}
+          <Box m={2}>
+            <Typography variant="h6" gutterBottom>
+              Alert Matrix
+            </Typography>
+
+            <ToggleButtonGroup
+              value={selectedChemical}
+              exclusive
+              onChange={(e, newVal) => newVal && setSelectedChemical(newVal)}
+              size="small"
+              sx={{ mb: 2, flexWrap: "wrap" }}
+            >
+              {chemicalList.map((chem) => (
+                <ToggleButton key={chem} value={chem}>
+                  {chem.toUpperCase()}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+
+            {/* Table Header */}
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              borderBottom="2px solid #000"
+              pb={1}
+            >
+              <Typography sx={{ width: "30%", fontWeight: "bold" }}>
+                Chemical
+              </Typography>
+              <Typography
+                sx={{
+                  width: "22%",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  color: "#f9b233",
+                }}
+              >
+                Concentration
+              </Typography>
+              <Typography
+                sx={{
+                  width: "22%",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  color: "#f9423a",
+                }}
+              >
+                Instant
+              </Typography>
+              <Typography
+                sx={{
+                  width: "22%",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  color: "#891c1c",
+                }}
+              >
+                Critical
+              </Typography>
+            </Box>
+
+            {renderAlertMatrix()}
+          </Box>
         </HvCard>
       </AccordionDetails>
     </Accordion>
