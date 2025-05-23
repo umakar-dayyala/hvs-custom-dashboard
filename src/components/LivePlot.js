@@ -82,6 +82,10 @@ const LivePlot = ({ data }) => {
               yanchor: "top",
               traceorder: "normal",
               tracegroupgap: 10,
+              font: {
+                size: 18,
+                color: "#000",
+              },
             },
             autosize: true,
             margin: { t: 50, r: 30, b: 40, l: 50 },

@@ -57,8 +57,24 @@ const excludedFromPlot = [
   "Laser PD",
   "Background Light Monitor",
   "V Power Supply",
-  
-
+  "Occupancy",
+  "System Type",
+  "Slave Sync",
+  "Vehicle In",
+  "DET 01 Status",
+  "DET 02 Status",
+  "Simulation Mode",
+  "555 Mode",
+  "DET 02 BG High",
+  "DET 02 BG Low",
+  "DET 02 Alarm", 
+  "DET 01 BG High",
+  "DET 01 BG Low", 
+  "DET 01 Alarm",
+  "Instrument Type",
+  "Filter Change Count",
+  "Configuration Change Count",
+  "Reading Change Count"
 ];
 
 // Memoized components
@@ -95,28 +111,29 @@ const IndividualParameters = memo(
   ({ paramsData, notifications = [], toggleState, AsmData }) => {
     /* ───── helpers ───── */
     const listContainerRef = useRef(null);
-const [listHeight, setListHeight] = useState(500); // Default height
+    const [listHeight, setListHeight] = useState(500); // Default height
+    const [cardStatusColor, setCardStatusColor] = useState("green");
 
-useEffect(() => {
-  if (!listContainerRef.current) return;
+    useEffect(() => {
+      if (!listContainerRef.current) return;
 
-  const resizeObserver = new ResizeObserver((entries) => {
-    const { height } = entries[0].contentRect;
-    setListHeight(height - 40); // Subtract padding/header space
-  });
+      const resizeObserver = new ResizeObserver((entries) => {
+        const { height } = entries[0].contentRect;
+        setListHeight(height - 40); // Subtract padding/header space
+      });
 
-  resizeObserver.observe(listContainerRef.current);
-  return () => resizeObserver.disconnect();
-}, []);
+      resizeObserver.observe(listContainerRef.current);
+      return () => resizeObserver.disconnect();
+    }, []);
 
     const memoizedCapitalize = useCallback(
       (str) =>
         !str
           ? ""
           : str
-              .split("_")
-              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-              .join(" "),
+            .split("_")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" "),
       []
     );
 
@@ -127,68 +144,68 @@ useEffect(() => {
     );
 
     const getBackgroundColor = (status, faultValue) => {
-  const green  = "#008000";
-  const yellow = "#ffbf00";
-  const red    = "#ff0000";
+      const green = "#008000";
+      const yellow = "#ffbf00";
+      const red = "#ff0000";
 
-  const statusStr = String(status).toLowerCase();
-  const faultStr  = String(faultValue).toLowerCase();
+      const statusStr = String(status).toLowerCase();
+      const faultStr = String(faultValue).toLowerCase();
 
-  /* ---- fault first ---- */
-  if (faultStr === "fault" || faultStr === "true") return yellow;
+      /* ---- fault first ---- */
+      if (faultStr === "fault" || faultStr === "true") return yellow;
 
-  /* ---- clear / no-fault / ok ---- */
-  if (
-    faultStr === "no fault" ||        // ← ADD THIS
-    statusStr === "false"  ||
-    statusStr === "no fault" ||
-    statusStr === "ok"      ||
-    statusStr === "clear"
-  )
-    return green;
+      /* ---- clear / no-fault / ok ---- */
+      if (
+        faultStr === "no fault" ||        // ← ADD THIS
+        statusStr === "false" ||
+        statusStr === "no fault" ||
+        statusStr === "ok" ||
+        statusStr === "clear"
+      )
+        return green;
 
-  /* ---- anything else = warning ---- */
-  return yellow;
-};
+      /* ---- anything else = warning ---- */
+      return yellow;
+    };
 
 
     /* ───── renderers ───── */
 
     const renderNotificationRow = useCallback(
-  ({ index, style }) => {
-    const n = notifications[index];
-    return (
-      <TableRow 
-        key={index}
-        style={{
-          ...style,
-          display: "flex",
-          alignItems: "center",
-          padding: "8px 16px",
-          borderBottom: "1px solid #e0e0e0",
-          fontSize: "14px",
-        }}
-      >
-        <TableCell style={{ flex: 1, padding: 0, border: "none" }}>
-          {n.label}
-        </TableCell>
-        <TableCell 
-          style={{ 
-            flex: 0.3, 
-            padding: 0, 
-            border: "none", 
-            textAlign: "right",
-            color: "#666",
-            fontSize: "12px"
-          }}
-        >
-          {n.value}
-        </TableCell>
-      </TableRow>
+      ({ index, style }) => {
+        const n = notifications[index];
+        return (
+          <TableRow
+            key={index}
+            style={{
+              ...style,
+              display: "flex",
+              alignItems: "center",
+              padding: "8px 16px",
+              borderBottom: "1px solid #e0e0e0",
+              fontSize: "14px",
+            }}
+          >
+            <TableCell style={{ flex: 1, padding: 0, border: "none" }}>
+              {n.label}
+            </TableCell>
+            <TableCell
+              style={{
+                flex: 0.3,
+                padding: 0,
+                border: "none",
+                textAlign: "right",
+                color: "#666",
+                fontSize: "12px"
+              }}
+            >
+              {n.value}
+            </TableCell>
+          </TableRow>
+        );
+      },
+      [notifications]
     );
-  },
-  [notifications]
-);
 
     const renderParameterGroup = useCallback(
       (groupTitle, subParams) => (
@@ -219,6 +236,7 @@ useEffect(() => {
                 {Object.keys(subParams).map((k) => {
                   const isAlarm = subParams[k] > 0;
                   const color = isAlarm ? "red" : "green";
+                  setCardStatusColor(color);
                   return (
                     <div
                       key={k}
@@ -244,13 +262,13 @@ useEffect(() => {
                 })}
               </div>
             </div>
-          ) : /* live-plot groups */ [
-              "Chemical Parameters",
-              "Radiation Parameter",
-              "Radiation Parameters",
-              "Concentrations",
-              "Biological Parameters",
-            ].includes(groupTitle) ? (
+          ) : /* live-plot groups */[
+            "Chemical Parameters",
+            "Radiation Parameter",
+            "Radiation Parameters",
+            "Concentrations",
+            "Biological Parameters",
+          ].includes(groupTitle) ? (
             <MemoizedLivePlot data={subParams} />
           ) : (
             /* simple key/value list */
@@ -385,36 +403,40 @@ useEffect(() => {
                           component={Paper}
                           elevation={0}
                           style={{
-                            width: "100%",
-                            overflowX: "auto",
-                            marginBottom: "16px",
+                           width: "100%",
+    maxHeight: "300px", // Limit vertical height
+    overflow: "auto",   // Add both vertical and horizontal scroll if needed
+    marginBottom: "16px",
                           }}
                         >
                           <Table
                             sx={{ minWidth: "100%" }}
                             aria-label="system-settings-table"
                           >
-                          <TableBody>
-  {Object.entries(parameters)
-    .filter(([k]) => !["HV (High Voltage)", "Exhaust Pressure","O2 AL1 Set Point","CO2 AL1 Set Point","CO AL1 Set Point","O2 AL2 Set Point","CO2 AL2 Set Point"].includes(k)) // exclude plotted values
-    .map(([k, v]) => (
-      <StyledTableRow key={k}>
-        <StyledTableCell
-          component="th"
-          scope="row"
-          style={{ width: "60%" }}
-        >
-          <div style={{ padding: "8px 0" }}>{k}</div>
-        </StyledTableCell>
-        <StyledTableCell
-          align="right"
-          style={{ width: "40%" }}
-        >
-          <div style={{ padding: "8px 0" }}>{v}</div>
-        </StyledTableCell>
-      </StyledTableRow>
-    ))}
-</TableBody>
+                            <TableBody>
+                              {Object.entries(parameters)
+                                .filter(([k]) => !["HV (High Voltage)", "Exhaust Pressure", "O2 AL1 Set Point",
+                                   "CO2 AL1 Set Point", "CO AL1 Set Point", "O2 AL2 Set Point", 
+                                   "CO2 AL2 Set Point", "Input Voltage", "Internal Temperature",
+                                    "Laser Current"].includes(k)) // exclude plotted values
+                                .map(([k, v]) => (
+                                  <StyledTableRow key={k}>
+                                    <StyledTableCell
+                                      component="th"
+                                      scope="row"
+                                      style={{ width: "60%" }}
+                                    >
+                                      <div style={{ padding: "8px 0" }}>{k}</div>
+                                    </StyledTableCell>
+                                    <StyledTableCell
+                                      align="right"
+                                      style={{ width: "40%" }}
+                                    >
+                                      <div style={{ padding: "8px 0" }}>{v}</div>
+                                    </StyledTableCell>
+                                  </StyledTableRow>
+                                ))}
+                            </TableBody>
 
 
 
@@ -422,60 +444,60 @@ useEffect(() => {
                         </TableContainer>
 
                         <MemoizedLivePlot
-  data={Object.fromEntries(
-    Object.entries(parameters)
-      .filter(([k, v]) => {
-        return !excludedFromPlot.includes(k) && !isNaN(Number(v));
-      })
-      .map(([k, v]) => [k, Number(v)])
-  )}
-/>
+                          data={Object.fromEntries(
+                            Object.entries(parameters)
+                              .filter(([k, v]) => {
+                                return !excludedFromPlot.includes(k) && !isNaN(Number(v));
+                              })
+                              .map(([k, v]) => [k, Number(v)])
+                          )}
+                        />
                       </div>
                     ) : ["Health Parameters", "Health_Parameters"].includes(
-                        sectionTitle
-                      ) ? (
+                      sectionTitle
+                    ) ? (
                       /* -------- Health Parameters ---------- */
-<TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
-  <Table sx={{ minWidth: "100%" }} aria-label="health-parameters-table">
-    <TableBody>
-      {Object.entries(parameters).map(([paramName, meta]) => {
-        // meta = { "<paramName> Status": "...", "Fault Value": "...", ... }
-        const status =
-          meta[`${paramName} Status`] ??
-          meta[Object.keys(meta).find((k) => k.toLowerCase().includes("status"))];
+                      <TableContainer component={Paper} elevation={0} style={{ width: "100%", overflowX: "auto" }}>
+                        <Table sx={{ minWidth: "100%" }} aria-label="health-parameters-table">
+                          <TableBody>
+                            {Object.entries(parameters).map(([paramName, meta]) => {
+                              // meta = { "<paramName> Status": "...", "Fault Value": "...", ... }
+                              const status =
+                                meta[`${paramName} Status`] ??
+                                meta[Object.keys(meta).find((k) => k.toLowerCase().includes("status"))];
 
-        const fault = meta["Fault Value"];
+                              const fault = meta["Fault Value"];
 
-        return (
-          <StyledTableRow key={paramName}>
-            {/* label column */}
-            <StyledTableCell component="th" scope="row" style={{ width: "60%" }}>
-              {paramName.replace(/_/g, " ")}
-            </StyledTableCell>
+                              return (
+                                <StyledTableRow key={paramName}>
+                                  {/* label column */}
+                                  <StyledTableCell component="th" scope="row" style={{ width: "60%" }}>
+                                    {paramName.replace(/_/g, " ")}
+                                  </StyledTableCell>
 
-            {/* value chip */}
-            <StyledTableCell align="right" style={{ width: "40%" }}>
-              <div
-                style={{
-                  backgroundColor: getBackgroundColor(status, fault),
-                  color: "white",
-                  borderRadius: "6px",
-                  padding: "4px 12px",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  minWidth: "70px",
-                  display: "inline-block",
-                }}
-              >
-                {status}
-              </div>
-            </StyledTableCell>
-          </StyledTableRow>
-        );
-      })}
-    </TableBody>
-  </Table>
-</TableContainer>
+                                  {/* value chip */}
+                                  <StyledTableCell align="right" style={{ width: "40%" }}>
+                                    <div
+                                      style={{
+                                        backgroundColor: getBackgroundColor(status, fault),
+                                        color: "white",
+                                        borderRadius: "6px",
+                                        padding: "4px 12px",
+                                        fontWeight: "bold",
+                                        textAlign: "center",
+                                        minWidth: "70px",
+                                        display: "inline-block",
+                                      }}
+                                    >
+                                      {status}
+                                    </div>
+                                  </StyledTableCell>
+                                </StyledTableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
 
                     ) : (
                       /* ---------- generic table ---------- */
@@ -501,93 +523,93 @@ useEffect(() => {
               );
             })}
 
-           
-{/* ------- Notifications card ------- */}
-<HvCard
-  className="parameter-card"
-  elevation={0}
-  statusColor="red"
-  style={{ ...cardStyle, flex: 1 }}
->
-  <HvCardContent className="parameter-content" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-    <HvTypography variant="title2" className="section-title">
-      Notifications
-    </HvTypography>
-    
-    <div style={{ flex: 1, minHeight: 0 }}>
-      {notifications.length > 0 ? (
-        <div ref={listContainerRef} style={{ height: '100%' }}>
-          <TableContainer 
-            component={Paper} 
-            elevation={0}
-            style={{ 
-              width: '100%',
-              height: '100%',
-              
-            }}
-          >
-            <Table sx={{ minWidth: '100%' }} >
-              <TableBody>
-                <List
-                  height={listHeight}
-                  itemCount={notifications.length}
-                  itemSize={100}
-                  width="100%"
-                >
-                  {({ index, style }) => {
-                    const n = notifications[index];
-                    return (
-                      <StyledTableRow 
-                        key={index}
+
+            {/* ------- Notifications card ------- */}
+            <HvCard
+              className="parameter-card"
+              elevation={0}
+              statusColor="red"
+              style={{ ...cardStyle, flex: 1 }}
+            >
+              <HvCardContent className="parameter-content" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <HvTypography variant="title2" className="section-title">
+                  Notifications
+                </HvTypography>
+
+                <div style={{ flex: 1, minHeight: 0 }}>
+                  {notifications.length > 0 ? (
+                    <div ref={listContainerRef} style={{ height: '100%' }}>
+                      <TableContainer
+                        component={Paper}
+                        elevation={0}
                         style={{
-                          ...style,
-                          display: 'flex',
-                          alignItems: 'center',
+                          width: '100%',
+                          height: '100%',
+
                         }}
                       >
-                        <StyledTableCell 
-                          component="div" 
-                          style={{ 
-                            flex: 1, 
-                            padding: '8px 16px',
-                            fontSize: '18px'
-                          }}
-                        >
-                          {n.label}
-                        </StyledTableCell>
-                        <StyledTableCell 
-                          component="div"
-                          align="right"
-                          style={{ 
-                            flex: 0.3, 
-                            padding: '8px 16px',
-                            color: '#666',
-                            fontSize: '18px'
-                          }}
-                        >
-                          {n.value}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    );
-                  }}
-                </List>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      ) : (
-        <StyledTableRow style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <StyledTableCell colSpan={2} align="center" style={{ border: 'none' }}>
-            <div style={{ display: 'flex', alignItems: 'center', color: '#666' }}>
-              <img src={sIcon} alt="Success" style={{ height: "16px", marginRight: "8px" }} />
-              All good. No active alarms.
-            </div>
-          </StyledTableCell>
-        </StyledTableRow>
-      )}
-    </div>
-  </HvCardContent>
-</HvCard>
+                        <Table sx={{ minWidth: '100%' }} >
+                          <TableBody>
+                            <List
+                              height={800}
+                              itemCount={notifications.length}
+                              itemSize={150}
+                              width="100%"
+                            >
+                              {({ index, style }) => {
+                                const n = notifications[index];
+                                return (
+                                  <StyledTableRow
+                                    key={index}
+                                    style={{
+                                      ...style,
+                                      display: 'flex',
+                                      alignItems: 'flex-start', 
+                                    }}
+                                  >
+                                    <StyledTableCell
+                                      component="div"
+                                      style={{
+                                        flex: 1,
+                                        padding: '8px 16px',
+                                        fontSize: '18px'
+                                      }}
+                                    >
+                                      {n.label}
+                                    </StyledTableCell>
+                                    <StyledTableCell
+                                      component="div"
+                                      align="right"
+                                      style={{
+                                        flex: 0.3,
+                                        padding: '8px 16px',
+                                        color: '#666',
+                                        fontSize: '18px'
+                                      }}
+                                    >
+                                      {n.value}
+                                    </StyledTableCell>
+                                  </StyledTableRow>
+                                );
+                              }}
+                            </List>
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </div>
+                  ) : (
+                    <StyledTableRow style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <StyledTableCell colSpan={2} align="center" style={{ border: 'none' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', color: '#666' }}>
+                          <img src={sIcon} alt="Success" style={{ height: "16px", marginRight: "8px" }} />
+                          All good. No active alarms.
+                        </div>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  )}
+                </div>
+              </HvCardContent>
+            </HvCard>
             {/* ------- optional ASM section ------- */}
             {AsmData && (
               <HvCard

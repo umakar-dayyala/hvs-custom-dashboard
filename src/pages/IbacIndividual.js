@@ -245,7 +245,9 @@ export const IbacIndividual = () => {
           </Box>
         </div>
       </div>
-
+            <Box mt={2}>
+      <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+      </Box>
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <HvStack direction="column" divider spacing="sm">
           <IndividualKPI kpiData={kpiData} ricon={bioicon} gicon={gbioicon} rbell={rbell} amberBell={amberBell} greenBell={greenBell} aicon={aicon} greyIcon={greyBio}
@@ -254,9 +256,11 @@ export const IbacIndividual = () => {
             { title: "Detector Health Faults", value: "No Data" },
             { title: "Analytics Alert", value: "No Data" }
           ]}/>
-          <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+          {/* <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} /> */}
         </HvStack>
+        <Box mt={2}>
         <IndividualParameters paramsData={param} notifications={notifications} />
+        </Box>
         <Box mt={2}>
           <PlotlyDataChart bioParamChartData={bioParamChartData} onRangeChange={handlePlotlyRangeChange} title={'Biological Readings'} lastFetchTime={lastFetchTimes.bioParam} />
         </Box>

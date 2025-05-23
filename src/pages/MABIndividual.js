@@ -242,6 +242,9 @@ export const MABIndividual = React.memo(() => {
             </Box>
           </div>
         </div>
+         <Box mt={2}>
+      <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+      </Box>
 
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -261,11 +264,13 @@ export const MABIndividual = React.memo(() => {
                   { title: "Analytics Alert", value: "No Data" }
                 ]}
               />
-              <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+              {/* <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} /> */}
             </HvStack>
 
             {/* Pass the actual asmData instead of dummy data */}
+            <Box mt={2}>
             <IndividualParameters paramsData={param} notifications={notifications} AsmData={asmData} />
+            </Box>
 
             <Box mt={2}>
               <PlotlyDataChart

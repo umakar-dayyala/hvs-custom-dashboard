@@ -193,7 +193,9 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
          
         </div>
       </div>
-     
+     <Box mt={2}>
+      <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+      </Box>
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
@@ -203,14 +205,16 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
               { title: "Detector Health Faults", value: "No Data" },
               { title: "Analytics Alert", value: "No Data" }
             ]}/>
-            <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+            {/* <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} /> */}
           </HvStack>
           {/* <Box mt={2} style={{ display: "flex", flexDirection: "row" ,justifyContent:"flex-end"}}>
   {LastFetchLiveData && (
     <span>Last Live Data fetched time: {LastFetchLiveData}</span>
   )}
 </Box> */}
+<Box mt={2}>
           <IndividualParameters paramsData={param} notifications={notifications} toggleState ={toggleState}/>
+          </Box>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={prmParamChartData}

@@ -216,7 +216,9 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
           
         </div>
       </div>
-
+            <Box mt={2}>
+      <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+      </Box>
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
@@ -231,9 +233,11 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
               greyIcon={greyChem}
               dummyKpiData={DUMMY_KPI_DATA}
             />
-            <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+            {/* <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} /> */}
           </HvStack>
+          <Box mt={2}>
           <IndividualParameters paramsData={param} notifications={notifications} toggleState={toggleState}/>
+          </Box>
           <Box mt={2}>
             <PlotlyDataChart
               bioParamChartData={ap4cParamChartData}

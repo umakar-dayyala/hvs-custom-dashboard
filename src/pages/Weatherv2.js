@@ -141,7 +141,9 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
         </div>
         
       </div>
-      <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+      <Box mt={2}>
+            <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+            </Box>
       <HvGrid container>
         <HvGrid item xs={12}>
           <HvCard
