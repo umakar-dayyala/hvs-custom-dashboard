@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { HvCard } from "@hitachivantara/uikit-react-core";
-import Alerts from "./Alerts"; // import your Overview component
+import Alerts from "./Alerts";
+
 
 const IntensityChart = ({ intensityData = {} }) => {
   const { alertData = {}, mostRecentAlert = {} } = intensityData;
