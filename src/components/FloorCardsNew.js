@@ -217,10 +217,10 @@ const FloorCards = ({ floorData }) => {
                       </Box>
                       <Box display="flex" flexDirection="column" alignItems="center">
                         <HvTypography variant="caption" style={{ fontWeight: 'bold', color: '#000' }}>
-                          Total
+                          Locations
                         </HvTypography>
                         <HvTypography variant="caption" style={{ fontWeight: 'bold', color: '#000' }}>
-                          {floor.totalSensors}
+                          {floor.total_location || 0}
                         </HvTypography>
                       </Box>
                     </Box>
