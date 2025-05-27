@@ -258,20 +258,35 @@ export const AP4CIndividual = React.memo(() => {
           </Box>
         </Box>
 
-        <Box style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }} mt={2} gap={2}>
-          <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <IntensityChart
-  intensityData={intensityData}
-/>
+        <Box
+  style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "stretch" }}
+  mt={2}
+  gap={2}
+>
+  <Box
+    width={locationDetails.floor === 'UGF' ? "33.33%" : "50%"}
+    style={{ display: "flex", flexDirection: "column", height: "100%" }}
+  >
+    <IntensityChart intensityData={intensityData} />
+  </Box>
 
-          </Box>
-          <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <Corelation />
-          </Box>
-          <Box width="33.33%" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <PredictionChart />
-          </Box>
-        </Box>
+  {locationDetails.floor === 'UGF' && (
+    <Box
+      width="33.33%"
+      style={{ display: "flex", flexDirection: "column", height: "100%" }}
+    >
+      <Corelation />
+    </Box>
+  )}
+
+  <Box
+    width={locationDetails.floor === 'UGF' ? "33.33%" : "50%"}
+    style={{ display: "flex", flexDirection: "column", height: "100%" }}
+  >
+    <PredictionChart />
+  </Box>
+</Box>
+
         <Connectivitydata />
       </Box>
     </Box>
