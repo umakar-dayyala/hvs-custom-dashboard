@@ -10,79 +10,70 @@ import {
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
-// Sample hardcoded notifications
-const notifications = [
-  // {
-  //   id: 1,
-  //   title: "Sensor Calibration Due",
-  //   description: "Sensor A12 in Zone 3 needs calibration.",
-  //   type: "Maintenance",
-  //   time: "2025-05-13T08:30:00",
-  // },
-  // {
-  //   id: 2,
-  //   title: "New Sensor Added",
-  //   description: "Sensor B09 has been added to Floor 2.",
-  //   type: "Update",
-  //   time: "2025-05-12T15:10:00",
-  // },
-  // {
-  //   id: 3,
-  //   title: "Connection Lost",
-  //   description: "Sensor D04 in Zone 5 is offline.",
-  //   type: "Alert",
-  //   time: "2025-05-13T06:45:00",
-  // },
-];
-
-// Helper to calculate how long ago something happened
-const timeAgo = (date) => {
-  const diffMs = Date.now() - new Date(date).getTime();
-  const minutes = Math.floor(diffMs / (1000 * 60));
-  if (minutes < 60) return `${minutes} min${minutes !== 1 ? "s" : ""} ago`;
-  const hours = Math.floor(minutes / 60);
-  return `${hours} hr${hours !== 1 ? "s" : ""} ago`;
+// Function to fix the timestamp format
+const fixTimestamp = (ts) => {
+  if (ts.includes('T') || ts.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)) {
+    return ts;
+  }
+  const match = ts.match(/^(\d{4}-\d{2}-\d{2})(\d{2}:\d{2}:\d{2}(\.\d+)?)$/);
+  if (match) {
+    return `${match[1]} ${match[2]}`;
+  }
+  return ts;
 };
 
-const FloorWiseNotificationPanel = () => {
-  const [filter, setFilter] = useState("All");
+const flattenNotifications = (data) => {
+  if (!data?.devices) return [];
 
+  let idCounter = 1;
+  return data.devices.flatMap((device) =>
+    device.notifications.map((note) => ({
+      id: idCounter++,
+      sensor_name: note.sensor_name,
+      label: note.label,
+      timestamp: fixTimestamp(note.timestamp),
+    }))
+  );
+};
+
+const FloorWiseNotificationPanel = ({ sensorData }) => {
+  const allNotifications = useMemo(
+    () => flattenNotifications(sensorData),
+    [sensorData]
+  );
+
+  // Extract unique sensor names for dropdown
+  const sensorNames = useMemo(() => {
+    const names = Array.from(new Set(allNotifications.map(n => n.sensor_name)));
+    return ["All", ...names];
+  }, [allNotifications]);
+
+  const [selectedSensor, setSelectedSensor] = useState("All");
+
+  // Filter by sensor name
   const filteredNotifications = useMemo(() => {
-    if (filter === "All") return notifications;
-    return notifications.filter((n) => n.type === filter);
-  }, [filter]);
-
-  const notificationTypes = [...new Set(notifications.map((n) => n.type))];
+    if (selectedSensor === "All") return allNotifications;
+    return allNotifications.filter(n => n.sensor_name === selectedSensor);
+  }, [selectedSensor, allNotifications]);
 
   return (
-    <Paper elevation={1}
-      sx={{
-        p: 2,
-        borderRadius: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        maxHeight: '42vh',
-        overflow: 'hidden',
-      }}>
+    <Paper elevation={1} sx={{ p: 2, borderRadius: 2, display: 'flex', flexDirection: 'column', maxHeight: '42vh', overflow: 'hidden' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography variant="subtitle1" fontWeight="bold">
             Notifications
           </Typography>
           <Typography variant="caption" color="textSecondary">
-            Recent system notifications
+            Filtered by sensor: {selectedSensor}
           </Typography>
         </Box>
         <Select
           size="small"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          value={selectedSensor}
+          onChange={(e) => setSelectedSensor(e.target.value)}
         >
-          <MenuItem value="All">All</MenuItem>
-          {notificationTypes.map((type) => (
-            <MenuItem key={type} value={type}>
-              {type}
-            </MenuItem>
+          {sensorNames.map(name => (
+            <MenuItem key={name} value={name}>{name}</MenuItem>
           ))}
         </Select>
       </Box>
@@ -92,9 +83,7 @@ const FloorWiseNotificationPanel = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', minHeight: '30vh' }}>
         {filteredNotifications.length === 0 ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-            <Typography color="textSecondary">
-              No notifications to display.
-            </Typography>
+            <Typography color="textSecondary">No notifications to display.</Typography>
           </Box>
         ) : (
           filteredNotifications.map((n) => (
@@ -113,17 +102,17 @@ const FloorWiseNotificationPanel = () => {
                 <Box display="flex" alignItems="center" gap={1}>
                   <NotificationsActiveIcon color="primary" fontSize="small" />
                   <Typography variant="body2" fontWeight="bold">
-                    {n.title}
+                    {n.sensor_name}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" gap={0.5}>
                   <AccessTimeIcon fontSize="small" color="disabled" />
                   <Typography variant="caption" color="textSecondary">
-                    {timeAgo(n.time)}
+                    {n.timestamp}
                   </Typography>
                 </Box>
               </Box>
-              <Typography variant="body2">{n.description}</Typography>
+              <Typography variant="body2">{n.label}</Typography>
             </Box>
           ))
         )}

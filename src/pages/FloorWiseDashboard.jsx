@@ -16,7 +16,8 @@ import {
   getLocationSelector,
   getSensorTypeSelector,
   getSensorNameSelector,
-  getSensorStatusSelector
+  getSensorStatusSelector,
+  getDeviceNotifications
 } from "../service/summaryServices";
 import Breadcrumbs from "../components/Breadcrumbs";
 import SensorLegend from "../components/SensorLegend";
@@ -54,6 +55,7 @@ const FloorWiseDashboard = () => {
   const [sensorNameData, setSensorNameData] = useState([]);
   const [sensorStatusData, setSensorStatusData] = useState([]);
   const [utilityView, setUtilityView] = useState("north"); // Default to "North"
+  const [floorNotificationData, setFloorNotificationData] = useState([]);
 
   // New loading state
   const [loading, setLoading] = useState(true);
@@ -244,6 +246,8 @@ const FloorWiseDashboard = () => {
         );
         const sensorSummaryRes = await GetSensorSummary(`param_floor=${floor}`);
         const floorListRes = await floorList();
+        const deviceIds = floorSummaryRes.map(item => String(item.s_no.device_id));
+        const notifData = await getDeviceNotifications(deviceIds);
         // const zoneDataRes = await getFloorZoneSelector(`param_floor=${floor}`);
         // const locationRes = await getLocationSelector(`param_floor=${floor}&param_zone=ALL`);
         // const sensorTypeRes = await getSensorTypeSelector(`param_floor=${floor}&param_zone=ALL&param_location=ALL`);
@@ -255,6 +259,7 @@ const FloorWiseDashboard = () => {
           console.log("Floor Summary Data:" + JSON.stringify(floorSummaryRes));
           setSensorSummary(sensorSummaryRes.data);
           setFloorData(floorListRes);
+          setFloorNotificationData(notifData);
           // setZoneData(zoneDataRes.data);
           // setLocationData(locationRes.data);
           // setSensorTypeData(sensorTypeRes.data);
@@ -329,6 +334,7 @@ const FloorWiseDashboard = () => {
 
   // Safely format the data
   const formattedSensorsData = transformSensorData(floorSummaryData || []);
+  console.log("Floor Data    "+JSON.stringify(floorNotificationData));
 
   return (
     <Box>
@@ -427,6 +433,7 @@ const FloorWiseDashboard = () => {
                 bg="transparent"
                 minW="300px"
                 minHeight="90vh"
+                mt={2}
               >
                 {/* Alarm Panel */}
                 <Box bg="white" p={2} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
@@ -437,7 +444,7 @@ const FloorWiseDashboard = () => {
                 <Box bg="white" p={1} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
                   {/* <FloorWiseNotificationPanal sensorData={floorSummaryData} /> */}
                   {/* {floor === "Upper Ground Floor" ? ( */}
-                    <FloorWiseNotificationPanal sensorData={floorSummaryData} />
+                    <FloorWiseNotificationPanal sensorData={floorNotificationData} />
                   {/* // ) : null} */}
                 </Box>
               </Box>
