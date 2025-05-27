@@ -10,13 +10,30 @@ const SummaryCards = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
+    let isMounted = true; // To avoid setting state on unmounted component
+  
     const fetchSummaryData = async () => {
-      const result = await summaryData();
-      setData(result);
+      try {
+        while (isMounted) {
+          const result = await summaryData();
+          if (isMounted) {
+            setData(result);
+          }
+          // Wait for 0.5 seconds before the next call
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (error) {
+        console.error("Error fetching summary data:", error);
+      }
     };
+  
     fetchSummaryData();
+  
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
+  
   if (!data) return null; // Or a loading spinner
 
   return (
@@ -82,7 +99,7 @@ const SummaryCards = () => {
             {["Total Sensor", "Chemical", "Biological", "Radiological", "Generic"].map((label, i) => (
               <Grid item xs={2.4} key={label}>
                 {/* Enablen when they want to show generic */}
-            {/* {["Total Sensor", "Chemical", "Biological", "Radiological","Generic"].map((label, i) => (
+                {/* {["Total Sensor", "Chemical", "Biological", "Radiological","Generic"].map((label, i) => (
               <Grid item xs={2.4} key={label}> */}
                 <Typography variant="subtitle1" fontWeight="bold" color="#333">
                   {label}
@@ -109,7 +126,7 @@ const SummaryCards = () => {
                 {data.total_radiation}
               </Typography>
             </Grid>
-             {/* Enablen when they want to show generic */}
+            {/* Enablen when they want to show generic */}
             <Grid item xs={2.4}>
               <Typography variant="h5" fontWeight="bold" color="#333">
                 {data.total_generic}
