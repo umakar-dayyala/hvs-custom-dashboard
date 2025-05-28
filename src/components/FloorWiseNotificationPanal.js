@@ -27,14 +27,17 @@ const flattenNotifications = (data) => {
 
   let idCounter = 1;
   return data.devices.flatMap((device) =>
-    device.notifications.map((note) => ({
-      id: idCounter++,
-      sensor_name: note.sensor_name,
-      label: note.label,
-      timestamp: fixTimestamp(note.timestamp),
-    }))
+    Array.isArray(device.notifications)
+      ? device.notifications.map((note) => ({
+          id: idCounter++,
+          sensor_name: note.sensor_name,
+          label: note.label,
+          timestamp: fixTimestamp(note.timestamp),
+        }))
+      : []
   );
 };
+
 
 const FloorWiseNotificationPanel = ({ sensorData }) => {
   const allNotifications = useMemo(
