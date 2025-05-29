@@ -127,7 +127,7 @@ const InventoryDashboard = () => {
     if (type === 'add') {
       setFormData({
         asset_type_unique_id: '',
-        asset_unique_id: '',
+        // asset_unique_id: '',
         Asset_Type: asset?.assetType || '',
         Asset_Name: '',
         Asset_Manufacturer: '',
@@ -212,7 +212,7 @@ const InventoryDashboard = () => {
         // Validate required fields
         const requiredFields = {
           'Asset Type': formData.Asset_Type,
-          'Asset Unique ID': formData.asset_unique_id,
+          // 'Asset Unique ID': formData.asset_unique_id,
           'Asset Location': formData.Asset_Location,
           'Asset Status': formData.Asset_Status,
         };
@@ -233,7 +233,7 @@ const InventoryDashboard = () => {
 
         const payload = {
           asset_type_unique_id: formData.asset_type_unique_id || '',
-          asset_unique_id: formData.asset_unique_id || '',
+          // asset_unique_id: formData.asset_unique_id || '',
           asset_type: formData.Asset_Type,
           asset_quantity: 1,
           asset_name: formData.Asset_Name || '',

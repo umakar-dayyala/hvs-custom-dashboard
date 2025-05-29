@@ -68,7 +68,7 @@ const ExcelUploadHandler = ({ setLoading, handleShowNotification, getInventoryDa
 
             return {
               asset_type_unique_id: row['Asset_type_unique_id'] || '',
-              asset_unique_id: row['Asset_unique_id'] || '',
+              // asset_unique_id: row['Asset_unique_id'] || '',
               asset_type: row['Asset_Type'] || '',
               asset_quantity: 1,
               asset_name: row['Asset_Name'] || '',

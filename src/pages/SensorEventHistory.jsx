@@ -5,7 +5,6 @@ import { getSensorEventHistory } from "../service/HistoryService";
 import Breadcrumbs from "../components/Breadcrumbs";
 import Loader from "../components/Loader";
 import { Box, Typography } from "@mui/material";
-// import dayjs from "dayjs";
 
 const SensorEventHistory = () => {
   const [filters, setFilters] = useState({});
@@ -91,7 +90,7 @@ const SensorEventHistory = () => {
             <Typography>{error}</Typography>
           </Box>
         )}
-        {!loading && <DataTableComponent data={tableData} />}
+        {!loading && <DataTableComponent data={tableData} tableFilters={filters} />}
       </div>
     </>
   );

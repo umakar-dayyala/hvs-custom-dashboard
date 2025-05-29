@@ -20,10 +20,11 @@ import {
 } from "@hitachivantara/uikit-react-core";
 import { Filters } from "@hitachivantara/uikit-react-icons";
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Checkbox, TextField } from "@mui/material";
-import { CSVLink } from "react-csv";
+import { debounce } from "lodash";
+import { Export } from "./ExportOptionHistorical";
 
-const HistoryDataTable = ({ data }) => {
-  console.log("Data received in HistoryDataTable:", data);
+const HistoryDataTable = ({ data, tableFilters }) => {
+  console.log("HistoryDataTable rendered with filter:", tableFilters);
   const filterRef = useRef(null);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [isViewAll, setIsViewAll] = useState(false);
@@ -31,7 +32,6 @@ const HistoryDataTable = ({ data }) => {
   const [tempVisibleColumns, setTempVisibleColumns] = useState({});
   const [columnSearch, setColumnSearch] = useState("");
 
-  // Default columns to show in toggles and table by default
   const defaultColumns = [
     "device_id",
     "health",
@@ -44,35 +44,39 @@ const HistoryDataTable = ({ data }) => {
     "sensor_status",
   ];
 
-  // Derive all columns dynamically from the first data item
   const allColumns = useMemo(() => {
     if (!data || data.length === 0) return [];
-    return Object.keys(data[0]).filter((key) => key !== "id"); // Exclude 'id' if not needed
+    return Object.keys(data[0]).filter((key) => key !== "id");
   }, [data]);
 
-  // Initialize visible columns to default columns only
   const initialVisibleColumns = useMemo(() => {
     const initial = {};
     allColumns.forEach((col) => {
-      initial[col] = defaultColumns.includes(col); // Only default columns are true
+      initial[col] = defaultColumns.includes(col);
     });
     return initial;
   }, [allColumns]);
 
   const [visibleColumns, setVisibleColumns] = useState(initialVisibleColumns);
 
-  // Reset to default columns when data changes (new filter applied)
   useEffect(() => {
-    console.log("Resetting visibleColumns to default due to data change");
-    setVisibleColumns(initialVisibleColumns);
-    setIsViewAll(false); // Reset View All state
-  }, [data, initialVisibleColumns]);
+    const newColumns = data && data.length > 0 ? Object.keys(data[0]).filter((key) => key !== "id") : [];
+    if (JSON.stringify(newColumns) !== JSON.stringify(allColumns)) {
+      setVisibleColumns(initialVisibleColumns);
+      setIsViewAll(false);
+    }
+  }, [data, initialVisibleColumns, allColumns]);
 
-  useEffect(() => {
-    console.log("Current visibleColumns:", visibleColumns);
-  }, [visibleColumns]);
+  const handleColumnToggle = useCallback(
+    debounce((column) => {
+      setVisibleColumns((prev) => ({
+        ...prev,
+        [column]: !prev[column],
+      }));
+    }, 200),
+    []
+  );
 
-  // Handle "View" button toggle
   const handleViewToggle = useCallback(() => {
     setIsViewAll((prev) => {
       const newIsViewAll = !prev;
@@ -80,14 +84,12 @@ const HistoryDataTable = ({ data }) => {
         const newState = { ...prevColumns };
         if (newIsViewAll) {
           allColumns.forEach((col) => {
-            newState[col] = true; // Show all columns in table
+            newState[col] = true;
           });
-          console.log("View All columns:", newState);
         } else {
           allColumns.forEach((col) => {
-            newState[col] = defaultColumns.includes(col); // Reset to default columns
+            newState[col] = defaultColumns.includes(col);
           });
-          console.log("Reset visibleColumns to:", newState);
         }
         return newState;
       });
@@ -95,27 +97,23 @@ const HistoryDataTable = ({ data }) => {
     });
   }, [allColumns, defaultColumns]);
 
-  // Handle opening the column selection dialog
   const handleOpenColumnDialog = () => {
-    setTempVisibleColumns({ ...visibleColumns }); // Copy current visible columns to temp state
-    setColumnSearch(""); // Reset search when opening dialog
+    setTempVisibleColumns({ ...visibleColumns });
+    setColumnSearch("");
     setOpenColumnDialog(true);
   };
 
-  // Handle closing the column selection dialog
   const handleCloseColumnDialog = () => {
     setOpenColumnDialog(false);
-    setColumnSearch(""); // Reset search when closing dialog
+    setColumnSearch("");
   };
 
-  // Handle applying column selections from dialog
   const handleApplyColumns = () => {
     setVisibleColumns({ ...tempVisibleColumns });
     setOpenColumnDialog(false);
-    setColumnSearch(""); // Reset search after applying
+    setColumnSearch("");
   };
 
-  // Handle column toggle in dialog
   const handleTempColumnToggle = (column) => {
     setTempVisibleColumns((prev) => ({
       ...prev,
@@ -123,7 +121,13 @@ const HistoryDataTable = ({ data }) => {
     }));
   };
 
-  // Filter columns based on search input
+  const handleSearchChange = useCallback(
+    debounce((value) => {
+      setColumnSearch(value);
+    }, 300),
+    []
+  );
+
   const filteredColumns = useMemo(() => {
     if (!columnSearch) return allColumns;
     return allColumns.filter((col) =>
@@ -133,7 +137,7 @@ const HistoryDataTable = ({ data }) => {
 
   const displayedData = useMemo(
     () =>
-      data.slice(0, 50).map((item) => ({
+      data.map((item) => ({
         ...item,
         connection: item.connection ? "True" : "False",
         health: item.health ? "True" : "False",
@@ -141,40 +145,28 @@ const HistoryDataTable = ({ data }) => {
     [data]
   );
 
-  const filters = useMemo(() => {
+  const columnFilters = useMemo(() => {
+    const visibleCols = allColumns.filter((col) => visibleColumns[col]);
     const opts = {};
-    allColumns.forEach((col) => {
+    visibleCols.forEach((col) => {
       opts[col] = new Set();
     });
     displayedData.forEach((row) => {
-      allColumns.forEach((col) => {
+      visibleCols.forEach((col) => {
         if (row[col] !== undefined && row[col] !== null) {
           opts[col].add(row[col]);
         }
       });
     });
-    return allColumns.map((col) => ({
+    return visibleCols.map((col) => ({
       id: col,
       name: col.replace(/_/g, " ").toUpperCase(),
       data: [...opts[col]].map((value) => ({ id: value, name: value.toString() })),
     }));
-  }, [displayedData, allColumns]);
-
-  const handleColumnToggle = useCallback((column) => {
-    setVisibleColumns((prev) => {
-      const newState = {
-        ...prev,
-        [column]: !prev[column],
-      };
-      console.log(`Toggling column ${column}: ${prev[column]} -> ${!prev[column]}`);
-      return newState;
-    });
-  }, []);
+  }, [displayedData, visibleColumns, allColumns]);
 
   const visibleCols = useMemo(() => {
-    const cols = allColumns.filter((col) => visibleColumns[col]);
-    console.log("Visible columns:", cols);
-    return cols;
+    return allColumns.filter((col) => visibleColumns[col]);
   }, [visibleColumns, allColumns]);
 
   const columns = useMemo(
@@ -218,14 +210,14 @@ const HistoryDataTable = ({ data }) => {
         if (!vals?.length) return [];
         return [
           {
-            id: filters[idx].id,
+            id: columnFilters[idx].id,
             value: vals,
           },
         ];
       });
       setAllFilters(hvFilters);
     },
-    [filters, setAllFilters]
+    [columnFilters, setAllFilters]
   );
 
   return (
@@ -253,9 +245,7 @@ const HistoryDataTable = ({ data }) => {
           <Button onClick={handleOpenColumnDialog}>All Columns</Button>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
-          <CSVLink data={data} filename={"sensor-event-history.csv"}>
-            {/* <Button variant="outlined">Export to CSV</Button> */}
-          </CSVLink>
+          <Export data={data} allColumns={allColumns} filters={tableFilters} />
         </div>
       </div>
 
@@ -265,7 +255,7 @@ const HistoryDataTable = ({ data }) => {
           <TextField
             label="Search Columns"
             value={columnSearch}
-            onChange={(e) => setColumnSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             fullWidth
             margin="normal"
             placeholder="Type to filter columns..."
@@ -309,7 +299,7 @@ const HistoryDataTable = ({ data }) => {
             />
             <HvFilterGroup
               ref={filterRef}
-              filters={filters}
+              filters={columnFilters}
               value={selectedFilters}
               onChange={handleFilters}
               filterContentProps={{

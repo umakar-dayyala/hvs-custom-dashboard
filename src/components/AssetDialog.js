@@ -79,7 +79,7 @@ const AssetDialog = ({
 
   const validateForm = () => {
     if (!formData.Asset_Type) return "Asset Type is required";
-    if (!formData.asset_unique_id) return "Asset Unique ID is required";
+    // if (!formData.asset_unique_id) return "Asset Unique ID is required";
     return null;
   };
 
@@ -348,15 +348,18 @@ const AssetDialog = ({
             disabled={type === "edit"}
             required
           />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Asset Unique ID"
-            name="asset_unique_id"
-            value={formData.asset_unique_id || ""}
-            onChange={onChange}
-            required
-          />
+          {type === "edit" && editStep === "edit" && (
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Asset Unique ID"
+              name="asset_unique_id"
+              value={formData.asset_unique_id || ""}
+              onChange={onChange}
+              disabled={type === "edit"}
+              required
+            />
+          )}
           <TextField
             fullWidth
             margin="normal"
@@ -487,7 +490,7 @@ const AssetDialog = ({
         return (
           <>
             <Typography variant="subtitle1" color="error.main">
-              Confirm remove this asset?  
+              Confirm remove this asset?
             </Typography>
             <div>
               <strong>{selectedAsset?.uniqueAssetID || "Unknown"}</strong> —{" "}
