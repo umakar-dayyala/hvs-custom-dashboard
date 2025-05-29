@@ -1,257 +1,297 @@
 /* Main table styling */
 .tableWrapper {
-    margin: 20px auto;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    border: 1px solid #d0d7de;
-    overflow: hidden;
-    background: #ffffff;
-    width: 100%;
-  }
-  
-  .commentCell {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    max-width: 200px;
-    word-wrap: break-word;
-    line-height: 1.4;
-  }
-  
-  .tableContainer {
-    overflow: auto;
-    max-height: calc(100vh - 120px);
-    scrollbar-width: thin;
-  }
-  
-  .tableContainer::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  .tableContainer::-webkit-scrollbar-thumb {
-    background-color: #b0bec5;
-    border-radius: 4px;
-  }
-  
-  .tableContainer::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
-  }
-  
-  .tableTitle {
-    padding: 20px 24px;
-    border-bottom: 1px solid #e0e0e0;
-    background: linear-gradient(to right, #f5f7fa, #fdfdfd);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 3;
-  }
-  
-  /* Header styling */
-  .headerCell {
-    background-color: #333333;
-    color: white;
-    font-weight: 700;
-    padding: 16px 20px;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    border-bottom: 2px solid #555555;
-  }
-  
-  .checkboxCell {
-    padding: 0 12px;
-    width: 48px;
-  }
-  
-  /* Row styling */
-  .parentRow {
-    cursor: pointer;
-    border-bottom: 1px solid #e0e0e0;
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .parentRow:hover {
-    background-color: #f5f9ff;
-  }
-  
-  .stripedRow {
-    background-color: #f9fafc;
-  }
-  
-  .selectedRow {
-    background-color: #e3f2fd !important;
-    box-shadow: inset 0 0 0 1px #bbdefb;
-  }
-  
-  .expandedRow {
-    background-color: #f0f8ff !important;
-    border-left: 5px solid #1976d2;
-    box-shadow: inset 0 0 0 1px #bbdefb;
-  }
-  
-  .tableCell {
-    padding: 16px 20px;
-    font-size: 14px;
-    color: #333;
-    border-bottom: 1px solid #f0f0f0;
-    white-space: nowrap;
-  }
-  
-  .cellContent {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-  }
-  
-  /* Nested table styling */
-  .childTable {
-    margin: 12px 20px 20px 20px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 1px solid #e0e0e0;
-  }
-  
-  .childHeaderCell {
-    background-color: #444444;
-    color: white;
-    font-weight: 600;
-    padding: 12px 16px;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  /* Action buttons */
-  .actionCell {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-start;
-  }
-  
-  .iconButton {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .addButton {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-  }
-  
-  .addButton:hover {
-    background-color: #c8e6c9;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  .removeButton {
-    background-color: #ffebee;
-    color: #c62828;
-  }
-  
-  .removeButton:hover {
-    background-color: #ffcdd2;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  .editButton {
-    background-color: #e3f2fd;
-    color: #1976d2;
-  }
-  
-  .editButton:hover {
-    background-color: #bbdefb;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  /* Status indicators */
-  .statusBadge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 12px;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-  }
-  
-  .activeStatus {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #c8e6c9;
-  }
-  
-  .inactiveStatus {
-    background-color: #f5f5f5;
-    color: #757575;
-    border: 1px solid #e0e0e0;
-  }
-  
-  .removedStatus {
-    background-color: #ffebee;
-    color: #c62828;
-    border: 1px solid #ffcdd2;
-  }
-  
-  /* Quantity indicators */
-  .quantityHigh {
-    font-weight: bold;
-    color: #2e7d32;
-  }
-  
-  .quantityMedium {
-    font-weight: bold;
-    color: #ed6c02;
-  }
-  
-  .quantityLow {
-    font-weight: bold;
-    color: #c62828;
-  }
-  
-  /* Utility styles */
-  .expandIcon {
-    transition: transform 0.3s;
-    margin-right: 8px;
-  }
-  
-  .noDataMessage {
-    padding: 30px;
-    text-align: center;
-    color: #666;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-  }
-  
-  .attachmentBadge {
-    padding: 2px 8px;
-    border-radius: 4px;
-    background-color: #e3f2fd;
-    color: #1976d2;
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  }
+  margin: 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid #d0d7de;
+  overflow: hidden;
+  background: #ffffff;
+  width: 100%;
+}
+
+.commentCell {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: 200px;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.tableContainer {
+  overflow: auto;
+  max-height: calc(100vh - 120px);
+  scrollbar-width: thin;
+}
+
+.tableContainer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background-color: #b0bec5;
+  border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+/* Header container styling */
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(to right, #f5f7fa, #fdfdfd);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+/* Title styling */
+.tableTitle {
+  display: flex;
+  align-items: center;
+}
+
+/* Filter and search container */
+.filterSearchContainer {
+  display: flex;
+  /* align-items: center; */
+  gap: 16px; /* Proper spacing between search input and filter */
+}
+
+/* Filter section styling */
+.filtersContainer {
+  display: flex;
+  width: 100%;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  padding: 8px;
+}
+
+.filters {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gemsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actionButton {
+  padding: 8px 16px;
+}
+
+/* Header cell styling */
+.headerCell {
+  background-color: #333333;
+  color: white;
+  font-weight: 700;
+  padding: 16px 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-bottom: 2px solid #555555;
+}
+
+.checkboxCell {
+  padding: 0 12px;
+  width: 48px;
+}
+
+/* Row styling */
+.parentRow {
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  transition: all 0.2s ease-in-out;
+}
+
+.parentRow:hover {
+  background-color: #f5f9ff;
+}
+
+.stripedRow {
+  background-color: #f9fafc;
+}
+
+.selectedRow {
+  background-color: #e3f2fd !important;
+  box-shadow: inset 0 0 0 1px #bbdefb;
+}
+
+.expandedRow {
+  background-color: #f0f8ff !important;
+  border-left: 5px solid #1976d2;
+  box-shadow: inset 0 0 0 1px #bbdefb;
+}
+
+.tableCell {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+}
+
+.cellContent {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Nested table styling */
+.childTable {
+  margin: 12px 20px 20px 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+}
+
+.childHeaderCell {
+  background-color: #444444;
+  color: white;
+  font-weight: 600;
+  padding: 12px 16px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Action buttons */
+.actionCell {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.iconButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addButton {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.addButton:hover {
+  background-color: #c8e6c9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.removeButton {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.removeButton:hover {
+  background-color: #ffcdd2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.editButton {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.editButton:hover {
+  background-color: #bbdefb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Status indicators */
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.activeStatus {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.inactiveStatus {
+  background-color: #f5f5f5;
+  color: #757575;
+  border: 1px solid #e0e0e0;
+}
+
+.removedStatus {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* Quantity indicators */
+.quantityHigh {
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.quantityMedium {
+  font-weight: bold;
+  color: #ed6c02;
+}
+
+.quantityLow {
+  font-weight: bold;
+  color: #c62828;
+}
+
+/* Utility styles */
+.expandIcon {
+  transition: transform 0.3s;
+  margin-right: 8px;
+}
+
+.noDataMessage {
+  padding: 30px;
+  text-align: center;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.attachmentBadge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}

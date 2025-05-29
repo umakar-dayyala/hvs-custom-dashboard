@@ -10,7 +10,7 @@ const Breadcrumbs = () => {
   const pathnames = pathname.split("/").filter(Boolean);
 
   const routes = [
-    { label: "Operators Dashboard", path: "/" },
+    { label: "Summary Dashboard", path: "/" },
     ...pathnames.map((seg, idx) => {
       const path = `/${pathnames.slice(0, idx + 1).join("/")}`;
 

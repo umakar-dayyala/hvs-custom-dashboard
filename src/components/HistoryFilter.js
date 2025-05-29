@@ -14,15 +14,16 @@ import {
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import { getSensorTypes, getSensorNamesByType, getSensorLocations, getHistDeviceId } from "../service/HistoryService";
 
 const HistoryFilter = ({ onFilterChange }) => {
   const [deviceId, setDeviceId] = useState(null);
+  const [dataType, setDataType] = useState("");
   const [sensorType, setSensorType] = useState("");
-  const [sensorName, setSensorName] = useState(""); // Changed to single string
-  const [sensorLocation, setSensorLocation] = useState(""); // Changed to single string
+  const [sensorName, setSensorName] = useState("");
+  const [sensorLocation, setSensorLocation] = useState("");
   const [dateRange, setDateRange] = useState([null, null]);
   const [deviceIds, setDeviceIds] = useState([]);
   const [sensorTypes, setSensorTypes] = useState([]);
@@ -52,7 +53,7 @@ const HistoryFilter = ({ onFilterChange }) => {
         setSensorNamesByType(namesByType);
 
         if (sensorName) {
-          const locations = await getSensorLocations([sensorName]); // Pass single sensorName as array
+          const locations = await getSensorLocations([sensorName]);
           setSensorLocations(locations.length > 0 ? locations : []);
         } else {
           setSensorLocations([]);
@@ -64,15 +65,20 @@ const HistoryFilter = ({ onFilterChange }) => {
       }
     };
     fetchFilterOptions();
-  }, [sensorName]); 
+  }, [sensorName]);
 
-  const validateSevenDayRange = ([start, end]) => {
+  const validateOneHourRange = ([start, end]) => {
     if (!start || !end) return true; // Will be caught by required validation
-    return dayjs(end).diff(start, "day") <= 7;
+    return dayjs(end).diff(start, "hour", true) <= 1;
   };
 
   const handleApply = () => {
-    setValidationError(null); // Clear previous validation errors
+    setValidationError(null);
+
+    if (!dataType) {
+      setValidationError("Please select a Data Type.");
+      return;
+    }
 
     if (!deviceId && !sensorType) {
       setValidationError("Please select either Device ID or Sensor Type.");
@@ -91,45 +97,55 @@ const HistoryFilter = ({ onFilterChange }) => {
     }
 
     if (!dateRange[0] || !dateRange[1]) {
-      setValidationError("Date range is required. Please select both Start and End dates.");
+      setValidationError("Date and time range is required. Please select both Start and End date-times.");
       return;
     }
 
-    if (!validateSevenDayRange(dateRange)) {
-      setValidationError("Date range must be within 7 days.");
+    if (!validateOneHourRange(dateRange)) {
+      setValidationError("Date range must be within 1 hour.");
       return;
     }
 
     const filters = {
+      dataType,
       deviceId: deviceId || null,
       sensorType: sensorType || null,
-      sensorNames: sensorType ? [sensorName] : [], // Wrap single sensorName in array for consistency
-      sensorLocation: sensorType ? [sensorLocation] : [], // Wrap single sensorLocation in array
+      sensorNames: sensorType ? [sensorName] : [],
+      sensorLocation: sensorType ? [sensorLocation] : [],
       dateRange,
     };
 
-    setValidationError(null); // Clear validation error on successful validation
+    setValidationError(null);
     onFilterChange(filters);
   };
 
   const handleDeviceIdChange = (event, newValue) => {
     setDeviceId(newValue);
     setSensorType("");
-    setSensorName(""); // Reset to empty string
-    setSensorLocation(""); // Reset to empty string
-    setValidationError(null); // Clear validation error on change
+    setSensorName("");
+    setSensorLocation("");
+    setValidationError(null);
+  };
+
+  const handleDataTypeChange = (e) => {
+    setDataType(e.target.value);
+    setDeviceId(null);
+    setSensorType("");
+    setSensorName("");
+    setSensorLocation("");
+    setValidationError(null);
   };
 
   const handleSensorTypeChange = (e) => {
     setSensorType(e.target.value);
     setDeviceId(null);
-    setSensorName(""); // Reset to empty string
-    setSensorLocation(""); // Reset to empty string
-    setValidationError(null); // Clear validation error on change
+    setSensorName("");
+    setSensorLocation("");
+    setValidationError(null);
   };
 
   const handleCloseSnackbar = () => {
-    setValidationError(null); // Clear validation error when closing Snackbar
+    setValidationError(null);
   };
 
   return (
@@ -156,6 +172,21 @@ const HistoryFilter = ({ onFilterChange }) => {
             <Alert severity="error">{error}</Alert>
           </Box>
         )}
+
+        <FormControl sx={{ minWidth: 180 }}>
+          <InputLabel>Data Type</InputLabel>
+          <Select
+            value={dataType}
+            onChange={handleDataTypeChange}
+            label="Data Type"
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            <MenuItem value="processed">Processed Data</MenuItem>
+            <MenuItem value="raw">Raw Data</MenuItem>
+          </Select>
+        </FormControl>
 
         <Autocomplete
           options={deviceIds}
@@ -195,8 +226,8 @@ const HistoryFilter = ({ onFilterChange }) => {
               value={sensorName}
               onChange={(e) => {
                 setSensorName(e.target.value);
-                setSensorLocation(""); 
-                setValidationError(null); // Clear validation error on change
+                setSensorLocation("");
+                setValidationError(null);
               }}
               input={<OutlinedInput label="Sensor Name" />}
             >
@@ -219,7 +250,7 @@ const HistoryFilter = ({ onFilterChange }) => {
               value={sensorLocation}
               onChange={(e) => {
                 setSensorLocation(e.target.value);
-                setValidationError(null); // Clear validation error on change
+                setValidationError(null);
               }}
               input={<OutlinedInput label="Sensor Location" />}
             >
@@ -236,19 +267,33 @@ const HistoryFilter = ({ onFilterChange }) => {
         )}
 
         {(deviceId || sensorType) && (
-          <DateRangePicker
-            startText="Start"
-            endText="End"
-            value={dateRange}
-            onChange={(newRange) => {
-              setDateRange(newRange);
-              setValidationError(null); // Clear validation error on change
-            }}
-            calendars={1}
-            disableFuture
-            maxDate={dayjs().subtract(1, "day")}
-            sx={{ minWidth: 250 }}
-          />
+          <>
+            <DateTimePicker
+              label="Start"
+              value={dateRange[0]}
+              onChange={(newStart) => {
+                if (newStart && newStart.isValid()) {
+                  const newEnd = newStart.add(1, "hour");
+                  setDateRange([newStart, newEnd]);
+                } else {
+                  setDateRange([newStart, dateRange[1]]);
+                }
+                setValidationError(null);
+              }}
+              maxDateTime={dayjs().subtract(1, "day")}
+              sx={{ minWidth: 250 }}
+            />
+            <DateTimePicker
+              label="End"
+              value={dateRange[1]}
+              onChange={(newEnd) => {
+                setDateRange([dateRange[0], newEnd]);
+                setValidationError(null);
+              }}
+              maxDateTime={dayjs().subtract(1, "day")}
+              sx={{ minWidth: 250 }}
+            />
+          </>
         )}
 
         <Button

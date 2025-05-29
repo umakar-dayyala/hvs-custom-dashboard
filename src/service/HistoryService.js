@@ -1,11 +1,14 @@
 import axios from "axios";
 import dayjs from "dayjs";
- 
+
 const BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/historical`;
- 
+
 export const getSensorEventHistory = async (filters) => {
   try {
-    const params = {};
+    // Common validations for both processed and raw data
+    if (!filters.dataType) {
+      throw new Error("Data Type is required");
+    }
 
     if (!filters.deviceId && !filters.sensorType) {
       throw new Error("Device ID or Sensor Type is required");
@@ -18,23 +21,35 @@ export const getSensorEventHistory = async (filters) => {
       if (!filters.sensorLocation?.length) {
         throw new Error("Location is required");
       }
-      params.sensorType = filters.sensorType;
-      params.sensorName = filters.sensorNames[0]; // Use single value
-      params.location = filters.sensorLocation[0]; // Use single value
-    } else if (filters.deviceId) {
-      params.deviceId = filters.deviceId;
     }
 
     if (!filters.dateRange || !filters.dateRange[0] || !filters.dateRange[1]) {
       throw new Error("Start and End dates are required");
     }
 
+    const params = {};
+
+    if (filters.sensorType) {
+      params.sensorType = filters.sensorType;
+      params.sensorName = filters.sensorNames[0];
+      params.location = filters.sensorLocation[0];
+    } else if (filters.deviceId) {
+      params.deviceId = filters.deviceId;
+    }
+
     params.startTime = filters.dateRange[0].format("YYYY-MM-DD HH:mm:ss.000");
     params.endTime = filters.dateRange[1].format("YYYY-MM-DD HH:mm:ss.000");
 
-    console.log("Fetching historical data with params:", params);
-    const response = await axios.get(`${BASE_URL}/getHistoricalData`, { params });
-    console.log("Historical data response:", response.data);
+    console.log(`Fetching ${filters.dataType} historical data with params:`, params);
+
+    // Route to appropriate endpoint based on dataType
+    const endpoint = filters.dataType === "raw" ? "getRawHistoricalData" : "getHistoricalData";
+    // const queryParams = new URLSearchParams(params).toString();
+    // const fullUrl = `${BASE_URL}/${endpoint}?${queryParams}`;
+    // console.log(`Full URL: ${fullUrl}`);
+
+    const response = await axios.get(`${BASE_URL}/${endpoint}`, { params });
+    console.log(`${filters.dataType} historical data response:`, response.data);
 
     if (response.data.success) {
       return response.data.data.map((item) => ({
@@ -52,7 +67,7 @@ export const getSensorEventHistory = async (filters) => {
     }
     throw new Error(`API returned success: false - ${response.data.message || "Unknown error"}`);
   } catch (error) {
-    console.error("Error fetching historical data:", {
+    console.error(`Error fetching ${filters.dataType || "historical"} data:`, {
       message: error.message,
       status: error.response?.status,
       data: error.response?.data,
