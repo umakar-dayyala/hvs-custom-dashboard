@@ -6,7 +6,7 @@ import ReactApexChart from "react-apexcharts";
 import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
-
+import SunburstChart from  "../components/SunburstChart";
 // Icons
 import totalZoneIcon from "../assets/greyDirection.svg";
 import floorIcon from "../assets/rJumpToFloor.svg";
@@ -173,16 +173,17 @@ const FloorCards = ({ floorData }) => {
                       </HvTypography>
                     ) : (
                       <Box display="flex" justifyContent="center" alignItems="center" width="100%">
-                        <ReactApexChart
+                        <SunburstChart floorBasedData={floor}/>
+                        {/* <ReactApexChart
                           key={chartKey}
                           options={chartOptions}
                           series={chartSeries}
                           type="donut"
                           width={140}
                           height={140}
-                        />
+                        />*/}
                         <Box ml={2}>
-                          {["Active", "Inactive", "Unhealthy"].map((label, i) => (
+                          {["Active", "Inactive", "Unhealthy","CBRN Alarms"].map((label, i) => (
                             <Box display="flex" alignItems="center" key={label} mb={1}>
                               <Box width={12} height={12} borderRadius="50%" bgcolor={chartColors[i]} mr={1} />
                               <HvTypography variant="caption">{label}: {(chartSeries[i] || 0)}</HvTypography>
