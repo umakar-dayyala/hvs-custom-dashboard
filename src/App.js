@@ -36,6 +36,7 @@ import { FcadIndividual } from "./pages/FcadIndividual";
 import { AamIndividual } from "./pages/AamIndividual";
 import SensorEventHistory from "./pages/SensorEventHistory";
 import OxygenMonitor from "./pages/OxygenMonitor";
+import AlarmSummary from "./pages/AlarmSummary";
 // import IncidentDashboard from "./pages/IncidentsDashboard";
 
 
@@ -92,6 +93,7 @@ const App = () => {
               <Route path="/inventory" element={<InventoryDashboard />} />
               <Route path="/sensorEventHistory" element={<SensorEventHistory />} />
               <Route path="/OxygenMonitoring" element={<OxygenMonitor />} />
+              <Route path="/AlarmSummary" element={<AlarmSummary />} />
               {/* <Route path="/incidentDashboard" element={<IncidentDashboard />} /> */}
             </Routes>
           </HvContainer>
