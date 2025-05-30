@@ -54,13 +54,20 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   title: {
-    fontSize: 10,
+    fontSize: 8,
     marginBottom: 10,
     fontWeight: "bold",
   },
+  pageNumber: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    fontSize: 8,
+    color: "#333",
+  },
 });
 
-export const HistoryPDF = ({ data, allColumns }) => {
+export const HistoryPDF = ({ data, allColumns, filters }) => {
   console.log("Generating PDF with data:", data);
   const columnsPerPage = 9;
   const columnChunks = [];
@@ -71,15 +78,18 @@ export const HistoryPDF = ({ data, allColumns }) => {
   const sensorNames = [...new Set(data.map((row) => row.sensor_name).filter((name) => name))].join(", ") || "N/A";
   const deviceIds = [...new Set(data.map((row) => row.device_id).filter((id) => id))].join(", ") || "N/A";
   const sensorTypes = [...new Set(data.map((row) => row.sensor_type).filter((type) => type))].join(", ") || "N/A";
+  const titleDataType = filters?.dataType === "raw" ? "Raw data" : "Processed data";
 
-  // Construct the title with sensor_name, device_id, and sensor_type
-  const title = `Sensor Event History - Sensor: ${sensorNames}, Device ID: ${deviceIds}, Sensor Type: ${sensorTypes} - Part`;
-  // const title = `Sensor Event History - Sensor: ${sensorNames?.length > 0 ? sensorNames.join(", ") : "N/A"}, Device ID: ${data.device_id|| "N/A"}, Sensor Type: ${sensorType || "N/A"} - Part`;
   return (
     <Document>
       {columnChunks.map((chunk, chunkIndex) => (
         <Page key={chunkIndex} size="A4" orientation="landscape" style={styles.page}>
-          <Text style={styles.title}>{`${title} ${chunkIndex + 1}`}</Text>
+          <Text style={styles.title}>{`Sensor Event History(${titleDataType}) Part ${chunkIndex + 1} - Sensor: ${sensorNames}, Device ID: ${deviceIds}, Sensor Type: ${sensorTypes}`}</Text>
+          <Text
+            style={styles.pageNumber}
+            render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
+            fixed 
+          />
           <View style={styles.row}>
             {chunk.map((col) => (
               <Text key={col} style={[styles.cell, styles.header]}>
@@ -271,7 +281,7 @@ export const Export = ({ data, allColumns, filters }) => {
             csvLinkRef.current.link.click();
             setProgress(100);
           } else if (exportType === "pdf" && pdfLinkRef.current) {
-            const blob = await pdf(<HistoryPDF data={exportData} allColumns={allColumns} />).toBlob();
+            const blob = await pdf(<HistoryPDF data={exportData} allColumns={allColumns} filters={filters} />).toBlob();
             const url = URL.createObjectURL(blob);
             pdfLinkRef.current.href = url;
             pdfLinkRef.current.download = "sensor-event-history.pdf";
@@ -396,7 +406,7 @@ export const Export = ({ data, allColumns, filters }) => {
           <DialogActions>
             <Button onClick={() => setOpenDateDialog(false)}>Cancel</Button>
             <Button variant="contained" onClick={handleDateRangeSubmit}>
-              Submit
+              Download
             </Button>
           </DialogActions>
         </Dialog>

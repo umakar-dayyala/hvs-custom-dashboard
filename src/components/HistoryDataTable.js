@@ -225,13 +225,14 @@ const HistoryDataTable = ({ data, tableFilters }) => {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          justifyContent: "flex-end",
+          // alignItems: "center",
           marginBottom: "4px",
           marginTop: "6px",
+          marginRight: "10px",
         }}
       >
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        {/* <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
           {defaultColumns.map((col) => (
             <label key={col} style={{ display: "flex", alignItems: "center" }}>
               <HvCheckBox
@@ -242,11 +243,11 @@ const HistoryDataTable = ({ data, tableFilters }) => {
               <span>{col.replace(/_/g, " ").toUpperCase()}</span>
             </label>
           ))}
-          <Button onClick={handleOpenColumnDialog}>All Columns</Button>
-        </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+          {/* <Button onClick={handleOpenColumnDialog}>All Columns</Button> */}
+        {/* </div> */} 
+        {/* <div style={{ display: "flex", gap: "8px" }}> */}
           <Export data={data} allColumns={allColumns} filters={tableFilters} />
-        </div>
+        {/* </div> */}
       </div>
 
       <Dialog open={openColumnDialog} onClose={handleCloseColumnDialog} maxWidth="sm" fullWidth>
@@ -289,6 +290,7 @@ const HistoryDataTable = ({ data, tableFilters }) => {
         title={<HvTypography variant="title4">History Data</HvTypography>}
         actions={
           <>
+          <Button onClick={handleOpenColumnDialog}>All Columns</Button>
             <Button onClick={handleViewToggle}>
               {isViewAll ? "Reset View" : "View All"}
             </Button>
@@ -332,7 +334,7 @@ const HistoryDataTable = ({ data, tableFilters }) => {
             <HvTableBody {...getTableBodyProps()}>
               {page.length === 0 ? (
                 <HvTableRow>
-                  <HvTableCell colSpan={columns.length} style={{ textAlign: "center" }}>
+                  <HvTableCell colSpan={columns.length} style={{ textAlign: "center", fontSize: "1.2rem"}}>
                     No data available
                   </HvTableCell>
                 </HvTableRow>
