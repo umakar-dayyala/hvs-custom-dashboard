@@ -37,7 +37,7 @@ import { AamIndividual } from "./pages/AamIndividual";
 import SensorEventHistory from "./pages/SensorEventHistory";
 import OxygenMonitor from "./pages/OxygenMonitor";
 import AlarmSummary from "./pages/AlarmSummary";
-// import IncidentDashboard from "./pages/IncidentsDashboard";
+import IncidentDashboard from "./pages/IncidentsDashboard";
 
 
 // import FloatingNotificationButton from "./components/FloatingNotificationButton";
@@ -94,7 +94,7 @@ const App = () => {
               <Route path="/sensorEventHistory" element={<SensorEventHistory />} />
               <Route path="/OxygenMonitoring" element={<OxygenMonitor />} />
               <Route path="/AlarmSummary" element={<AlarmSummary />} />
-              {/* <Route path="/incidentDashboard" element={<IncidentDashboard />} /> */}
+              <Route path="/incidentDashboard" element={<IncidentDashboard />} />
             </Routes>
           </HvContainer>
         </Router>
