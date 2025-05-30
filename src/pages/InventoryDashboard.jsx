@@ -50,7 +50,7 @@ const InventoryDashboard = () => {
   const assetTypes = [
     "VRM", "WRM", "PRM", "AGM", "AP4CF", "IBAC", "MAB", "WM", "FCAD", "AAM",
     "FTIR", "APC", "DO", "PCAD", "GCMS", "RCM", "LRGS", "LDGS", "OM", "ASU",
-    "BAT", "FIS", "ANCM", "ATR", "Area Gamma Monitor","FPD based CWA Detector", "OTH", "Sensor"
+    "BAT", "FIS", "ANCM", "ATR", "Area Gamma Monitor", "FPD based CWA Detector", "OTH", "Sensor"
   ];
 
   const assetLocations = [
@@ -69,6 +69,15 @@ const InventoryDashboard = () => {
     status: "",
   });
 
+  const handleTemplateDwoload = () => {
+    const link = document.createElement("a");
+    link.href = "/templates/Inventory-Template.xlsx";
+    link.download = "Inventory-Template.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   const handleShowNotification = (msg, sev = "success") =>
     setNotification({ open: true, message: msg, severity: sev });
   const handleCloseNotification = () =>
@@ -237,7 +246,7 @@ const InventoryDashboard = () => {
           asset_type: formData.Asset_Type,
           asset_quantity: 1,
           asset_name: formData.Asset_Name || '',
-          asset_manufacterer: formData.Asset_Manufacturer || '', 
+          asset_manufacterer: formData.Asset_Manufacturer || '',
           asset_serial_number: formData.Asset_Serial_Number || '',
           asset_location: formData.Asset_Location,
           asset_status: formData.Asset_Status,
@@ -339,10 +348,10 @@ const InventoryDashboard = () => {
     setFormData((f) => ({ ...f, [name]: files ? files[0] : value }));
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((f) => ({ ...f, [name]: value }));
-  };
+  // const handleFilterChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFilters((f) => ({ ...f, [name]: value }));
+  // };
 
   const handleDownload = () => {
     const allAssets = allRows.flatMap(row => row.children);
@@ -419,9 +428,18 @@ const InventoryDashboard = () => {
             <IconButton onClick={() => handleDialogOpen("remove", { type: "all" })} disabled={loading}>
               <Remove color="error" />
             </IconButton>
-            <IconButton onClick={handleDownload} disabled={loading}>
+            {/* <IconButton onClick={handleDownload} disabled={loading}>
               <Download />
-            </IconButton>
+            </IconButton> */}
+            <Button
+              component="label"
+              variant="outlined"
+              startIcon={<Download />}
+              onClick={handleTemplateDwoload}
+              disabled={loading}
+            >
+            Template
+            </Button>
             <ExcelUploadHandler
               setLoading={setLoading}
               handleShowNotification={handleShowNotification}
@@ -431,7 +449,17 @@ const InventoryDashboard = () => {
             />
           </Stack>
           <Stack direction="row" spacing={2}>
-            <TextField
+            <Button
+              component="label"
+              variant="outlined"
+              startIcon={<Download />}
+              onClick={handleDownload}
+              disabled={loading}
+            >
+             Inventory Log
+            </Button>
+
+            {/*   <TextField
               select
               label="Filter Type"
               name="type"
@@ -478,7 +506,7 @@ const InventoryDashboard = () => {
                   {s}
                 </MenuItem>
               ))}
-            </TextField>
+            </TextField>*/}
           </Stack>
         </Stack>
 

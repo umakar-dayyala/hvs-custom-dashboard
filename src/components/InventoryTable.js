@@ -127,12 +127,12 @@ const InventoryTable = ({
 
   const totalAssets = parents.reduce((total, p) => total + (p.filteredChildren?.length || 0), 0);
 
-  // Helper for quantity color coding
-  const getQuantityStyle = (qty) => {
-    if (qty > 10) return "quantityHigh";
-    if (qty > 5) return "quantityMedium";
-    return "quantityLow";
-  };
+  // // Helper for quantity color coding
+  // const getQuantityStyle = (qty) => {
+  //   if (qty > 10) return "quantityHigh";
+  //   if (qty > 5) return "quantityMedium";
+  //   return "quantityLow";
+  // };
 
   return (
     <Box className="tableWrapper">
@@ -279,7 +279,8 @@ const InventoryTable = ({
                       </HvTableCell>
                       <HvTableCell className="tableCell">{p.assetType}</HvTableCell>
                       <HvTableCell className="tableCell">
-                        <Box className={getQuantityStyle(p.quantity)}>{p.quantity}</Box>
+                        {/* <Box className={getQuantityStyle(p.quantity)}>{p.quantity}</Box> */}
+                        {p.quantity}
                       </HvTableCell>
                       <HvTableCell className="tableCell">{p.loggedBy}</HvTableCell>
                       <HvTableCell className="tableCell">{p.logDate}</HvTableCell>

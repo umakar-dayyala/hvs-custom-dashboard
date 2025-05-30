@@ -20,6 +20,12 @@ const Breadcrumbs = () => {
         label = floorLabel;
       } else if (seg === "allalerts") {
         label = "All alarms and alerts";
+      }
+      else if (seg === "sensorEventHistory") {
+        label = "Historical Dashboard";
+      }
+      else if (seg === "inventory") {
+        label = "Inventory Dashboard";
       } else {
         label = seg.replace(/^\w/, c => c.toUpperCase());
       }

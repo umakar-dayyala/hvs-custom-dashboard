@@ -299,7 +299,20 @@ const HistoryFilter = ({ onFilterChange }) => {
         <Button
           variant="contained"
           onClick={handleApply}
-          sx={{ minWidth: 120, alignSelf: "center" }}
+          sx={{
+            minWidth: 150,
+            height: 54,
+            alignSelf: "center",
+            border: "1px solid #1976d2", 
+            color: "#1976d2", 
+            backgroundColor: "transparent", 
+            "&:hover": {
+              backgroundColor: "#1976d2", 
+              color: "#fff", 
+              border: "2px solid #1976d2",
+              fontWeight: "bold", 
+            },
+          }}
         >
           Apply
         </Button>
