@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import DeviceBox from "./DeviceBox";
 import { fetchAlarmSummary } from "../service/AlarmSummaryService";
+import { Link } from "react-router-dom";
 
 const DeviceFilter = () => {
   const [deviceData, setDeviceData] = useState([]);
@@ -68,6 +69,21 @@ const DeviceFilter = () => {
     return [{ value: "", label: "All" }, ...uniqueValues.map((value) => ({ value, label: value }))];
   };
 
+  const getDevicePath = (device) => {
+  const { type2, device_id } = device;
+  switch (type2) {
+    case "Oxygen":
+      return `/${type2}?device_id=${device_id}`;
+    case "Weather":
+      return `/${type2}?device_id=${device_id}`;
+    case "AP4C-F":
+      return `/ap4cIndividual?device_id=${device_id}`;
+    default:
+      return `/${type2}Individual?device_id=${device_id}`;
+  }
+};
+
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
       <Box sx={{ flexShrink: 0, zIndex: 2, backgroundColor: "background.paper" }}>
@@ -100,13 +116,21 @@ const DeviceFilter = () => {
         <Typography variant="h6" gutterBottom sx={{ mb: 2, px: 2 }}>
           Devices ({filteredDevices.length})
         </Typography>
-        <Grid container spacing={2} sx={{ px: 2, pb: 2 }}>
-          {filteredDevices.map((device, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={2} xl={1.5} key={index}>
-      <DeviceBox device={device} />
-    </Grid>
-          ))}
-        </Grid>
+       <Grid container spacing={2} sx={{ px: 2, pb: 2 }}>
+  {filteredDevices.map((device, index) => {
+    const type2 = device.type2;
+ 
+    return (
+      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+       <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
+  <DeviceBox device={device} />
+</Link>
+
+      </Grid>
+    );
+  })}
+</Grid>
+
       </Box>
     </Box>
   );
