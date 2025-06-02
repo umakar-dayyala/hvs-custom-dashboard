@@ -13,49 +13,6 @@ import {
   Paper,
 } from "@mui/material";
 
-// Dummy intensityData
-const intensityData = {
-  alertData: {
-    phosphorus: {
-      concentration: "no alert",
-      instant: "no alert",
-      critical: "no alert",
-      value: 0.12,
-      timestamp: "2025-01-25 14:01:17.243",
-      status: "Active",
-    },
-    arsenic: {
-      concentration: "no alert",
-      instant: "no alert",
-      critical: "alert",
-      value: 0.05,
-      timestamp: "2025-01-25 14:01:17.243",
-      status: "Active",
-    },
-    sulphur: {
-      concentration: "no alert",
-      instant: "no alert",
-      critical: "no alert",
-      value: 0.8,
-      timestamp: "2025-01-25 14:01:17.243",
-      status: "Active",
-    },
-    cyanide: {
-      concentration: "no alert",
-      instant: "no alert",
-      critical: "no alert",
-      value: 0.02,
-      timestamp: "2025-01-25 14:01:17.243",
-      status: "Active",
-    },
-  },
-  mostRecentAlert: {
-    type: "No Alert",
-    parameter: "Phosphorous",
-    time: "2025-01-25 14:01:17.243",
-  },
-};
-
 // Utility functions
 const statusColor = (status) => {
   return status === "Resolved" ? "default" : "primary";
@@ -65,18 +22,20 @@ const alertTypeColor = (type) => {
   return type === "Critical Alert" ? "error" : "default";
 };
 
-// Transform intensityData into a table-ready format
-const data = Object.entries(intensityData.alertData).map(([chemicalKey, details]) => {
-  return {
-    timestamp: details.timestamp,
-    chemical: chemicalKey.charAt(0).toUpperCase() + chemicalKey.slice(1),
-    alertType: details.critical === "alert" ? "Critical Alert" : "No Alert",
-    value: `${details.value}`,
-    status: details.status,
-  };
-});
+const Alerts = ({ intensityData }) => {
+  if (!intensityData || !intensityData.alertData) return null;
 
-const Alerts = () => {
+  // Transform intensityData into a table-ready format
+  const data = Object.entries(intensityData.alertData).map(
+    ([chemicalKey, details]) => ({
+      timestamp: details.timestamp,
+      chemical: chemicalKey.charAt(0).toUpperCase() + chemicalKey.slice(1),
+      alertType: details.critical === "alert" ? "Critical Alert" : "No Alert",
+      value: `${details.value}`,
+      status: details.status,
+    })
+  );
+
   return (
     <Box p={3}>
       <Typography variant="h6" fontWeight="bold" gutterBottom>

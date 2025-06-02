@@ -56,29 +56,47 @@ export const AgmIndividual = () => {
   };
 
   useEffect(() => {
-    // Real-time data updates (WebSocket)
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
+  const queryParams = new URLSearchParams(window.location.search);
+  const deviceId = queryParams.get("device_id");
 
-    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-      if (err) {
-        console.error("Error receiving data:", err);
-      } else {
-        setKpiData(data.kpiData);
-        setParamsData(data.parametersData);
-        setParam(data.parametersData);
-        setNotifications(data.Notifications);
-        setLastFetchLiveData(data.lastfetched.time); 
-      }
-    });
+  // Real-time Data (from SSE)
+  const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+    if (err) {
+      console.error("Error receiving data:", err);
+    } else {
+      setKpiData(data.kpiData);
+      setParamsData(data.parametersData);
+      setParam(data.parametersData);
+      setLastFetchLiveData(data.lastfetched.time);
+    }
+  });
 
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-        console.log("WebSocket closed");
-      }
-    };
-  }, []);
+  // Notification polling from Redis Cache
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/floor/getRedisCache?device_ids=${deviceId}`);
+      const json = await res.json();
+      const deviceData = json?.devices?.find(d => d.device_id === deviceId);
+      setNotifications(deviceData?.notifications || []);
+      console.log("Fetched notifications:", deviceData?.notifications || []);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  fetchNotifications(); // initial fetch
+
+  const intervalId = setInterval(fetchNotifications, 10000); // refresh every 10s
+
+  return () => {
+    if (eventSource) eventSource.close();
+    clearInterval(intervalId); // clear polling on unmount
+    console.log("Cleaned up WebSocket and polling");
+  };
+}, []);
+
+
+  
 
   const fetchData = async (fromTime, toTime, component) => {
     if (!fromTime || !toTime) return;
@@ -162,6 +180,8 @@ export const AgmIndividual = () => {
       sensorType: sensorType || locationDetails.sensorType
     });
   }
+
+  
 
   return (
     <Box>

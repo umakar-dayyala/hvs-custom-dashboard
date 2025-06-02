@@ -23,21 +23,29 @@ const fixTimestamp = (ts) => {
 };
 
 const flattenNotifications = (data) => {
-  if (!data?.devices) return [];
+  // Handle cases where data is undefined/null or doesn't have devices property
+  if (!data || !data.devices) return [];
+
+  // Ensure devices is an array before calling flatMap
+  const devicesArray = Array.isArray(data.devices) ? data.devices : [data.devices].filter(Boolean);
 
   let idCounter = 1;
-  return data.devices.flatMap((device) =>
-    Array.isArray(device.notifications)
-      ? device.notifications.map((note) => ({
-          id: idCounter++,
-          sensor_name: note.sensor_name,
-          label: note.label,
-          timestamp: fixTimestamp(note.timestamp),
-        }))
-      : []
-  );
-};
+  return devicesArray.flatMap((device) => {
+    // Handle cases where device is null/undefined or notifications is not an array
+    if (!device || !device.notifications) return [];
+    
+    const notificationsArray = Array.isArray(device.notifications) 
+      ? device.notifications 
+      : [device.notifications].filter(Boolean);
 
+    return notificationsArray.map((note) => ({
+      id: idCounter++,
+      sensor_name: note?.sensor_name || 'Unknown Sensor',
+      label: note?.label || 'No label provided',
+      timestamp: note?.timestamp ? fixTimestamp(note.timestamp) : 'No timestamp',
+    }));
+  });
+};
 
 const FloorWiseNotificationPanel = ({ sensorData }) => {
   const allNotifications = useMemo(
