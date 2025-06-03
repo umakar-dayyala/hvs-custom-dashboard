@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import IndividualKPI from "../components/IndividualKPI";
 import IndividualParameters from "../components/IndividualParameters";
 import { HvStack } from "@hitachivantara/uikit-react-core";
@@ -30,6 +30,7 @@ import greyradio from "../assets/greyRadio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from "../components/Connectivitydata";
 import Imagedata from "../components/Imagedata";
+import { fetchDeviceNotifications } from "../service/notificationService";
 
 
 export const WRMIndividual = () => {
@@ -45,6 +46,7 @@ export const WRMIndividual = () => {
   const [param, setParam] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
+  const [intensityData, setIntensityData] = useState({});
   
  const [lastFetchTimes, setLastFetchTimes] = useState({
          plotly: null,
@@ -68,31 +70,52 @@ export const WRMIndividual = () => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
-   useEffect(() => {
-      // Real-time WebSocket data updates
-      const queryParams = new URLSearchParams(window.location.search);
-      const deviceId = queryParams.get("device_id");
-  
-      const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-        if (err) {
-          console.error("Error receiving data:", err);
-        } else {
-          setKpiData(data.kpiData);
-          setParamsData(data.parametersData);
-          setAddParams(data.supervisor_data);
-          setParam(data.parametersData);
-          setNotifications(data.Notifications);
-          setLastFetchLiveData(data.lastfetched.time);
-        }
-      });
-  
-      return () => {
-        if (eventSource) {
-          eventSource.close();
-          console.log("WebSocket closed");
-        }
-      };
-    }, []);
+   const deviceId = useMemo(() => {
+          const queryParams = new URLSearchParams(window.location.search);
+          return queryParams.get("device_id");
+        }, []);
+   
+     // WebSocket connection
+       useEffect(() => {
+         if (!deviceId) return;
+     
+         const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+           if (err) {
+             console.error("Error receiving data:", err);
+           } else {
+             setKpiData(data.kpiData);
+             setParamsData(data.parametersData);
+             setParam(data.parametersData);
+             // setNotifications(data.Notifications);
+             setLastFetchLiveData(data.lastfetched.time); 
+             setIntensityData(data["Intensity Data"]);
+           }
+         });
+     
+         return () => {
+           if (eventSource) {
+             eventSource.close();
+             console.log("WebSocket closed");
+           }
+         };
+       }, [deviceId]);
+   
+      useEffect(() => {
+               const loadNotifications = async () => {
+                 const data = await fetchDeviceNotifications(deviceId);
+                 setNotifications(data);
+                 console.log("Fetched notifications:", data);
+               };
+           
+               loadNotifications(); // initial fetch
+           
+               const intervalId = setInterval(loadNotifications, 10000); // fetch every 10s
+           
+               return () => {
+                 clearInterval(intervalId);
+                 console.log("Cleaned up polling");
+               };
+             }, [deviceId]);
 
   const fetchData = async (fromTime, toTime, component) => {
     if (!fromTime || !toTime) return;
@@ -248,7 +271,7 @@ export const WRMIndividual = () => {
 
         <Box display={"flex"} style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={ "50%"} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <IntensityChart />
+            <IntensityChart  intensityData={intensityData}/>
           </Box>
           
             <>

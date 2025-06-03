@@ -26,6 +26,7 @@ import amberBell from "../assets/amberBell.svg";
 import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aBiological.svg";
 import greyBio from "../assets/greyBio.svg";
+import { fetchDeviceNotifications } from '../service/notificationService';
 
 export const MABIndividual = React.memo(() => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -87,7 +88,7 @@ export const MABIndividual = React.memo(() => {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
         setParam(data.parametersData);
-        setNotifications(data.Notifications);
+        // setNotifications(data.Notifications);
         setLastFetchLiveData(data.lastfetched.time);
       }
     });
@@ -99,6 +100,23 @@ export const MABIndividual = React.memo(() => {
       }
     };
   }, [deviceId]);
+
+  useEffect(() => {
+              const loadNotifications = async () => {
+                const data = await fetchDeviceNotifications(deviceId);
+                setNotifications(data);
+                console.log("Fetched notifications:", data);
+              };
+          
+              loadNotifications(); // initial fetch
+          
+              const intervalId = setInterval(loadNotifications, 10000); // fetch every 10s
+          
+              return () => {
+                clearInterval(intervalId);
+                console.log("Cleaned up polling");
+              };
+            }, [deviceId]);
 
   // Fetch ASU Data every 10 seconds
   useEffect(() => {

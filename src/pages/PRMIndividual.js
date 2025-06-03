@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -25,6 +25,7 @@ import greyradio from "../assets/greyRadio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from '../components/Connectivitydata';
 import Imagedata from '../components/Imagedata';
+import { fetchDeviceNotifications } from '../service/notificationService';
 
 
 
@@ -50,6 +51,7 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
+  const [intensityData, setIntensityData] = useState({});
 
   const [locationDetails, setUdatedLocationDetails] = useState({
       floor: 'default',
@@ -63,29 +65,52 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
+  const deviceId = useMemo(() => {
+         const queryParams = new URLSearchParams(window.location.search);
+         return queryParams.get("device_id");
+       }, []);
   
-    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-      if (err) {
-        console.error("Error receiving data:", err);
-      } else {
-        setKpiData(data.kpiData);
-        setParamsData(data.parametersData);
-        setParam(data.parametersData);
-        setNotifications(data.Notifications);    
-        setLastFetchLiveData(data.lastfetched.time); 
-      }
-    });
+    // WebSocket connection
+      useEffect(() => {
+        if (!deviceId) return;
+    
+        const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+          if (err) {
+            console.error("Error receiving data:", err);
+          } else {
+            setKpiData(data.kpiData);
+            setParamsData(data.parametersData);
+            setParam(data.parametersData);
+            // setNotifications(data.Notifications);
+            setLastFetchLiveData(data.lastfetched.time); 
+            setIntensityData(data["Intensity Data"]);
+          }
+        });
+    
+        return () => {
+          if (eventSource) {
+            eventSource.close();
+            console.log("WebSocket closed");
+          }
+        };
+      }, [deviceId]);
   
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-        console.log("WebSocket closed");
-      }
-    };
-  }, []);
+     useEffect(() => {
+              const loadNotifications = async () => {
+                const data = await fetchDeviceNotifications(deviceId);
+                setNotifications(data);
+                console.log("Fetched notifications:", data);
+              };
+          
+              loadNotifications(); // initial fetch
+          
+              const intervalId = setInterval(loadNotifications, 10000); // fetch every 10s
+          
+              return () => {
+                clearInterval(intervalId);
+                console.log("Cleaned up polling");
+              };
+            }, [deviceId]);
   
 
   // Fetch Data Function
@@ -246,7 +271,7 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={"50%"}>
-            <IntensityChart />
+            <IntensityChart intensityData={intensityData} />
           </Box>
           
             <Box width={"50%"}>
