@@ -23,17 +23,21 @@ const fixTimestamp = (ts) => {
 };
 
 const flattenNotifications = (data) => {
-  if (!data?.devices) return [];
+  console.log('data is', data);
+  if (!data?.devices || !Array.isArray(data.devices)) {
+    console.warn('data.devices is not an array or is missing:', data?.devices);
+    return [];
+  }
 
   let idCounter = 1;
   return data.devices.flatMap((device) =>
     Array.isArray(device.notifications)
       ? device.notifications.map((note) => ({
-          id: idCounter++,
-          sensor_name: note.sensor_name,
-          label: note.label,
-          timestamp: fixTimestamp(note.timestamp),
-        }))
+        id: idCounter++,
+        sensor_name: note.sensor_name,
+        label: note.label,
+        timestamp: fixTimestamp(note.timestamp),
+      }))
       : []
   );
 };
