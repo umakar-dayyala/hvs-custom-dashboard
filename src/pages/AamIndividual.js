@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -14,6 +14,7 @@ import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from 'dayjs';
 import { fetchAamParamChartData } from '../service/aamSensorService';
 import { fetchAnomalyChartData, fetchOutlierChartData } from '../service/aamSensorService';
+import { fetchDeviceNotifications } from '../service/notificationService';
 import Breadcrumbs from '../components/Breadcrumbs';
 import IntensityChart from '../components/IntensityChart';
 import PredictionChart from '../components/PredictionChart';
@@ -55,31 +56,45 @@ export const AamIndividual = () => {
     if (!isoDate) return null;
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
+   const deviceId = useMemo(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        return queryParams.get("device_id");
+      }, []);
 
   useEffect(() => {
-    // Real-time data updates (WebSocket)
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
+      const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+        if (err) {
+          console.error("Error receiving data:", err);
+        } else {
+          setKpiData(data.kpiData);
+          setParamsData(data.parametersData);
+          setParam(data.parametersData);
+          setLastFetchLiveData(data.lastfetched.time);
+        }
+      });
+  
+      return () => {
+        if (eventSource) eventSource.close();
+        console.log("Cleaned up WebSocket");
+      };
+    }, [deviceId]);
 
-    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-      if (err) {
-        console.error("Error receiving data:", err);
-      } else {
-        setKpiData(data.kpiData);
-        setParamsData(data.parametersData);
-        setParam(data.parametersData);
-        setNotifications(data.Notifications);
-        setLastFetchLiveData(data.lastfetched.time); 
-      }
-    });
-
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-        console.log("WebSocket closed");
-      }
-    };
-  }, []);
+   useEffect(() => {
+      const loadNotifications = async () => {
+        const data = await fetchDeviceNotifications(deviceId);
+        setNotifications(data);
+        console.log("Fetched notifications:", data);
+      };
+  
+      loadNotifications(); // initial fetch
+  
+      const intervalId = setInterval(loadNotifications, 10000); // fetch every 10s
+  
+      return () => {
+        clearInterval(intervalId);
+        console.log("Cleaned up polling");
+      };
+    }, [deviceId]);
 
   const fetchData = async (fromTime, toTime, component) => {
     if (!fromTime || !toTime) return;

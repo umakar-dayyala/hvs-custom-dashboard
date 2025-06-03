@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
@@ -12,8 +12,8 @@ import rbell from "../assets/rbell.svg";
 import Alertbar from '../components/Alertbar';
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import dayjs from 'dayjs';
-import { fetchAGMParamChartData } from '../service/AGMSensorService';
-import { fetchAnomalyChartData, fetchOutlierChartData } from '../service/AGMSensorService';
+import { fetchAGMParamChartData, fetchAnomalyChartData, fetchOutlierChartData } from '../service/AGMSensorService';
+import { fetchDeviceNotifications } from '../service/notificationService';
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from '../components/Connectivitydata';
 import IntensityChart from '../components/IntensityChart';
@@ -38,10 +38,10 @@ export const AgmIndividual = () => {
   });
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 
-  // Time range states initialized as null
   const [plotlyRange, setPlotlyRange] = useState({ fromTime: null, toTime: null });
   const [anomalyRange, setAnomalyRange] = useState({ fromTime: null, toTime: null });
   const [outlierRange, setOutlierRange] = useState({ fromTime: null, toTime: null });
+  const [intensityData, setIntensityData] = useState({});
 
   const [locationDetails, setUdatedLocationDetails] = useState({
     floor: 'default',
@@ -55,57 +55,56 @@ export const AgmIndividual = () => {
     return `'${dayjs(isoDate).format("YYYY/MM/DD HH:mm:ss.SSS")}'`;
   };
 
+    // Memoized device ID
+    const deviceId = useMemo(() => {
+      const queryParams = new URLSearchParams(window.location.search);
+      return queryParams.get("device_id");
+    }, []);
+    
+  // Real-time data connection (SSE/WebSocket)
   useEffect(() => {
-  const queryParams = new URLSearchParams(window.location.search);
-  const deviceId = queryParams.get("device_id");
+    const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
+      if (err) {
+        console.error("Error receiving data:", err);
+      } else {
+        setKpiData(data.kpiData);
+        setParamsData(data.parametersData);
+        setParam(data.parametersData);
+        setLastFetchLiveData(data.lastfetched.time);
+        setIntensityData(data["Intensity Data"]);
+      }
+    });
 
-  // Real-time Data (from SSE)
-  const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
-    if (err) {
-      console.error("Error receiving data:", err);
-    } else {
-      setKpiData(data.kpiData);
-      setParamsData(data.parametersData);
-      setParam(data.parametersData);
-      setLastFetchLiveData(data.lastfetched.time);
-    }
-  });
+    return () => {
+      if (eventSource) eventSource.close();
+      console.log("Cleaned up WebSocket");
+    };
+  }, [deviceId]);
 
-  // Notification polling from Redis Cache
-  const fetchNotifications = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/floor/getRedisCache?device_ids=${deviceId}`);
-      const json = await res.json();
-      const deviceData = json?.devices?.find(d => d.device_id === deviceId);
-      setNotifications(deviceData?.notifications || []);
-      console.log("Fetched notifications:", deviceData?.notifications || []);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    }
-  };
+  // Polling notifications
+  useEffect(() => {
+    const loadNotifications = async () => {
+      const data = await fetchDeviceNotifications(deviceId);
+      setNotifications(data);
+      console.log("Fetched notifications:", data);
+    };
 
-  fetchNotifications(); // initial fetch
+    loadNotifications(); // initial fetch
 
-  const intervalId = setInterval(fetchNotifications, 10000); // refresh every 10s
+    const intervalId = setInterval(loadNotifications, 10000); // fetch every 10s
 
-  return () => {
-    if (eventSource) eventSource.close();
-    clearInterval(intervalId); // clear polling on unmount
-    console.log("Cleaned up WebSocket and polling");
-  };
-}, []);
+    return () => {
+      clearInterval(intervalId);
+      console.log("Cleaned up polling");
+    };
+  }, [deviceId]);
 
-
-  
-
+  // Chart data fetching
   const fetchData = async (fromTime, toTime, component) => {
     if (!fromTime || !toTime) return;
 
     const formattedFromTime = formatDateForApi(fromTime);
     const formattedToTime = formatDateForApi(toTime);
-
-    const queryParams = new URLSearchParams(window.location.search);
-    const deviceId = queryParams.get("device_id");
 
     try {
       if (component === 'PlotlyDataChart') {
@@ -119,7 +118,6 @@ export const AgmIndividual = () => {
         setOutlierChartData(outlier?.data || {});
       }
 
-      // Update last fetch time on success
       setLastFetchTimes(prev => ({
         ...prev,
         [component.toLowerCase().replace('datachart', '').replace('chart', '')]: new Date().toLocaleString()
@@ -143,7 +141,6 @@ export const AgmIndividual = () => {
       return;
     }
 
-    // Update the appropriate range state
     if (component === 'PlotlyDataChart') {
       setPlotlyRange({ fromTime, toTime });
     } else if (component === 'AnomalyChart') {
@@ -153,7 +150,6 @@ export const AgmIndividual = () => {
     }
   };
 
-  // Fetch data when ranges change
   useEffect(() => {
     if (plotlyRange.fromTime && plotlyRange.toTime) {
       fetchData(plotlyRange.fromTime, plotlyRange.toTime, 'PlotlyDataChart');
@@ -179,56 +175,47 @@ export const AgmIndividual = () => {
       location: location || locationDetails.location,
       sensorType: sensorType || locationDetails.sensorType
     });
-  }
-
-  
+  };
 
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <BreadCrumbsIndividual locationDetails={locationDetails}/>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <Box style={{ whiteSpace: "nowrap" }}>
-            {LastFetchLiveData && (
-              <span>Last Live Data fetched time: {LastFetchLiveData}</span>
-            )}
-          </Box>
-        </div>
+        <BreadCrumbsIndividual locationDetails={locationDetails} />
+        <Box style={{ whiteSpace: "nowrap" }}>
+          {LastFetchLiveData && <span>Last Live Data fetched time: {LastFetchLiveData}</span>}
+        </Box>
       </div>
       <Box mt={2}>
-      <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+        <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
       </Box>
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <HvStack direction="column" divider spacing="sm">
-            <IndividualKPI 
-              kpiData={kpiData} 
-              ricon={bioicon} 
-              gicon={gbioicon} 
-              rbell={rbell} 
-              amberBell={amberBell} 
-              greenBell={greenBell} 
-              aicon={aicon} 
-              greyIcon={greyradio}
-              dummyKpiData={[
-                { title: "Radiological Alarms", value: "No Data" },
-                { title: "Detector Health Faults", value: "No Data" },
-                { title: "Analytics Alert", value: "No Data" }
-              ]}
-            />
-            
-          </HvStack>
-          <Box mt={2}>
+        <HvStack direction="column" divider spacing="sm">
+          <IndividualKPI
+            kpiData={kpiData}
+            ricon={bioicon}
+            gicon={gbioicon}
+            rbell={rbell}
+            amberBell={amberBell}
+            greenBell={greenBell}
+            aicon={aicon}
+            greyIcon={greyradio}
+            dummyKpiData={[
+              { title: "Radiological Alarms", value: "No Data" },
+              { title: "Detector Health Faults", value: "No Data" },
+              { title: "Analytics Alert", value: "No Data" }
+            ]}
+          />
+        </HvStack>
+        <Box mt={2}>
           <IndividualParameters paramsData={param} notifications={notifications} />
-          </Box>
-          <Box mt={2}>
-            <PlotlyDataChart
-              bioParamChartData={agmParamChartData}
-              onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
-              title={'Radiation Readings'}
-              lastFetchTime={lastFetchTimes.plotly}
-            />
-          </Box>
+        </Box>
+        <Box mt={2}>
+          <PlotlyDataChart
+            bioParamChartData={agmParamChartData}
+            onRangeChange={(range) => handleRangeChange(range, 'PlotlyDataChart')}
+            title={'Radiation Readings'}
+            lastFetchTime={lastFetchTimes.plotly}
+          />
         </Box>
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width={"50%"}>
@@ -250,7 +237,7 @@ export const AgmIndividual = () => {
         </Box>
         <Box style={{ display: "flex", flexDirection: "row", width: "100%" }} mt={2} gap={2}>
           <Box width="50%">
-            <IntensityChart />
+            <IntensityChart intensityData={intensityData}/>
           </Box>
           <Box width="50%">
             <PredictionChart />

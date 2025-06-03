@@ -27,6 +27,7 @@ import aicon from "../assets/aChemical.svg";
 import greyChem from "../assets/greyChem.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from '../components/Connectivitydata';
+import { fetchDeviceNotifications } from '../service/notificationService';
 
 // Constants
 const DUMMY_KPI_DATA = [
@@ -86,7 +87,7 @@ export const AP4CIndividual = React.memo(() => {
         setKpiData(data.kpiData);
         setParamsData(data.parametersData);
         setParam(data.parametersData);
-        setNotifications(data.Notifications);
+        // setNotifications(data.Notifications);
         setLastFetchLiveData(data.lastfetched.time);
         setIntensityData(data["Intensity Data"]);
 
@@ -101,6 +102,25 @@ export const AP4CIndividual = React.memo(() => {
       }
     };
   }, [deviceId]);
+
+
+  useEffect(() => {
+        const loadNotifications = async () => {
+          const data = await fetchDeviceNotifications(deviceId);
+          setNotifications(data);
+          console.log("Fetched notifications:", data);
+        };
+    
+        loadNotifications(); // initial fetch
+    
+        const intervalId = setInterval(loadNotifications, 10000); // fetch every 10s
+    
+        return () => {
+          clearInterval(intervalId);
+          console.log("Cleaned up polling");
+        };
+      }, [deviceId]);
+  
 
   // Memoized fetch data function
   const fetchData = useCallback(async (fromTime, toTime, component) => {
