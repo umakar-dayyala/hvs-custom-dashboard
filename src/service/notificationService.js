@@ -3,7 +3,7 @@
 export const fetchDeviceNotifications = async (deviceId) => {
   try {
     const res = await fetch(
-      `${process.env.REACT_APP_API_PROTOCOL}://localhost:5000/api/floor/getRedisCache?device_ids=${deviceId}`
+      `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/floor/getRedisCache?device_ids=${deviceId}`
     );
 
     const json = await res.json();
