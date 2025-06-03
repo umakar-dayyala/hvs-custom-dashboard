@@ -188,37 +188,37 @@ const HistoryFilter = ({ onFilterChange }) => {
           </Select>
         </FormControl>
 
-        <Autocomplete
-          options={deviceIds}
-          getOptionLabel={(option) => option.toString()}
-          value={deviceId}
-          onChange={handleDeviceIdChange}
-          renderInput={(params) => (
-            <TextField {...params} label="Device ID" sx={{ minWidth: 180 }} />
-          )}
-          freeSolo={false}
-          disabled={!!sensorType}
-        />
-
-        <FormControl sx={{ minWidth: 180 }}>
-          <InputLabel>Sensor Type</InputLabel>
-          <Select
-            value={sensorType}
-            onChange={handleSensorTypeChange}
-            label="Sensor Type"
-            disabled={!!deviceId}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {sensorTypes.map((type) => (
-              <MenuItem key={type} value={type}>
-                {type}
+        {!sensorType && (
+          <Autocomplete
+            options={deviceIds}
+            getOptionLabel={(option) => option.toString()}
+            value={deviceId}
+            onChange={handleDeviceIdChange}
+            renderInput={(params) => (
+              <TextField {...params} label="Device ID" sx={{ minWidth: 180 }} />
+            )}
+            freeSolo={false}
+          />
+        )}
+        {!deviceId && (
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>Sensor Type</InputLabel>
+            <Select
+              value={sensorType}
+              onChange={handleSensorTypeChange}
+              label="Sensor Type"
+            >
+              <MenuItem value="">
+                <em>None</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
+              {sensorTypes.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
         {sensorType && (
           <FormControl sx={{ minWidth: 200 }}>
             <InputLabel>Sensor Name</InputLabel>
@@ -303,14 +303,14 @@ const HistoryFilter = ({ onFilterChange }) => {
             minWidth: 150,
             height: 54,
             alignSelf: "center",
-            border: "1px solid #1976d2", 
-            color: "#1976d2", 
-            backgroundColor: "transparent", 
+            border: "1px solid #1976d2",
+            color: "#1976d2",
+            backgroundColor: "transparent",
             "&:hover": {
-              backgroundColor: "#1976d2", 
-              color: "#fff", 
+              backgroundColor: "#1976d2",
+              color: "#fff",
               border: "2px solid #1976d2",
-              fontWeight: "bold", 
+              fontWeight: "bold",
             },
           }}
         >

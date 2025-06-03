@@ -384,7 +384,7 @@ const AssetDialog = ({
             name="Asset_Location"
             value={formData.Asset_Location || ""}
             onChange={onChange}
-            required
+            // required
           >
             {assetLocations.map((loc) => (
               <MenuItem key={loc} value={loc}>
@@ -456,7 +456,7 @@ const AssetDialog = ({
             value={formData.Comments || ""}
             onChange={onChange}
           />
-          <Button
+          {/* <Button
             variant="outlined"
             component="label"
             fullWidth
@@ -474,7 +474,7 @@ const AssetDialog = ({
             <p style={{ marginTop: 8 }}>Uploaded: {formData.Attachments.name}</p>
           ) : selectedAsset?.attachments ? (
             <p style={{ marginTop: 8 }}>Existing: {selectedAsset.attachments}</p>
-          ) : null}
+          ) : null} */}
         </>
       );
     }
