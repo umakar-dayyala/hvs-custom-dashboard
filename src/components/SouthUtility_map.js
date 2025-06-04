@@ -28,9 +28,9 @@ const sensorPositions = {
     //SENSOR NAMES are not updated
     41: [185, 175],     // AP4C - 1 > DONE  
     1161: [190, 180],    // AP4C - 2 > DONE  
-    2207: [165, 180],   // FCAD - 3 >  DONE
-    42: [175, 185],     // AP4C - 4 >  DONE 
-    57: [175, 190],   // IBAC - 5 >   DONE
+    2207: [164, 180],   // FCAD - 3 >  DONE
+    42: [171, 187],     // AP4C - 4 >  DONE 
+    57: [176, 193],   // IBAC - 5 >   DONE
     125: [190, 185],      // AP4C - 6 > DONE  
     43: [550, 610],    // MAB - 7 > DONE  
     1164: [530, 615],     // AP4C - 8 >  DONE 

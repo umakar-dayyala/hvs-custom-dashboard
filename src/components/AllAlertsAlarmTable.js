@@ -185,12 +185,12 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
     },
     { Header: "Location", accessor: "location" },
     { Header: "Correlated Alarm", accessor: "correlated_alarm" },
-    {
-      Header: "Action",
-      accessor: "action",
-      disableFilters: true,
-      Cell: () => <HvButton className={classes.actionButton} category="primary">Stop LED / Buzzer</HvButton>,
-    },
+    // {
+    //   Header: "Action",
+    //   accessor: "action",
+    //   disableFilters: true,
+    //   Cell: () => <HvButton className={classes.actionButton} category="primary">Stop LED / Buzzer</HvButton>,
+    // },
   ], [onDetectorClick]);
 
   const {

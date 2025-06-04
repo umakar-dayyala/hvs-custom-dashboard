@@ -92,7 +92,7 @@ const FloorCards = ({ floorData }) => {
 
           const chartOptions = {
             chart: { type: "donut", toolbar: { show: false }, animations: { enabled: true } },
-            labels: ["Active", "Inactive", "Unhealthy", "CBRN Alarms"],
+            labels: ["Healthy", "Inactive", "Unhealthy", "CBRN Alarms"],
             legend: { show: false },
             colors: chartColors,
             dataLabels: {
@@ -183,7 +183,7 @@ const FloorCards = ({ floorData }) => {
                           height={140}
                         />*/}
                         <Box ml={2}>
-                          {["Active", "Inactive", "Unhealthy","CBRN Alarms"].map((label, i) => (
+                          {["Healthy", "Inactive", "Unhealthy","CBRN Alarms"].map((label, i) => (
                             <Box display="flex" alignItems="center" key={label} mb={1}>
                               <Box width={12} height={12} borderRadius="50%" bgcolor={chartColors[i]} mr={1} />
                               <HvTypography variant="caption">{label}: {(chartSeries[i] || 0)}</HvTypography>

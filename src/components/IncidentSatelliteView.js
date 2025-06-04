@@ -194,8 +194,8 @@ const createPinIcon = (imgUrl, status, alarm_status) => {
 
 
 const IncidentSatelliteView = ({ sensorData = [] }) => {
-  console.log("IncidentMap Opened: ");
-  console.log("Sensor Data:", sensorData);
+  // console.log("IncidentMap Opened: ");
+  // console.log("Sensor Data:", sensorData);
   const navigate = useNavigate();
 
   const handleClick = (sensor) => {
@@ -238,7 +238,7 @@ const IncidentSatelliteView = ({ sensorData = [] }) => {
 
         const iconUrl = getIconByStatus(sensor.detector_type, sensor.status);
         const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
-        console.log("Sensor Data:", sensor.device_id, sensor.detector, position);
+        // console.log("Sensor Data:", sensor.device_id, sensor.detector, position);
 
         return (
 

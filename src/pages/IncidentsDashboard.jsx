@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Box, ToggleButton, ToggleButtonGroup, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { isEqual } from "lodash";
 
@@ -99,6 +99,10 @@ const IncidentDashboard = () => {
     }
   };
 
+  const handleSensorsStatusClick = () => {
+    navigate("/sensorStatus");
+  };
+
   return (
     <>
       {loading && <Loader />}
@@ -128,6 +132,25 @@ const IncidentDashboard = () => {
               Map View
             </ToggleButton>
           </ToggleButtonGroup>
+          <Button
+            onClick={handleSensorsStatusClick}
+              sx={{
+                minWidth: 150,
+                height: 54,
+                alignSelf: "center",
+                border: "1px solid #1976d2",
+                color: "#1976d2",
+                backgroundColor: "transparent",
+                "&:hover": {
+                  backgroundColor: "#1976d2",
+                  color: "#fff",
+                  border: "2px solid #1976d2",
+                  fontWeight: "bold",
+                },
+            }}
+          >
+            Sensors Status
+          </Button>
         </Box>
         {/* Main Content: Map + Alert Panel */}
         <Box display="flex" px={2} py={2} gap={2} alignItems="flex-start" flex={1}>

@@ -1,49 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import { authenticateUser, acknowledgeAlarm } from '../service/IncidentService';
 
 const IncidentAlertPanal = ({ incidentData }) => {
-  const handleAcknowledge = (deviceId) => {
-    // Handle acknowledgment - you can integrate with your router here
-    console.log(`Acknowledging alert for device ${deviceId}`);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success', // 'success' or 'error'
+  });
+
+  const handleAcknowledge = async (deviceId) => {
+    try {
+      console.log('handleAcknowledge triggered for deviceId:', deviceId);
+      const accessToken = await authenticateUser();
+      const timestamp = new Date().toISOString();
+      const message = await acknowledgeAlarm(deviceId, timestamp);
+      console.log('Acknowledge success, setting snackbar:', message);
+      setSnackbar({
+        open: true,
+        message: message,
+        severity: 'success',
+      });
+    } catch (error) {
+      console.error('Failed to acknowledge alarm:', error.message);
+      setSnackbar({
+        open: true,
+        message: `Failed to acknowledge alarm: ${error.message}`,
+        severity: 'error',
+      });
+    }
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    console.log('Closing snackbar');
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const handleGoToIncident = (deviceId) => {
-    // Handle navigation to incident - you can integrate with your router here
     console.log(`Navigating to incident for device ${deviceId}`);
   };
 
-  // Filter incidents with active alarms (alarm_status is not "No Alarm")
-  const activeAlarms = incidentData.filter(incident => incident.s_no.alarm_status !== "No Alarm");
+  const activeAlarms = incidentData?.filter(incident => incident?.s_no?.alarm_status !== "No Alarm") || [];
 
   return (
     <>
       <style>
         {`
           @keyframes blinkAlert {
-            0% { 
-              background-color: white; 
-            }
-            50% { 
-              background-color: #ffebee; 
-            }
-            100% { 
-              background-color: white; 
-            }
+            0% { background-color: white; }
+            50% { background-color: red; }
+            100% { background-color: white; }
           }
           
           @keyframes blinkButton {
-            0% { 
-              background-color: #333;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            }
-            50% { 
-              background-color: #333;
-              box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4), 
-                          0 0 20px rgba(211, 47, 47, 0.3);
-            }
-            100% { 
-              background-color: #333;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            }
+            0% { background-color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+            50% { background-color: #333; box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4), 0 0 20px rgba(211, 47, 47, 0.3); }
+            100% { background-color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
           }
           
           .alert-card {
@@ -78,14 +94,14 @@ const IncidentAlertPanal = ({ incidentData }) => {
             display: flex;
             flex-direction: column;
             gap: 16px;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
           }
           
           .alert-scroll.no-alarm {
             justify-content: center;
             align-items: center;
-            min-height: 85vh; /* Ensure full height for vertical centering */
+            min-height: 85vh;
           }
           
           .alert-scroll::-webkit-scrollbar {
@@ -99,8 +115,7 @@ const IncidentAlertPanal = ({ incidentData }) => {
           
           .acknowledge-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(211, 47, 47, 0.5), 
-                        0 0 25px rgba(211, 47, 47, 0.4) !important;
+            box-shadow: 0 6px 16px rgba(211, 47, 47, 0.5), 0 0 25px rgba(211, 47, 47, 0.4) !important;
           }
           
           .acknowledge-btn:active {
@@ -110,14 +125,13 @@ const IncidentAlertPanal = ({ incidentData }) => {
       </style>
       <div className={`alert-scroll ${activeAlarms.length === 0 ? 'no-alarm' : ''}`} style={{
         maxHeight: '85vh',
-
         overflowY: 'auto',
         padding: '8px',
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
-        scrollbarWidth: 'none',          // Firefox
-        msOverflowStyle: 'none'          // IE/Edge
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
       }}>
         {activeAlarms.length > 0 ? (
           activeAlarms.map((incident) => (
@@ -142,8 +156,11 @@ const IncidentAlertPanal = ({ incidentData }) => {
                 zIndex: 1
               }} />
               <h3 style={{ fontSize: '18px', margin: 0 }}>
-                {incident.s_no.location || 'Unknown Location'}
+                {incident.s_no.detector} Alarm - {incident.s_no.location || 'Unknown Location'}
               </h3>
+              <p style={{ fontSize: '14px', margin: '8px 0' }}>
+                Sensor Type: {incident.s_no.detector_type} | Status: {incident.s_no.alarm_status}
+              </p>
               <button
                 onClick={() => handleAcknowledge(incident.s_no.device_id)}
                 className="acknowledge-btn"
@@ -156,7 +173,7 @@ const IncidentAlertPanal = ({ incidentData }) => {
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '500',
-                  fontSize: '14px'
+                  fontSize: '16px'
                 }}>
                 Acknowledge Alarm
               </button>
@@ -173,7 +190,7 @@ const IncidentAlertPanal = ({ incidentData }) => {
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '500',
-                  fontSize: '14px'
+                  fontSize: '16px'
                 }}>
                 Go to Incident
               </button>
@@ -233,6 +250,17 @@ const IncidentAlertPanal = ({ incidentData }) => {
           </div>
         )}
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ zIndex: 1500 }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
