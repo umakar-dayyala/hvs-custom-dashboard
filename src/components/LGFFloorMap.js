@@ -116,7 +116,7 @@ const LGFFloorMap = ({ sensorData = [] }) => {
       minZoom={-2}
       maxZoom={2}
     >
-      <ImageOverlay url="/LGF_PNG.png" bounds={imageBounds} />
+      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}LGF_PNG.png`} bounds={imageBounds} />
 
       
       {/* Sensor markers */}
