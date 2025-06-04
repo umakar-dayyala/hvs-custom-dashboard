@@ -38,7 +38,7 @@ const InventoryDashboard = () => {
     warranty_start_date: "",
     warranty_end_date: "",
     Comments: "",
-    Attachments: null,
+    // Attachments: null,
   });
   const [notification, setNotification] = useState({
     open: false,
@@ -77,7 +77,7 @@ const InventoryDashboard = () => {
     link.click();
     document.body.removeChild(link);
   };
-  
+
   const handleShowNotification = (msg, sev = "success") =>
     setNotification({ open: true, message: msg, severity: sev });
   const handleCloseNotification = () =>
@@ -148,7 +148,7 @@ const InventoryDashboard = () => {
         warranty_start_date: '',
         warranty_end_date: '',
         Comments: '',
-        Attachments: null,
+        // Attachments: null,
       });
     } else if (type === "edit") {
       console.log('Editing asset:', asset);
@@ -167,7 +167,7 @@ const InventoryDashboard = () => {
           warranty_start_date: asset.warranty_start_date || "",
           warranty_end_date: asset.warranty_end_date || "",
           Comments: asset.comments || "",
-          Attachments: null,
+          // Attachments: null,
         });
       } else {
         setFormData({
@@ -184,7 +184,7 @@ const InventoryDashboard = () => {
           warranty_start_date: "",
           warranty_end_date: "",
           Comments: "",
-          Attachments: null,
+          // Attachments: null,
         });
       }
     } else if (type === "remove" && asset && asset.type === "all") {
@@ -209,7 +209,7 @@ const InventoryDashboard = () => {
       warranty_start_date: "",
       warranty_end_date: "",
       Comments: "",
-      Attachments: null,
+      // Attachments: null,
     });
     setSelectedIds([]);
   };
@@ -222,7 +222,7 @@ const InventoryDashboard = () => {
         const requiredFields = {
           'Asset Type': formData.Asset_Type,
           // 'Asset Unique ID': formData.asset_unique_id,
-          'Asset Location': formData.Asset_Location,
+          // 'Asset Location': formData.Asset_Location,
           'Asset Status': formData.Asset_Status,
         };
         for (const [fieldName, value] of Object.entries(requiredFields)) {
@@ -248,7 +248,7 @@ const InventoryDashboard = () => {
           asset_name: formData.Asset_Name || '',
           asset_manufacterer: formData.Asset_Manufacturer || '',
           asset_serial_number: formData.Asset_Serial_Number || '',
-          asset_location: formData.Asset_Location,
+          asset_location: formData.Asset_Location || 'Storeroom',
           asset_status: formData.Asset_Status,
           installation_date: formData.installation_date || null,
           camc_period: formData.camc_period || '',
@@ -409,7 +409,7 @@ const InventoryDashboard = () => {
       warranty_start_date: child.warranty_start_date || "",
       warranty_end_date: child.warranty_end_date || "",
       Comments: child.comments || "",
-      Attachments: null,
+      // Attachments: null,
     });
   };
 
@@ -438,7 +438,7 @@ const InventoryDashboard = () => {
               onClick={handleTemplateDwoload}
               disabled={loading}
             >
-            Template
+              Template
             </Button>
             <ExcelUploadHandler
               setLoading={setLoading}
@@ -456,7 +456,7 @@ const InventoryDashboard = () => {
               onClick={handleDownload}
               disabled={loading}
             >
-             Inventory Log
+              Inventory Log
             </Button>
 
             {/*   <TextField

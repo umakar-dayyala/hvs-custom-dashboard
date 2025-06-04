@@ -43,7 +43,7 @@ export const getInventoryData = async () => {
         warranty_start_date: child.WarrantyStartDate,
         warranty_end_date: child.WarrantyEndDate,
         comments: child.comments,
-        attachments: child.attachments, // Assuming this field exists
+        // attachments: child.attachments, // Assuming this field exists
       })),
     }));
   } catch (error) {

@@ -345,7 +345,7 @@ const InventoryTable = ({
                                       "Location",
                                       "Status",
                                       "Comments",
-                                      "Attachments",
+                                      // "Attachments",
                                       "Action",
                                     ].map((h) => (
                                       <HvTableHeader key={h} className="childHeaderCell">
@@ -392,13 +392,13 @@ const InventoryTable = ({
                                           <span className="commentCell">{c.comments || "—"}</span>
                                         </Tooltip>
                                       </HvTableCell>
-                                      <HvTableCell className="tableCell">
+                                      {/* <HvTableCell className="tableCell">
                                         {c.attachments ? (
                                           <Box className="attachmentBadge">{c.attachments}</Box>
                                         ) : (
                                           "None"
                                         )}
-                                      </HvTableCell>
+                                      </HvTableCell> */}
                                       <HvTableCell className="tableCell">
                                         <Box className="actionCell">
                                           <Tooltip title="Remove Asset" arrow placement="top">
