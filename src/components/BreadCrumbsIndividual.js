@@ -41,7 +41,7 @@ const BreadCrumbsIndividual = ({ locationDetails }) => {
   };
 
   const routes = [
-    { label: "Operators Dashboard", path: "/" },
+    { label: "Summary Dashboard", path: "/" },
     ...(pathnames[0] !== "floorwise" && floorLabel
       ? [{ label: floorLabel, path: `/floorwise${floorQueryParam}` }]
       : []),

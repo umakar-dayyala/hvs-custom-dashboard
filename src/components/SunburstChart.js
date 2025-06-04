@@ -1,31 +1,33 @@
 import React, { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import Sunburst from "sunburst-chart";
-
+import * as d3 from "d3"; // Required to override transition globally
+import "../css/sunburst.css";
+ 
 const SunburstChart = ({ floorBasedData }) => {
     const chartRef = useRef(null);
     const centerTextRef = useRef(null);
-
+ 
     const floor = floorBasedData || {};
-
+ 
     const totalValue =
         (floor.activeSensors || 0) +
         (floor.inactiveSensors || 0) +
         (floor.disconnected_sensors || 0) +
         (floor.unhealthySensors || 0);
-
+ 
     const allValuesZero =
         (floor.activeSensors || 0) === 0 &&
         ((floor.inactiveSensors || 0) + (floor.disconnected_sensors || 0)) === 0 &&
         (floor.unhealthySensors || 0) === 0 &&
         (floor.active_alarms || 0) === 0 &&
         (floor.unhealthy_alarms || 0) === 0;
-
+ 
     const buildSunburstData = () => ({
         name: floor.floor || "Unknown Floor",
         children: [
             {
-                name: "Active",
+                name: "Healthy",
                 value: floor.activeSensors || 0,
                 children:
                     floor.active_alarms > 0
@@ -46,22 +48,37 @@ const SunburstChart = ({ floorBasedData }) => {
             },
         ],
     });
-
+ 
     useEffect(() => {
         if (!chartRef.current || allValuesZero) return;
-
-        // Clear any old content in the chart container
+ 
         chartRef.current.innerHTML = "";
-
+ 
+        // Safe local override to make transitions instant
+        if (d3.selection.prototype.transition) {
+            const originalTransition = d3.selection.prototype.transition;
+            d3.selection.prototype.transition = function () {
+                return originalTransition.call(this).duration(0);
+            };
+        }
+ 
         const data = buildSunburstData();
-
-        // Defer chart rendering to ensure DOM is ready
+ 
         const frame = requestAnimationFrame(() => {
             const chart = Sunburst()
                 .data(data)
                 .width(120)
                 .height(120)
-                .label(() => "")
+            
+                .label((d) => {
+    if (d.name === "Healthy") return ` ${d.value}`;
+    if (d.name === "Inactive") return `${d.value}`;
+    if (d.name === "Unhealthy") return ` ${d.value}`;
+    if (d.name === "Active Alarms") return ` ${d.value}`;
+    if (d.name === "Unhealthy Alarms") return ` ${d.value}`;
+    return "";
+})
+                
                 .tooltipContent(() => "")
                 .onClick(() => null)
                 .onHover((node) => {
@@ -75,16 +92,16 @@ const SunburstChart = ({ floorBasedData }) => {
                 })
                 .color((d) => {
                     if (d.name === floor.floor) return "rgba(255, 255, 255, 0.1)";
-                    if (d.name === "Active") return "#29991d";
+                    if (d.name === "Healthy") return "#29991d";
                     if (d.name === "Inactive") return "RGB(128, 128,128)";
                     if (d.name === "Unhealthy") return "#ff9933";
                     if (d.name === "Active Alarms" || d.name === "Unhealthy Alarms") return "#E30613";
                     return "rgba(0, 0, 0, 0.1)";
                 });
-
+ 
             chart(chartRef.current);
         });
-
+ 
         return () => {
             cancelAnimationFrame(frame);
             if (chartRef.current) {
@@ -92,8 +109,8 @@ const SunburstChart = ({ floorBasedData }) => {
             }
         };
     }, [floor]);
-
-
+ 
+ 
     return (
         <Box mt={2} display="flex" justifyContent="center" position="relative">
             {allValuesZero ? (
@@ -121,5 +138,5 @@ const SunburstChart = ({ floorBasedData }) => {
         </Box>
     );
 };
-
+ 
 export default SunburstChart;

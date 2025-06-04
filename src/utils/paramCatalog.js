@@ -30,27 +30,74 @@ export const sensorParamCatalog = {
 
   ibac: [
     // example – replace with the real IBAC list
-    { id: 1, label: "sensor_datetime" },
-    { id: 24, label: "ip_address" },
-    { id: 25, label: "network_mask" },
-    { id: 26, label: "router_ip" },
-    { id: 27, label: "alarm_function" },
-    { id: 28, label: "alarm_criteria" },
-    { id: 29, label: "alarm_reset" },
-    { id: 30, label: "pump_status" },
-    { id: 31, label: "auxiliary_status" },
-    { id: 32, label: "auxiliary_alarm_status" },
-    { id: 38, label: "trigger_simulated_alarm" },
-    { id: 39, label: "nauto_collect" },
+    { id: 1, label: "Sensor Datetime" },
+    { id: 24, label: "IP Address" },
+    { id: 25, label: "Network Mask" },
+    { id: 26, label: "Router IP" },
+    { id: 27, label: "Alarm Function" },
+    { id: 28, label: "Alarm Criteria" },
+    { id: 29, label: "Alarm Reset" },
+    { id: 30, label: "Pump Status" },
+    { id: 31, label: "Auxiliary Status" },
+    { id: 32, label: "Auxiliary Alarm Status" },
+    { id: 38, label: "Trigger Simulated Alarm" },
+    { id: 39, label: "Nauto Collect" },
     { id: 40, label: "collect" },
   ],
 
   mab: [
-     { id: 13, label: "waking_state" },
-    { id: 17, label: "device_state" },
+     { id: 14, label: "Waking State" },
+    { id: 20, label: "Device State" },
     
+  ],
+
+  vrm:[
+    { id: 25, label: "DET 1 STATUS" },
+    { id: 26, label: "DET 2 STATUS" },
+    { id: 36, label: "BGH1" },
+    { id: 37, label: "BGL1" },
+    { id: 38, label: "BGA1"},
+    { id: 39, label: "BGH2"},
+    { id: 40, label: "BGL2"},
+    { id: 41, label: "BGA2"},
+    { id: 60, label: "ACK"},
+    { id: 79, label: "DATETIME" },
+  ],
+
+  prm:[
+    { id: 1, label: "DET 1 COUNTS " },
+    { id: 3, label: "DET 1 STAT " },
+    { id: 11, label: "DET 1 BGHIGH " },
+    { id: 12, label: "DET 1 BGLOW " },
+    { id: 13, label: "DET 1 ALARM "},
+    { id: 17, label: "DATETIME"},
+    { id: 21, label: "ACK"}
+  ],
+
+  wrm: [
+   
+    { id: 3, label: "DET 1 STAT " },
+    { id: 4, label: "DET 2 STAT" },
+    { id: 11, label: "DET 1 BGHIGH " },
+    { id: 12, label: "DET 1 BGLOW " },
+    { id: 13, label: "DET 1 ALARM "},
+    { id: 14, label: "DET 2 BGHIGH " },
+    { id: 15, label: "DET 2 BGLOW " },
+    { id: 16, label: "DET 2 ALARM "},
+    { id: 17, label: "DATETIME"},
+    { id: 21, label: "ACK"}
+  ],
+  fcad:[
+    { id: 8, label: "IP address" },
+  ],
+
+  aam:[
+    { id: 44, label: "Reset Instrument" },
   ]
+    
 };
+
+
 
 /* ----- helpers ---------------------------------------------------------- */
 

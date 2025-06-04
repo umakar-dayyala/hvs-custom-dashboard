@@ -73,7 +73,7 @@ const DeviceFilter = () => {
   const { type2, device_id } = device;
   switch (type2) {
     case "Oxygen":
-      return `/${type2}?device_id=${device_id}`;
+      return `/OxygenMonitoring?device_id=${device_id}`;
     case "Weather":
       return `/${type2}?device_id=${device_id}`;
     case "AP4C-F":
@@ -121,7 +121,7 @@ const DeviceFilter = () => {
     const type2 = device.type2;
  
     return (
-      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+      <Grid item xs={12} sm={6} md={6} lg={2} key={index}>
        <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
   <DeviceBox device={device} />
 </Link>
