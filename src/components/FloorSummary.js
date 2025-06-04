@@ -14,7 +14,7 @@ import rRadiologicalIcon from "../assets/rRadiological.svg";
 import rBiologicalIcon from "../assets/rBiological.svg";
 import rChemicalIcon from "../assets/rChemical.svg";
 import activeSensorsIcon from "../assets/onlineWifi.svg";
-import inactiveSensorsIcon from "../assets/rWifiIcon.svg";
+import inactiveSensorsIcon from "../assets/greyWifi.svg";
 import WarningIcon from "@mui/icons-material/Warning";
 
 // Sensor type to icon mapping
@@ -69,8 +69,7 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
               />
               <HvTypography variant="title3">
                 <span style={{ color: getSensorTextColor(floor.chemical_alarms) }}>
-                  Chemical {floor.chemical_alarms}/{sensorCounts.Chemical || 0}
-                </span>
+                  Chemical {floor.chemical_alarms}</span>/{sensorCounts.Chemical || 0}
               </HvTypography>
 
               <VerticalDivider />
@@ -85,8 +84,8 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
               />
               <HvTypography variant="title3">
                 <span style={{ color: getSensorTextColor(floor.biological_alarms) }}>
-                  Biological {floor.biological_alarms}/{sensorCounts.Biological || 0}
-                </span></HvTypography>
+                  Biological {floor.biological_alarms}</span>/{sensorCounts.Biological || 0}
+              </HvTypography>
               <VerticalDivider />
             </Box>
 
@@ -99,8 +98,8 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
               />
               <HvTypography variant="title3">
                 <span style={{ color: getSensorTextColor(floor.radiological_alarms) }}>
-                  Radiological {floor.radiological_alarms}/{sensorCounts.Radiation || 0}
-                </span></HvTypography>
+                  Radiological {floor.radiological_alarms}</span>/{sensorCounts.Radiation || 0}
+              </HvTypography>
               <VerticalDivider />
             </Box>
 
@@ -126,7 +125,7 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>
               <img src={activeSensorsIcon} alt="Active Sensors Icon" width={30} height={30} />
               <HvTypography variant="title3">
-                Active <HvTypography variant="label1">{floor.active_sensors}</HvTypography>
+                Healthy <HvTypography variant="label1">{floor.active_sensors}</HvTypography>
               </HvTypography>
               <VerticalDivider />
             </Box>
