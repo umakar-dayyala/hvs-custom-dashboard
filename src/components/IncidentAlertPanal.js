@@ -24,7 +24,7 @@ const IncidentAlertPanal = (props) => {
     const fetchAlarms = async () => {
       try {
         const response = await getRedisAlarms();
-        const data = response?.devices?.devices || [];
+        const data = response?.devices?.devices?.devices || [];
         setAlarms(data);
       } catch (error) {
         console.error('Error fetching alarms:', error);
@@ -32,7 +32,7 @@ const IncidentAlertPanal = (props) => {
     };
 
     fetchAlarms();
-    const interval = setInterval(fetchAlarms, 1000);
+    const interval = setInterval(fetchAlarms, 3000);
     return () => clearInterval(interval);
   }, []);
 
