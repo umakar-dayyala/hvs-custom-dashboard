@@ -219,7 +219,7 @@ const IncidentAlertPanal = (props) => {
                   {incident.sensor_name} Alarm - {incident.location || 'Unknown Location'}
                 </h3>
                 <p style={{ fontSize: '14px', margin: '8px 0' }}>
-                  Sensor Type - {incident.sensor_type} | Timestamp - {incident.timestamp}
+                  Sensor Type - {incident.sensor_type} 
                 </p>
 
                 {isAcknowledged ? (
