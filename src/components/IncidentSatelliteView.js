@@ -238,7 +238,7 @@ const IncidentSatelliteView = ({ sensorData = [] }) => {
       maxZoom={4} // Allow zooming in
     >
 
-      <ImageOverlay url="/img_incidentSatelliteView.jpg" bounds={imageBounds} />
+      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}img_incidentSatelliteView.jpg`} bounds={imageBounds} />
 
 
       {/* Sensor markers */}

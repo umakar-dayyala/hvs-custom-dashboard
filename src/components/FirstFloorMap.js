@@ -135,7 +135,7 @@ const FirstFloorMap = ({ sensorData = [] }) => {
       minZoom={-2}
       maxZoom={2}
     >
-      <ImageOverlay url="/First_Floor_map.png" bounds={imageBounds} />
+      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}First_Floor_map.png`} bounds={imageBounds} />
 
 
       {/* Sensor markers */}

@@ -25,10 +25,9 @@ const DeviceFilter = () => {
     status: "",
   });
 
-  // Fetch device data from API and auto-refresh every 30 seconds
   const getDeviceData = async () => {
     try {
-      const data = await fetchAlarmSummary(); // Make sure this returns an array of device objects
+      const data = await fetchAlarmSummary();
       setDeviceData(data);
     } catch (error) {
       console.error("Failed to fetch device data", error);
@@ -36,9 +35,9 @@ const DeviceFilter = () => {
   };
 
   useEffect(() => {
-    getDeviceData(); // Initial fetch
-    const interval = setInterval(getDeviceData, 30000); // Auto-refresh every 30s
-    return () => clearInterval(interval); // Cleanup on unmount
+    getDeviceData();
+    const interval = setInterval(getDeviceData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -47,7 +46,21 @@ const DeviceFilter = () => {
         value === "" || String(device[key]).toLowerCase() === String(value).toLowerCase()
       )
     );
-    setFilteredDevices(filtered);
+
+    const statusPriority = {
+      Alarm: 1,
+      Unhealthy: 2,
+      Healthy: 3,
+      Inactive: 4,
+    };
+
+    const sorted = [...filtered].sort((a, b) => {
+      const aPriority = statusPriority[a.status] || 5;
+      const bPriority = statusPriority[b.status] || 5;
+      return aPriority - bPriority;
+    });
+
+    setFilteredDevices(sorted);
   }, [filters, deviceData]);
 
   const handleFilterChange = (key) => (event) => {
@@ -70,19 +83,18 @@ const DeviceFilter = () => {
   };
 
   const getDevicePath = (device) => {
-  const { type2, device_id } = device;
-  switch (type2) {
-    case "Oxygen":
-      return `/OxygenMonitoring?device_id=${device_id}`;
-    case "Weather":
-      return `/${type2}?device_id=${device_id}`;
-    case "AP4C-F":
-      return `/ap4cIndividual?device_id=${device_id}`;
-    default:
-      return `/${type2}Individual?device_id=${device_id}`;
-  }
-};
-
+    const { type2, device_id } = device;
+    switch (type2) {
+      case "Oxygen":
+        return `/OxygenMonitoring?device_id=${device_id}`;
+      case "Weather":
+        return `/${type2}?device_id=${device_id}`;
+      case "AP4C-F":
+        return `/ap4cIndividual?device_id=${device_id}`;
+      default:
+        return `/${type2}Individual?device_id=${device_id}`;
+    }
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
@@ -116,21 +128,15 @@ const DeviceFilter = () => {
         <Typography variant="h6" gutterBottom sx={{ mb: 2, px: 2 }}>
           Devices ({filteredDevices.length})
         </Typography>
-       <Grid container spacing={2} sx={{ px: 2, pb: 2 }}>
-  {filteredDevices.map((device, index) => {
-    const type2 = device.type2;
- 
-    return (
-      <Grid item xs={12} sm={6} md={6} lg={2} key={index}>
-       <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
-  <DeviceBox device={device} />
-</Link>
-
-      </Grid>
-    );
-  })}
-</Grid>
-
+        <Grid container spacing={2} sx={{ px: 2, pb: 2 }}>
+          {filteredDevices.map((device, index) => (
+            <Grid item xs={12} sm={6} md={6} lg={2} key={index}>
+              <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
+                <DeviceBox device={device} />
+              </Link>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     </Box>
   );

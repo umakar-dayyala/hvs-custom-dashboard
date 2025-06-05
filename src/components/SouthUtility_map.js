@@ -135,7 +135,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
       minZoom={-2}
       maxZoom={2}
     >
-      <ImageOverlay url="/SU_map.png" bounds={imageBounds} />
+      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}SU_map.png`} bounds={imageBounds} />
 
       {/* Sensor markers */}
        {Array.isArray(sensorData) && sensorData.map((entry) => {
