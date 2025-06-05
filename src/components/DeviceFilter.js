@@ -36,7 +36,7 @@ const DeviceFilter = () => {
 
   useEffect(() => {
     getDeviceData();
-    const interval = setInterval(getDeviceData, 3000);
+    const interval = setInterval(getDeviceData, 10000);
     return () => clearInterval(interval);
   }, []);
 
