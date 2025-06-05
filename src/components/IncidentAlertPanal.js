@@ -218,11 +218,12 @@ const IncidentAlertPanal = (props) => {
                   {incident.sensor_name} Alarm - {incident.location || 'Unknown Location'}
                 </h3>
                 <p style={{ fontSize: '14px', margin: '8px 0' }}>
-                  Sensor Type: {incident.sensor_type}
+                  Sensor Type - {incident.sensor_type} | Timestamp - {incident.timestamp}
                 </p>
 
                 {isAcknowledged ? (
                   <>
+                  <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent:'center', gap: '10px' }}>
                     <button className="acknowledge-btn acknowledged" disabled>
                       Acknowledged
                     </button>
@@ -236,6 +237,7 @@ const IncidentAlertPanal = (props) => {
                         Go to Incident
                       </a>
                     )}
+                    </div>
                   </>
                 ) : (
                   <button
