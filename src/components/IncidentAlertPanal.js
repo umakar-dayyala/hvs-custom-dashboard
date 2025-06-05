@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { getRedisAlarms, getIncidentBySourceId, acknowledgeAlarm } from '../service/IncidentService';
+import { getRedisAlarms, /* getIncidentBySourceId, */ acknowledgeAlarm } from '../service/IncidentService';
 
 const IncidentAlertPanal = (props) => {
   const [alarms, setAlarms] = useState([]);
@@ -44,13 +44,14 @@ const IncidentAlertPanal = (props) => {
       }));
 
       const timestamp = new Date().toISOString();
-      const incidentResponse = await getIncidentBySourceId(incidentId, props?.keycloak?.idToken || '');
-      const pkIncId = incidentResponse.data.pk_inc_id;
 
-      setIncidentIds((prev) => ({
-        ...prev,
-        [deviceId]: pkIncId,
-      }));
+      // const incidentResponse = await getIncidentBySourceId(incidentId, props?.keycloak?.idToken || '');
+      // const pkIncId = incidentResponse.data.pk_inc_id;
+
+      // setIncidentIds((prev) => ({
+      //   ...prev,
+      //   [deviceId]: pkIncId,
+      // }));
 
       const message = await acknowledgeAlarm(deviceId, timestamp);
       setSnackbar({
@@ -197,7 +198,7 @@ const IncidentAlertPanal = (props) => {
             const deviceId = incident.device_id;
             const incidentId = incident.incident_id;
             const isAcknowledged = acknowledgedDevices[deviceId];
-            const pkIncId = incidentIds[deviceId];
+            // const pkIncId = incidentIds[deviceId];
 
             return (
               <div key={deviceId} className={`alert-card ${!isAcknowledged ? 'active' : ''}`}>
@@ -222,12 +223,19 @@ const IncidentAlertPanal = (props) => {
                 </p>
 
                 {isAcknowledged ? (
-                  <>
-                  <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent:'center', gap: '10px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '10px',
+                    }}
+                  >
                     <button className="acknowledge-btn acknowledged" disabled>
                       Acknowledged
                     </button>
-                    {pkIncId && (
+                    {/* {pkIncId && (
                       <a
                         className="incident-link"
                         href={`https://devs.hitachivisualization.com/incidents/${pkIncId}`}
@@ -236,9 +244,8 @@ const IncidentAlertPanal = (props) => {
                       >
                         Go to Incident
                       </a>
-                    )}
-                    </div>
-                  </>
+                    )} */}
+                  </div>
                 ) : (
                   <button
                     onClick={() => handleAcknowledge(deviceId, incidentId)}
