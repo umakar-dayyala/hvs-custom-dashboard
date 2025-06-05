@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/floor`;
-
 const INCIDENT_API_URL = 'https://haproxy.hitachivisualization.com:6443/api/Incidents';
 
 export const acknowledgeAlarm = async (deviceId, timestamp, accessToken) => {
