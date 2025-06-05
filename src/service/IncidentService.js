@@ -1,63 +1,57 @@
-// apiService.js
-const API_BASE_URL = 'https://api.hvsapp.com';
-const FLOOR_API_URL = 'http://172.16.95.12:31000/api/floor';
+import axios from 'axios';
 
-export const authenticateUser = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/authenticate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json', // Added for compatibility
-      },
-      body: JSON.stringify({
-        username: 'marco_marco@hitachivisualization.com',
-        password: 'Vishal12345',
-        domain: 'marco',
-        scope: 'web',
-      }),
-    });
+const API_BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/floor`;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Authentication failed: ${response.status} ${response.statusText} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    if (data.ok && data.data?.access_token) {
-      return data.data.access_token;
-    } else {
-      throw new Error('Invalid authentication response: Missing access token');
-    }
-  } catch (error) {
-    console.error('Error in authenticateUser:', error.message);
-    throw error;
-  }
-};
+const INCIDENT_API_URL = 'https://haproxy.hitachivisualization.com:6443/api/Incidents';
 
 export const acknowledgeAlarm = async (deviceId, timestamp, accessToken) => {
   try {
-    const response = await fetch(`${FLOOR_API_URL}/postAcknowledgeAlarm`, {
-      method: 'POST',
+    const response = await axios.post(`${API_BASE_URL}/postAcknowledgeAlarm`, {
+      device_id: deviceId,
+      timestamp: timestamp || new Date().toISOString(),
+    }, {
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json', // Added for compatibility
+        'Accept': 'application/json',
       },
-      body: JSON.stringify({
-        device_id: deviceId,
-        timestamp: timestamp || new Date().toISOString(),
-      }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Acknowledge alarm failed: ${response.status} ${response.statusText} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data.message;
+    return response.data.message;
   } catch (error) {
     console.error('Error in acknowledgeAlarm:', error.message);
-    throw error;
+    throw new Error(`Acknowledge alarm failed: ${error.response?.status} ${error.response?.statusText} - ${error.response?.data || error.message}`);
+  }
+};
+
+export const getIncidentBySourceId = async (sourceId, token) => {
+  try {
+    const response = await axios.get(`${INCIDENT_API_URL}/getbycorrelatedentitysourceid?sourceId=${sourceId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error in getIncidentBySourceId:', error.message);
+    throw new Error(`Failed to fetch incident: ${error.response?.status} ${error.response?.statusText} - ${error.response?.data || error.message}`);
+  }
+};
+
+export const getRedisAlarms = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/getRedisAlarms`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error in getRedisAlarms:', error.message);
+    throw new Error(`Failed to fetch Redis alarms: ${error.response?.status} ${error.response?.statusText} - ${error.response?.data || error.message}`);
   }
 };

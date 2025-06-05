@@ -1,20 +1,40 @@
 import React, { useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { authenticateUser, acknowledgeAlarm } from '../service/IncidentService';
+import { acknowledgeAlarm, getIncidentBySourceId, getRedisAlarms } from '../service/IncidentService';
 
-const IncidentAlertPanal = ({ incidentData }) => {
+const IncidentAlertPanal = ({ incidentData, ...props }) => {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
-    severity: 'success', // 'success' or 'error'
+    severity: 'success',
   });
+  const [incidentIds, setIncidentIds] = useState({}); // Store pk_inc_id for each deviceId
 
   const handleAcknowledge = async (deviceId) => {
     try {
       console.log('handleAcknowledge triggered for deviceId:', deviceId);
-      const accessToken = await authenticateUser();
       const timestamp = new Date().toISOString();
+      
+      // Fetch Redis alarms to get incident_id
+      const redisResponse = await getRedisAlarms();
+      const alarm = redisResponse.devices.devices.find(alarm => alarm.device_id === deviceId);
+      if (!alarm) {
+        throw new Error(`No incident ID found for device ID: ${deviceId}`);
+      }
+      const uniqueId = alarm.incident_id;
+
+      // Call the GET API to fetch pk_inc_id
+      const incidentResponse = await getIncidentBySourceId(uniqueId, props.keycloak.idToken);
+      const pkIncId = incidentResponse.data.pk_inc_id;
+      
+      // Store the pk_inc_id in state
+      setIncidentIds((prev) => ({
+        ...prev,
+        [deviceId]: pkIncId,
+      }));
+
+      // Call existing acknowledgeAlarm API
       const message = await acknowledgeAlarm(deviceId, timestamp);
       console.log('Acknowledge success, setting snackbar:', message);
       setSnackbar({
@@ -23,7 +43,7 @@ const IncidentAlertPanal = ({ incidentData }) => {
         severity: 'success',
       });
     } catch (error) {
-      console.error('Failed to acknowledge alarm:', error.message);
+      console.error('Failed to acknowledge alarm or fetch incident:', error.message);
       setSnackbar({
         open: true,
         message: `Failed to acknowledge alarm: ${error.message}`,
@@ -40,10 +60,6 @@ const IncidentAlertPanal = ({ incidentData }) => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handleGoToIncident = (deviceId) => {
-    console.log(`Navigating to incident for device ${deviceId}`);
-  };
-
   const activeAlarms = incidentData?.filter(incident => incident?.s_no?.alarm_status !== "No Alarm") || [];
 
   return (
@@ -52,7 +68,7 @@ const IncidentAlertPanal = ({ incidentData }) => {
         {`
           @keyframes blinkAlert {
             0% { background-color: white; }
-            50% { background-color: red; }
+            50% { background-color: red; color:white }
             100% { background-color: white; }
           }
           
@@ -177,8 +193,8 @@ const IncidentAlertPanal = ({ incidentData }) => {
                 }}>
                 Acknowledge Alarm
               </button>
-              <button
-                onClick={() => handleGoToIncident(incident.s_no.device_id)}
+              <a
+                href={incidentIds[incident.s_no.device_id] ? `https://devs.hitachivisualization.com/incidents/${incidentIds[incident.s_no.device_id]}` : '#'}
                 className="acknowledge-btn"
                 style={{
                   marginTop: '12px',
@@ -190,10 +206,23 @@ const IncidentAlertPanal = ({ incidentData }) => {
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: '500',
-                  fontSize: '16px'
+                  fontSize: '16px',
+                  textDecoration: 'none'
+                }}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!incidentIds[incident.s_no.device_id]) {
+                    e.preventDefault();
+                    setSnackbar({
+                      open: true,
+                      message: 'Please acknowledge the alarm first to view the incident.',
+                      severity: 'warning',
+                    });
+                  }
                 }}>
                 Go to Incident
-              </button>
+              </a>
               <div style={{
                 position: 'absolute',
                 bottom: '-10px',

@@ -17,6 +17,10 @@ import gRadiation from "../assets/gRadiological.svg";
 import greyBio from "../assets/greyBio.svg";
 import greyChemical from "../assets/greyChem.svg";
 import greyRadio from "../assets/greyRadio.svg";
+import gOxygen from "../assets/gOxygen.svg";
+import gWeather from "../assets/gWeather.svg";
+import greyOxygen from "../assets/gyOxygen.svg";
+import greyWeather from "../assets/gyWeather.svg";
 
 import { routeName } from "../utils/RouteUtils";
 
@@ -145,12 +149,19 @@ const sensorPositions = {
 
 
 // Return icon by sensor type and status
-const getIconByStatus = (detector_type, status) => {
+const getIconByStatus = (detector_type, status, detector) => {
   const isActive = status === "Active";
+
   switch (detector_type) {
     case "Radiation": return isActive ? gRadiation : greyRadio;
     case "Chemical": return isActive ? gChemical : greyChemical;
     case "Biological": return isActive ? gBiological : greyBio;
+    case "Generic":
+      switch (detector) {
+        case "Oxygen": return isActive ? gOxygen : greyOxygen;
+        case "Weather": return isActive ? gWeather : greyWeather;
+        default: return null;
+      }
     default: return isActive ? gRadiation : greyRadio;
   }
 };
@@ -236,7 +247,7 @@ const IncidentSatelliteView = ({ sensorData = [] }) => {
         const position = sensorPositions[sensor.device_id];
         if (!position) return null;
 
-        const iconUrl = getIconByStatus(sensor.detector_type, sensor.status);
+        const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.detector);
         const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
         // console.log("Sensor Data:", sensor.device_id, sensor.detector, position);
 

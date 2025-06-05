@@ -12,7 +12,7 @@ import IncidentSatelliteView from "../components/IncidentSatelliteView";
 import IncidentAlertPanal from "../components/IncidentAlertPanal";
 import Breadcrumbs from "../components/Breadcrumbs";
 
-const IncidentDashboard = () => {
+const IncidentDashboard = (props) => {
   const [floorData, setFloorData] = useState([]);
   const [sensorSummaryData, setSensorSummaryData] = useState([]);
   const [incidentData, setIncidentData] = useState([]);
@@ -74,21 +74,6 @@ const IncidentDashboard = () => {
     };
   }, []);
 
-  const incidentDatatest = [
-    { "s_no": { "s_no": 1, "device_id": 1168, "alarm_status": "No Alarm", "zone": "1", "location": "At Makar Dwar (Left side)", "detector_type": "Radiation", "detector": "PRM", "status": "Active", "last_updated": "2025-05-14 15:55:48.393", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 2, "device_id": 49, "alarm_status": "Alarm", "zone": "1", "location": "At Makar Dwar (Right side)", "detector_type": "Radiation", "detector": "AGM", "status": "Active", "last_updated": "2025-05-14 15:55:48.400", "alarm_start_timestamp": "2025-05-14T15:55:48.400Z" } },
-    { "s_no": { "s_no": 3, "device_id": 1159, "alarm_status": "Alarm", "zone": "2", "location": "Near Control Room", "detector_type": "Chemical", "detector": "FCAD", "status": "Active", "last_updated": "2025-05-14 15:55:48.410", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 4, "device_id": 15, "alarm_status": "Alarm", "zone": "2", "location": "Behind Main Gate", "detector_type": "Radiation", "detector": "PRM", "status": "Active", "last_updated": "2025-05-14 15:55:48.420", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 1, "device_id": 1168, "alarm_status": "No Alarm", "zone": "1", "location": "At Makar Dwar (Left side)", "detector_type": "Radiation", "detector": "PRM", "status": "Active", "last_updated": "2025-05-14 15:55:48.393", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 2, "device_id": 49, "alarm_status": "Alarm", "zone": "1", "location": "At Makar Dwar (Right side)", "detector_type": "Radiation", "detector": "AGM", "status": "Active", "last_updated": "2025-05-14 15:55:48.400", "alarm_start_timestamp": "2025-05-14T15:55:48.400Z" } },
-    { "s_no": { "s_no": 3, "device_id": 1159, "alarm_status": "Alarm", "zone": "2", "location": "Near Control Room", "detector_type": "Chemical", "detector": "FCAD", "status": "Active", "last_updated": "2025-05-14 15:55:48.410", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 4, "device_id": 15, "alarm_status": "Alarm", "zone": "2", "location": "Behind Main Gate", "detector_type": "Radiation", "detector": "PRM", "status": "Active", "last_updated": "2025-05-14 15:55:48.420", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 1, "device_id": 1168, "alarm_status": "No Alarm", "zone": "1", "location": "At Makar Dwar (Left side)", "detector_type": "Radiation", "detector": "PRM", "status": "Active", "last_updated": "2025-05-14 15:55:48.393", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 2, "device_id": 49, "alarm_status": "Alarm", "zone": "1", "location": "At Makar Dwar (Right side)", "detector_type": "Radiation", "detector": "AGM", "status": "Active", "last_updated": "2025-05-14 15:55:48.400", "alarm_start_timestamp": "2025-05-14T15:55:48.400Z" } },
-    { "s_no": { "s_no": 3, "device_id": 1159, "alarm_status": "Alarm", "zone": "2", "location": "Near Control Room", "detector_type": "Chemical", "detector": "FCAD", "status": "Active", "last_updated": "2025-05-14 15:55:48.410", "alarm_start_timestamp": null } },
-    { "s_no": { "s_no": 4, "device_id": 15, "alarm_status": "Alarm", "zone": "2", "location": "Behind Main Gate", "detector_type": "Radiation", "detector": "PRM", "status": "Active", "last_updated": "2025-05-14 15:55:48.420", "alarm_start_timestamp": null } },
-  ]
-
   const handleTabClick = (floorName) => {
     navigate(`floorwise?floor=${floorName}`);
   };
@@ -134,19 +119,19 @@ const IncidentDashboard = () => {
           </ToggleButtonGroup>
           <Button
             onClick={handleSensorsStatusClick}
-              sx={{
-                minWidth: 150,
-                height: 54,
-                alignSelf: "center",
-                border: "1px solid #1976d2",
-                color: "#1976d2",
-                backgroundColor: "transparent",
-                "&:hover": {
-                  backgroundColor: "#1976d2",
-                  color: "#fff",
-                  border: "2px solid #1976d2",
-                  fontWeight: "bold",
-                },
+            sx={{
+              minWidth: 150,
+              height: 54,
+              alignSelf: "center",
+              border: "1px solid #1976d2",
+              color: "#1976d2",
+              backgroundColor: "transparent",
+              "&:hover": {
+                backgroundColor: "#1976d2",
+                color: "#fff",
+                border: "2px solid #1976d2",
+                fontWeight: "bold",
+              },
             }}
           >
             Sensors Status
@@ -164,7 +149,7 @@ const IncidentDashboard = () => {
           </Box>
           {/* Alert Panel Section */}
           <Box width="25%" minWidth="280px">
-            <IncidentAlertPanal incidentData={incidentData} />
+            <IncidentAlertPanal incidentData={incidentData} {...props} />
           </Box>
         </Box>
       </Box>
