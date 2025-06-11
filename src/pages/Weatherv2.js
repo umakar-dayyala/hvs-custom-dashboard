@@ -12,7 +12,7 @@ import OpacityIcon from "@mui/icons-material/Opacity";
 import CompressIcon from "@mui/icons-material/Compress";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 
-import locationImg from "../assets/location.png";
+import locationImg from "../assets/location1.svg";
 import WindRoseChart from "../components/WindRoseChart";
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import GaugeChart from "react-gauge-chart";

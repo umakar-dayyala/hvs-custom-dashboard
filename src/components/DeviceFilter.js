@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Button } from "@mui/material";
 import {
   FormControl,
   InputLabel,
@@ -8,6 +9,8 @@ import {
   Grid,
   Paper,
   Typography,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import DeviceBox from "./DeviceBox";
 import { fetchAlarmSummary } from "../service/AlarmSummaryService";
@@ -17,12 +20,12 @@ const DeviceFilter = () => {
   const [deviceData, setDeviceData] = useState([]);
   const [filteredDevices, setFilteredDevices] = useState([]);
   const [filters, setFilters] = useState({
-    floor: "",
-    zone: "",
-    location: "",
-    category: "",
-    type: "",
-    status: "",
+    floor: [],
+    zone: [],
+    location: [],
+    category: [],
+    type: [],
+    status: [],
   });
 
   const getDeviceData = async () => {
@@ -42,9 +45,10 @@ const DeviceFilter = () => {
 
   useEffect(() => {
     const filtered = deviceData.filter((device) =>
-      Object.entries(filters).every(([key, value]) =>
-        value === "" || String(device[key]).toLowerCase() === String(value).toLowerCase()
-      )
+      Object.entries(filters).every(([key, values]) => {
+        if (!values.length) return true;
+        return values.includes(String(device[key]));
+      })
     );
 
     const statusPriority = {
@@ -64,9 +68,10 @@ const DeviceFilter = () => {
   }, [filters, deviceData]);
 
   const handleFilterChange = (key) => (event) => {
+    const value = event.target.value;
     setFilters((prev) => ({
       ...prev,
-      [key]: event.target.value,
+      [key]: value,
     }));
   };
 
@@ -74,12 +79,12 @@ const DeviceFilter = () => {
     const filteredBase = deviceData.filter((device) =>
       Object.entries(filters).every(([k, v]) => {
         if (k === key) return true;
-        return v === "" || String(device[k]).toLowerCase() === String(v).toLowerCase();
+        return !v.length || v.includes(String(device[k]));
       })
     );
 
     const uniqueValues = [...new Set(filteredBase.map((d) => d[key]))];
-    return [{ value: "", label: "All" }, ...uniqueValues.map((value) => ({ value, label: value }))];
+    return uniqueValues.map((value) => ({ value, label: value }));
   };
 
   const getDevicePath = (device) => {
@@ -100,20 +105,38 @@ const DeviceFilter = () => {
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
       <Box sx={{ flexShrink: 0, zIndex: 2, backgroundColor: "background.paper" }}>
         <Paper elevation={3} sx={{ p: 3, position: "sticky", top: 0, zIndex: 1 }}>
-          <Typography variant="h6" gutterBottom>Device Filters</Typography>
+          {/* <Typography variant="h6" gutterBottom>Device Filters</Typography> */}
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h6">Device Filters</Typography>
+            <Button variant="outlined" color="primary" onClick={() => {
+              setFilters({
+                floor: [],
+                zone: [],
+                location: [],
+                category: [],
+                type: [],
+                status: [],
+              });
+            }}>
+              Clear All Filters
+            </Button>
+          </Box>
           <Grid container spacing={2}>
             {["floor", "zone", "location", "category", "type", "status"].map((key) => (
               <Grid item xs={12} sm={6} md={4} lg={2} key={key}>
                 <FormControl fullWidth>
                   <InputLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</InputLabel>
                   <Select
+                    multiple
                     value={filters[key]}
-                    label={key.charAt(0).toUpperCase() + key.slice(1)}
                     onChange={handleFilterChange(key)}
+                    renderValue={(selected) => selected.join(", ")}
+                    label={key.charAt(0).toUpperCase() + key.slice(1)}
                   >
                     {getOptions(key).map((option) => (
                       <MenuItem key={option.value} value={option.value}>
-                        {option.label}
+                        <Checkbox checked={filters[key].includes(option.value)} />
+                        <ListItemText primary={option.label} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -130,7 +153,7 @@ const DeviceFilter = () => {
         </Typography>
         <Grid container spacing={2} sx={{ px: 2, pb: 2 }}>
           {filteredDevices.map((device, index) => (
-            <Grid item xs={12} sm={6} md={6} lg={2} key={index}>
+            <Grid  item xs={12} sm={6} md={3} lg={1.5} key={index}>
               <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
                 <DeviceBox device={device} />
               </Link>

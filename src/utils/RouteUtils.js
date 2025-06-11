@@ -10,7 +10,8 @@ export const routeName = (detector) => {
       AAM: "aamIndividual",
       WRM: "wrmIndividual",
       Oxygen: "OxygenMonitoring",
-      Weather: "Weather"
+      Weather: "Weather",
+      ASM :"MABIndividual",
     };
     return routes[detector] || null;
   };

@@ -39,7 +39,7 @@ const DeviceBox = ({ device }) => {
     p: 1.5,
     height: "100%",
     minHeight: 120,
-    fontWeight: 500,
+    fontWeight: "bold",
     fontSize: { xs: "0.75rem", sm: "0.8rem", md: "0.85rem" },
     backgroundColor: getBackgroundColor(),
     color: "white",
@@ -62,7 +62,7 @@ const DeviceBox = ({ device }) => {
         noWrap
         sx={{
           fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-          width: "100%",
+          width: "100%", fontWeight:"bold",
         }}
       >
         {device.name}
@@ -101,6 +101,7 @@ const DeviceBox = ({ device }) => {
       overflow: "hidden",
       textOverflow: "ellipsis",
       maxWidth: "100%", // Prevent overflow
+      fontWeight:"bold",
     }}
     title={device.sensorName} // Tooltip for full name
   >
@@ -110,7 +111,7 @@ const DeviceBox = ({ device }) => {
   <Typography
     variant="caption"
     sx={{
-      fontSize: { xs: "1rem", sm: "1rem" },
+      fontSize: { xs: "1rem", sm: "1rem" },  fontWeight:"bold",
     }}
   >
     {device.status}

@@ -13,11 +13,23 @@ import { useNavigate } from "react-router-dom";
 import gChemical from "../assets/gChemical.svg";
 import gBiological from "../assets/gBiological.svg";
 import gRadiation from "../assets/gRadiological.svg";
-
+import alertChemical from "../assets/rChemical.svg";
+import alertBiological from "../assets/rBiological.svg";
+import alertRadiation from "../assets/rRadiological.svg";
 import greyBio from "../assets/greyBio.svg";
 import greyChemical from "../assets/greyChem.svg";
 import greyRadio from "../assets/greyRadio.svg";
-
+import aBio from "../assets/aBiological.svg";
+import aChemical from "../assets/aChemical.svg";
+import aRadiation from "../assets/aRadiological.svg";
+import aOxygen from "../assets/aOxygen.svg";
+import aWeather from "../assets/aWeather.svg";
+import gOxygen from "../assets/gOxygen.svg";
+import gWeather from "../assets/gWeather.svg";
+import alertOxygen from "../assets/rOxygen.svg";
+import alertWeather from "../assets/rWeather.svg";
+import greyOxygen from "../assets/gyOxygen.svg";
+import greyWeather from "../assets/gyWeather.svg";
 import { routeName } from "../utils/RouteUtils";
 
 const imageBounds = [[0, 0], [775, 825]];
@@ -51,13 +63,64 @@ const gatePositions = {
 };
 
 // Return icon by sensor type and status
-const getIconByStatus = (detector_type, status) => {
-  const isActive = status === "Active";
-  switch (detector_type) {
-    case "Radiation": return isActive ? gRadiation : greyRadio;
-    case "Chemical": return isActive ? gChemical : greyChemical;
-    case "Biological": return isActive ? gBiological : greyBio;
-    default: return isActive ? gRadiation : greyRadio;
+const getIconByStatus = (type, status, alarmStatus, detector) => {
+  if (alarmStatus === "Alarm") {
+    if (type === "Generic") {
+      switch (detector) {
+        case "Oxygen": return alertOxygen;
+        case "Weather": return alertWeather;
+        default: return null;
+      }
+    }
+    switch (type) {
+      case "Chemical": return alertChemical;
+      case "Biological": return alertBiological;
+      case "Radiation": return alertRadiation;
+      default: return null;
+    }
+  }
+  if (status === "Inactive" || status === "Disconnected") {
+    if (type === "Generic") {
+      switch (detector) {
+        case "Oxygen": return greyOxygen;
+        case "Weather": return greyWeather;
+        default: return null;
+      }
+    }
+    switch (type) {
+      case "Chemical": return greyChemical;
+      case "Biological": return greyBio;
+      case "Radiation": return greyRadio;
+      default: return null;
+    }
+  }
+  if (status === "Fault") {
+    if (type === "Generic") {
+      switch (detector) {
+        case "Oxygen": return aOxygen;
+        case "Weather": return aWeather;
+        default: return null;
+      }
+    }
+    switch (type) {
+      case "Chemical": return aChemical;
+      case "Biological": return aBio;
+      case "Radiation": return aRadiation;
+      default: return null;
+    }
+  }
+  if (type === "Generic") {
+    switch (detector) {
+      case "Oxygen": return gOxygen;
+      case "Weather": return gWeather;
+      default: return null;
+    }
+  }
+  switch (type) {
+    case "Chemical": return gChemical;
+    case "Biological": return gBiological;
+    case "Radiation": return gRadiation;
+    default: return null;
   }
 };
 
@@ -89,7 +152,7 @@ const createPinIcon = (imgUrl, status, alarm_status) => {
     html: `
       <div class="pin-wrapper">
         <div class="pin-body" style="background-color: ${backgroundColor};">
-          <img src="${imgUrl}" class="pin-img" style="filter: brightness(0) invert(1);" />
+          ${imgUrl ? `<img src="${imgUrl}" class="pin-img" style="filter: brightness(0) invert(1);" />` : ""}
         </div>
       </div>
     `,
@@ -143,7 +206,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         const position = sensorPositions[sensor.device_id];
         if (!position) return null;
 
-        const iconUrl = getIconByStatus(sensor.detector_type, sensor.status);
+        const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.alarm_status, sensor.detector);
         const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
 
         return (

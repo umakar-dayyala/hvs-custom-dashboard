@@ -110,7 +110,7 @@ const OperatorDashboard = () => {
   return (
     <>
       {loading && <Loader />}
-      <Box css={scrollContainer}>
+      <Box>
         {/* Sticky Header Section */}
         <Box position="sticky" top={0} zIndex={1000} bgcolor={"#f0f1f6"}>
           {/* Breadcrumbs and Toggle Section */}
@@ -148,12 +148,27 @@ const OperatorDashboard = () => {
 
 
           {/* Pass floorData to FloorCards */}
-          <Box width="100%" mt={2}>
+          <Box
+            width="100%"
+            mt={2}
+            sx={{
+              maxHeight: "calc(100vh - 300px)", // Adjust based on your header size
+              overflowY: "auto",
+              paddingRight: 1, // Optional for scrollbar space
+              "&::-webkit-scrollbar": {
+                width: "8px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#d3d3d3",
+                borderRadius: "4px",
+              },
+            }}
+          >
             <FloorCards floorData={floorData} />
           </Box>
 
           {/* Add Bottom Gap */}
-          <Box mt={1} />
+          <Box mt={3} />
         </Box>
       </Box>
     </>

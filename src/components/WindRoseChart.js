@@ -1,7 +1,7 @@
 import { HvCard } from "@hitachivantara/uikit-react-core";
 import React from "react";
 import Plot from "react-plotly.js";
-import centralvista from "../assets/centralvista.png";
+import centralvista from "../assets/new_centravista.png";
 
 /**
  * @param {Object[]}  data  array like [{ direction:"N", speed: 12 }, …]
@@ -29,7 +29,7 @@ const WindRoseChart = ({ data = [] }) => {
       style={{
         borderRadius: 0,
         boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-        height: "50vh",
+        height: "60vh",
         width: "100%",
       }}
     >
