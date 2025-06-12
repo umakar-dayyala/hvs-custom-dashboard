@@ -3,9 +3,8 @@ import { Button, Typography, Box } from "@mui/material";
 import bioicon from "../assets/blackBio.svg";
 import chemicon from "../assets/blackChemical.svg";
 import radioicon from "../assets/blackRadio.svg";
-import weathericon from "../assets/bWeather.svg"; // Assuming you have a weather icon
-import oxygenicon from "../assets/bOxygen.svg"; // Assuming you have an oxygen icon
-
+import weathericon from "../assets/bWeather.svg";
+import oxygenicon from "../assets/bOxygen.svg";
 
 const DeviceBox = ({ device }) => {
   const getBackgroundColor = () => {
@@ -32,93 +31,81 @@ const DeviceBox = ({ device }) => {
   };
 
   return (
-  <Button
-  variant="contained"
-  fullWidth
-  sx={{
-    p: 1.5,
-    height: "100%",
-    minHeight: 120,
-    fontWeight: "bold",
-    fontSize: { xs: "0.75rem", sm: "0.8rem", md: "0.85rem" },
-    backgroundColor: getBackgroundColor(),
-    color: "white",
-    "&:hover": {
-      backgroundColor: getHoverBackgroundColor(),
-    },
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "center", // 🔧 Changed from "space-between"
-    textAlign: "left",
-    gap: 1.5, // ✅ Added spacing between name and bottom block
-    transition: "background-color 0.3s ease",
-  }}
->
+    
+    <Button
+      variant="contained"
+      fullWidth
+      sx={{
+        p: 1.5,
+        height: "100%",
+        
+        fontWeight: "bold",
+        backgroundColor: getBackgroundColor(),
+        color: "white",
+        "&:hover": {
+          backgroundColor: getHoverBackgroundColor(),
+        },
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        textAlign: "left",
+        gap: 2,
+        transition: "background-color 0.3s ease",
+      }}
+    >
+      {getIcon() && (
+        <Box
+          component="img"
+          src={getIcon()}
+          alt="icon"
+          sx={{
+            width: 40,
+            height: 40,
+            filter: "invert(100%)",
+            flexShrink: 0,
+          }}
+        />
+      )}
 
-      <Typography
-        variant="subtitle2"
-        fontWeight={600}
-        noWrap
-        sx={{
-          fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-          width: "100%", fontWeight:"bold",
-        }}
-      >
-        {device.name}
-      </Typography>
+      <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <Typography
+          variant="subtitle2"
+          title={device.name}
+          sx={{
+            fontSize: { xs: "0.85rem", sm: "0.95rem" },
+            fontWeight: "bold",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {device.name}
+        </Typography>
 
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          mt: 1,
-          width: "100%",
-        }}
-      >
-        {getIcon() && (
-          <Box
-            component="img"
-            src={getIcon()}
-            alt="icon"
-            sx={{
-              width: 40,
-              height: 40,
-              filter: "invert(100%)",
-              flexShrink: 0,
-            }}
-          />
-        )}
+        <Typography
+          variant="body1"
+          title={device.sensorName}
+          sx={{
+            fontSize: "1rem",
+            fontWeight: "bold",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {device.sensorName}
+        </Typography>
 
-        <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
-  <Typography
-    variant="title"
-    sx={{
-      fontSize: { xs: "1rem", sm: "1rem" },
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      maxWidth: "100%", // Prevent overflow
-      fontWeight:"bold",
-    }}
-    title={device.sensorName} // Tooltip for full name
-  >
-    {device.sensorName}
-  </Typography>
-
-  <Typography
-    variant="caption"
-    sx={{
-      fontSize: { xs: "1rem", sm: "1rem" },  fontWeight:"bold",
-    }}
-  >
-    {device.status}
-  </Typography>
-</Box>
-
-        </Box>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: "0.9rem",
+            fontWeight: "bold",
+          }}
+        >
+          {device.status}
+        </Typography>
       </Box>
     </Button>
   );

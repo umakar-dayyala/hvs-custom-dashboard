@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@mui/material";
 import {
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -11,9 +11,12 @@ import {
   Typography,
   Checkbox,
   ListItemText,
+  Chip,
+  IconButton
 } from "@mui/material";
 import DeviceBox from "./DeviceBox";
 import { fetchAlarmSummary } from "../service/AlarmSummaryService";
+import CloseIcon from "@mui/icons-material/Close";
 import { Link } from "react-router-dom";
 
 const DeviceFilter = () => {
@@ -75,6 +78,13 @@ const DeviceFilter = () => {
     }));
   };
 
+  const clearFilterValue = (key, valueToRemove) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: prev[key].filter((val) => val !== valueToRemove),
+    }));
+  };
+
   const getOptions = (key) => {
     const filteredBase = deviceData.filter((device) =>
       Object.entries(filters).every(([k, v]) => {
@@ -101,26 +111,17 @@ const DeviceFilter = () => {
     }
   };
 
+  const hasAnyFilter = Object.values(filters).some((v) => v.length > 0);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
       <Box sx={{ flexShrink: 0, zIndex: 2, backgroundColor: "background.paper" }}>
         <Paper elevation={3} sx={{ p: 3, position: "sticky", top: 0, zIndex: 1 }}>
-          {/* <Typography variant="h6" gutterBottom>Device Filters</Typography> */}
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6">Device Filters</Typography>
-            <Button variant="outlined" color="primary" onClick={() => {
-              setFilters({
-                floor: [],
-                zone: [],
-                location: [],
-                category: [],
-                type: [],
-                status: [],
-              });
-            }}>
-              Clear All Filters
-            </Button>
+            
           </Box>
+
           <Grid container spacing={2}>
             {["floor", "zone", "location", "category", "type", "status"].map((key) => (
               <Grid item xs={12} sm={6} md={4} lg={2} key={key}>
@@ -144,16 +145,56 @@ const DeviceFilter = () => {
               </Grid>
             ))}
           </Grid>
+
+          {hasAnyFilter && (
+            <Box
+              mt={2}
+              px={1}
+              py={2}
+              sx={{
+                backgroundColor: "#fffbea",
+                borderRadius: 2,
+                border: "1px solid #ccc",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              {Object.entries(filters).map(([key, values]) =>
+                values.map((val) => (
+                  <Chip
+                    key={`${key}-${val}`}
+                    label={`${key.charAt(0).toUpperCase() + key.slice(1)}: ${val}`}
+                    onDelete={() => clearFilterValue(key, val)}
+                    sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}
+                  />
+                ))
+              )}
+              <Box ml="auto" fontWeight="bold" sx={{ cursor: "pointer" }} onClick={() =>
+                setFilters({
+                  floor: [],
+                  zone: [],
+                  location: [],
+                  category: [],
+                  type: [],
+                  status: [],
+                })
+              }>
+                Clear
+              </Box>
+            </Box>
+          )}
         </Paper>
       </Box>
 
-      <Box sx={{ flex: 1, overflowY: "auto", pt: 2 }}>
+      <Box sx={{ flex: 1, overflowY: "auto", pt: 2, pb: 20 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2, px: 2 }}>
           Devices ({filteredDevices.length})
         </Typography>
-        <Grid container spacing={2} sx={{ px: 2, pb: 2 }}>
+        <Grid container spacing={2} sx={{ px: 2 }}>
           {filteredDevices.map((device, index) => (
-            <Grid  item xs={12} sm={6} md={3} lg={1.5} key={index}>
+            <Grid item xs={12} sm={6} md={4} lg={2} xl={2} key={index}>
               <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
                 <DeviceBox device={device} />
               </Link>
