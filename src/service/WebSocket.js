@@ -30,3 +30,45 @@ export const getLiveStreamingDataForSensors = (device_id, callback) => {
 
     return eventSource; // Return EventSource so the caller can close it when done
 };
+
+// // WebSocket.js or service/WebSocket.js
+// export const getLiveStreamingDataForSensors = (deviceId, callback) => {
+//     // simulate an EventSource-like interface
+//     const interval = setInterval(() => {
+//       const dummyPacket = {
+//         parametersData: [
+//           {
+//             lastfetched: {
+//               time: new Date().toLocaleString(),
+//             },
+//             kpiData: {
+//               "Air Temperature": (20 + Math.random() * 15).toFixed(1),
+//               "Relative Humidity (%)": (40 + Math.random() * 60).toFixed(1),
+//               "Cumulative Rain (mm)": (Math.random() * 10).toFixed(2),
+//               Pressure: (990 + Math.random() * 50).toFixed(1),
+//               "Solar radiation": (Math.random() * 1000).toFixed(0),
+//             },
+//             "Direction Data": [
+//               { direction: "N", speed: Math.floor(Math.random() * 100) },
+//               { direction: "NE", speed: 0 },
+//               { direction: "E", speed: 0 },
+//               { direction: "SE", speed: 0 },
+//               { direction: "S", speed: 0 },
+//               { direction: "SW", speed: 0 },
+//               { direction: "W", speed: 0 },
+//               { direction: "NW", speed: 0 },
+//             ],
+//           },
+//         ],
+//       };
+  
+//       // simulate callback as in SSE
+//       callback(null, dummyPacket);
+//     }, 5000);
+  
+//     // return a close function to mimic EventSource.close()
+//     return {
+//       close: () => clearInterval(interval),
+//     };
+//   };
+  

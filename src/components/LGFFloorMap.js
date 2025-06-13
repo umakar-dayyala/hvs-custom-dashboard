@@ -30,13 +30,14 @@ import alertOxygen from "../assets/rOxygen.svg";
 import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
+import compassImg from "../assets/CompassIcon.png";
 import { routeName } from "../utils/RouteUtils";
 
 const imageBounds = [[0, 0], [775, 825]];
 
 // Sensor positions
 const sensorPositions = {
-  1168: [708, 230],     // AAM - 1
+  1168: [712, 231],     // AAM - 1
 };
 
 
@@ -168,6 +169,7 @@ const LGFFloorMap = ({ sensorData = [] }) => {
   };
 
   return (
+    <div style={{ position: "relative", width: "100%", height: "90vh" }}>
     <MapContainer
       crs={L.CRS.Simple}
       bounds={imageBounds}
@@ -227,6 +229,20 @@ const LGFFloorMap = ({ sensorData = [] }) => {
         );
       })}
     </MapContainer>
+        {/* Top-right corner image overlay */ }
+  <img
+  src={compassImg}
+   alt="Overlay"
+   style={{
+     position: "absolute",
+     top: "10px",
+     right: "10px",
+     width: "150px", 
+     height: "150px", 
+     zIndex: 1000,
+   }}
+ />
+</div >
   );
 };
 

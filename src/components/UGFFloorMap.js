@@ -25,52 +25,53 @@ import alertOxygen from "../assets/rOxygen.svg";
 import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
+import compassImg from "../assets/CompassIcon.png";
 import { routeName } from "../utils/RouteUtils";
 
 const imageBounds = [[0, 0], [775, 825]];
 
 // Sensor positions
 const sensorPositions = {
-  1159: [395, 113],
-  49: [400, 123],
-  15: [533, 163],
-  3: [598, 492],
-  146: [598, 486],
-  65: [592, 481],
-  2187: [588, 478],
-  2186: [620, 373],
-  33: [585, 502],
-  34: [352, 755],
-  53: [359, 745],
-  113: [350, 745],
-  145: [580, 499],
-  35: [340, 755],
-  66: [340, 745],
-  2188: [330, 745],
-  2189: [245, 565],
-  36: [135, 457],
-  2190: [139, 463],
-  90: [146, 470],
-  67: [156, 466],
-  37: [140, 450],
-  50: [146, 445],
-  2191: [117, 322],
-  38: [379, 113],
-  2192: [233, 140],
-  69: [185, 207],
-  3183: [190, 211],
-  68: [605, 263],
+ 1159: [378, 103], //1 Done
+  49: [382, 113], //2  Done
+  15: [514, 154], //3 Done
+  3: [569, 476], //4 Done
+  146: [567, 472], //5 Done
+  65: [563, 467], //6 Done
+  2187: [561, 463], //7 Done
+  2186: [586, 356], //8 Done
+  33: [561, 489], //a Done
+  34: [337, 734], //b Done
+  53: [343, 724], //c Done
+  113: [335, 724], //d Done
+  145: [549, 486], //e Done
+  35: [324, 734], //f Done
+  66: [328, 724], //g Done
+  2188: [320, 724], //h Done
+  2189: [240, 544],  //i Done
+  36: [142, 447], //j Done
+  2190: [143, 453], //k Done
+  90: [149, 457], //l Done
+  67: [157, 451], //m Done
+  37: [141, 441], //n Done
+  50: [144, 435],//o Done
+  2191: [130, 329], //p Done
+  38: [367, 108], //q Done
+  2192: [239, 134], //r Done
+  69: [182, 196], //s Done
+  3183: [188, 202], //t Done
+  68: [573, 253], //u Done
   3186: [600, 250],
   3185: [110, 257],
 };
 
 // Gate label positions
-const gatePositions = {
-  northGate: [30, 412],
-  southGate: [780, 412],
-  eastGate: [388, 810],
-  westGate: [388, 10],
-};
+// const gatePositions = {
+//   northGate: [30, 412],
+//   southGate: [780, 412],
+//   eastGate: [388, 810],
+//   westGate: [388, 10],
+// };
 
 // Return icon by sensor type, status, alarm status, and detector
 const getIconByStatus = (type, status, alarmStatus, detector) => {
@@ -201,6 +202,7 @@ const UGFFloorMap = ({ sensorData = [] }) => {
   };
 
   return (
+  <div style={{ position: "relative", width: "100%", height: "90vh" }}>
     <MapContainer
       crs={L.CRS.Simple}
       bounds={imageBounds}
@@ -212,14 +214,14 @@ const UGFFloorMap = ({ sensorData = [] }) => {
       <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}UGF_map.png`} bounds={imageBounds} />
 
       {/* Gate markers */}
-      {Object.entries(gatePositions).map(([key, position]) => (
+      {/* {Object.entries(gatePositions).map(([key, position]) => (
         <Marker
           key={key}
           position={position}
           icon={createGateIcon(key.replace(/([A-Z])/g, " $1").toUpperCase())}
           interactive={false}
         />
-      ))}
+      ))} */}
 
       {/* Sensor markers */}
       {Array.isArray(sensorData) &&
@@ -268,6 +270,20 @@ const UGFFloorMap = ({ sensorData = [] }) => {
           );
         })}
     </MapContainer>
+    {/* Top-right corner image overlay */ }
+  <img
+   src={compassImg}
+    alt="Overlay"
+    style={{
+      position: "absolute",
+      top: "10px",
+      right: "10px",
+      width: "150px", 
+      height: "150px", 
+      zIndex: 1000,
+    }}
+  />
+</div >
   );
 };
 

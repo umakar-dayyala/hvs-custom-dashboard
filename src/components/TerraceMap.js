@@ -30,6 +30,7 @@ import alertOxygen from "../assets/rOxygen.svg";
 import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
+import compassImg from "../assets/CompassIcon.png";
 
 import { routeName } from "../utils/RouteUtils";
 
@@ -38,36 +39,36 @@ const imageBounds = [[0, 0], [775, 825]];
 // Sensor positions
 const sensorPositions = {
 
-    72: [530, 130],     // AP4C - a > DONE
-    73: [620, 415],     // AP4C - b > DONE
-    2202: [620, 400],   // FCAD - c >DONE
-    74: [496, 579],     // AP4C - d > DONE
-    1148: [490, 570],   // IBAC - e > DONE
-    75: [210, 590],      // AP4C - f > 
-    122: [220, 580],    // MAB - g > 
-    76: [120, 410],     // AP4C - h > DONE
-    77: [210, 90],      // AP4C - i >DONE
-    2203: [215, 575],  // FCAD - j > 
-    2204: [200, 100],   // FCAD - k > DONE
-    9990: [210, 100],   // IBAC - l (IBAC-IBAC), pseudo device_id
-    78: [410, 310],     // AP4C - m >DONE
-    79: [410, 270],      // AP4C - n > DONE
-    123: [400, 305],    // MAB - o > DONE
-    1147: [420, 315],   // IBAC - p > DONE
-    2205: [400, 320],  // FCAD - q > DONE
-    2206: [315, 300],   // FCAD - r > DONE
-    1160: [310, 298],   // AP4C - s & w > DONE
-    1145: [320, 298],  // IBAC - t > DONE
-    124: [310, 290],   // MAB - u > DONE
-    1146: [320, 308],   // IBAC - v > DONE
+  72: [541, 101],     // AP4C - a > Done
+  73: [645, 329],     // AP4C - b > Done
+  2202: [640, 336],   // FCAD - c > Done
+  74: [488, 579],     // AP4C - d > Done
+  1148: [494, 573],   // IBAC - e > Done
+  75: [242, 589],      // AP4C - f > Done
+  122: [245, 582],    // MAB - g > Done
+  76: [128, 377],     // AP4C - h > Done
+  77: [237, 83],      // AP4C - i > Done
+  2203: [237, 589],  // FCAD - j > Done
+  2204: [237, 76],   // FCAD - k > Done
+  7: [419, 232],   // IBAC - l (IBAC-IBAC), pseudo device_id Done
+  78: [428, 272],     // AP4C - m > Done
+  79: [415, 225],      // AP4C - n > Done
+  123: [414, 252],    // MAB - o > Done
+  1147: [416, 258],   // IBAC - p > Done
+  2205: [423, 264],  // FCAD - q > Done
+  2206: [325, 260],   // FCAD - r > Done
+  1160: [329, 264],   // AP4C - s & w > Done
+  1145: [336, 270],  // IBAC - t > Done
+  124: [345, 275],   // MAB - u > Done
+  1146: [352, 261],   // IBAC - v > Done
 
-    1170: [310, 190],   // AAM (81) - 1 >DONE
-    1169: [410, 190],   // AAM (85) - 2 > DONE
-    1172: [225, 585],   // ASB - 3 >
-    1175: [420, 305],   // ASB - 4 > DONE
-    1176: [330, 290],   // ASB - 5 > DONE
-  };
-  
+  1170: [322, 153],   // AAM (81) - 1 > Done
+  1169: [427, 160],   // AAM (85) - 2 > Done
+  1172: [246, 578],   // ASB - 3 > Done
+  1175: [424, 253],   // ASB - 4 > Done
+  1176: [347, 268],   // ASB - 5 > Done
+};
+
 
 // Gate label positions
 const gatePositions = {
@@ -205,50 +206,65 @@ const FloorPlanMap = ({ sensorData = [] }) => {
   };
 
   return (
-    <MapContainer
-      crs={L.CRS.Simple}
-      bounds={imageBounds}
-      style={{ height: "90vh", width: "100%" }}
-      zoom={0}
-      minZoom={-2}
-      maxZoom={2}
-    >
-      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}Terrace_PNG.png`} bounds={imageBounds} />
+    <div style={{ position: "relative", width: "100%", height: "90vh" }}>
+      <MapContainer
+        crs={L.CRS.Simple}
+        bounds={imageBounds}
+        style={{ height: "90vh", width: "100%" }}
+        zoom={0}
+        minZoom={-2}
+        maxZoom={2}
+      >
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}Terrace_PNG.png`} bounds={imageBounds} />
 
-      {/* Sensor markers */}
-      {Array.isArray(sensorData) && sensorData.map((entry) => {
-        const sensor = entry.s_no;
-        const position = sensorPositions[sensor.device_id];
-        if (!position) return null;
+        {/* Sensor markers */}
+        {Array.isArray(sensorData) && sensorData.map((entry) => {
+          const sensor = entry.s_no;
+          const position = sensorPositions[sensor.device_id];
+          if (!position) return null;
 
-        const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.alarm_status,
-          sensor.detector);
-        const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
+          const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.alarm_status,
+            sensor.detector);
+          const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
 
-        return (
-          <Marker key={sensor.device_id} position={position} icon={icon}>
-            <Popup>
-              <div>
-                <strong
-                  style={{
-                    color: "blue",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                  }}
-                  onClick={() => handleClick(sensor)}
-                >
-                  {sensor.detector}
-                </strong>
-                <p><strong>Status:</strong> {sensor.status}</p>
-                <p><strong>Zone:</strong> {sensor.zone}</p>
-                <p><strong>Location:</strong> {sensor.location}</p>
-                <p><strong>Device ID:</strong> {sensor.device_id}</p>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </MapContainer>
+          return (
+            <Marker key={sensor.device_id} position={position} icon={icon}>
+              <Popup>
+                <div>
+                  <strong
+                    style={{
+                      color: "blue",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => handleClick(sensor)}
+                  >
+                    {sensor.detector}
+                  </strong>
+                  <p><strong>Status:</strong> {sensor.status}</p>
+                  <p><strong>Zone:</strong> {sensor.zone}</p>
+                  <p><strong>Location:</strong> {sensor.location}</p>
+                  <p><strong>Device ID:</strong> {sensor.device_id}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
+      {/* Top-right corner image overlay */}
+      <img
+        src={compassImg}
+        alt="Overlay"
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          width: "150px",
+          height: "150px",
+          zIndex: 1000,
+        }}
+      />
+    </div >
   );
 };
 

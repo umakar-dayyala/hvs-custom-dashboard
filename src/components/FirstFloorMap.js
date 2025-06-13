@@ -30,6 +30,7 @@ import alertOxygen from "../assets/rOxygen.svg";
 import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
+import compassImg from "../assets/CompassIcon.png";
 import { routeName } from "../utils/RouteUtils";
 
 const imageBounds = [[0, 0], [775, 825]];
@@ -37,29 +38,29 @@ const imageBounds = [[0, 0], [775, 825]];
 // Sensor positions
 const sensorPositions = {
 
-  2193: [495, 153],     // AP4C - 1 > DONE
-  2194: [410, 153],      // AP4C - 2 > DONE
-  2196: [480, 560],   // FCAD - 3 >DONE
-  2197: [240, 560],     // AP4C - 4 > DONE
-  2198: [210, 138],   // IBAC - 5 > DONE
-  2195: [628, 330],     // AP4C - 6 > DONE
-  51: [628, 335],   // MAB - 7 > DONE
-  2199: [540, 430],     // AP4C - 8 > DONE
-  2200: [190, 410],     // AP4C - 9 > DONE
-  2201: [360, 153],   // FCAD - a > DONE
-  39: [540, 440],   // FCAD - b >DONE
-  40: [185, 410],   // IBAC - c > DONE
-  70: [640, 225],     // AP4C - d >DONE
-  71: [135, 170],     // AP4C - e > DONE
+  2193: [511, 147],     // FCAD - 1 > Done
+  2194: [410, 159],      // FCAD - 2 > Done
+  2196: [493, 556],   // FCAD - 3 > Done
+  2197: [239, 565],     // FCAD - 4 > Done
+  2198: [201, 136],   // FCAD - 5 > Done
+  2195: [629, 330],     // FCAD - 6 > Done
+  51: [626, 336],   // AGM - 7 > Done
+  2199: [544, 440],     // FCAD - 8 > Done
+  2200: [193, 409],     // FCAD - 9 > Done
+  2201: [359, 153],   // FCAD - a > Done
+  39: [549, 445],   // PRM - b > Done
+  40: [195, 413],   // PRM - c > Done
+  70: [636, 225],     // AP4C - d >Done
+  71: [136, 177],     // AP4C - e > Done
 };
-  
+
 
 // Gate label positions
 // const gatePositions = {
-//   northGate: [30, 412],
-//   southGate: [780, 412],
-//   eastGate: [388, 810],
-//   westGate: [388, 10],
+//   northGate: [770, 412],
+//   southGate: [40, 412],
+//   eastGate: [390, 860],
+//   westGate: [388, -40],
 // };
 
 // Return icon by sensor type, status, alarm status, and detector
@@ -190,18 +191,19 @@ const FirstFloorMap = ({ sensorData = [] }) => {
   };
 
   return (
-    <MapContainer
-      crs={L.CRS.Simple}
-      bounds={imageBounds}
-      style={{ height: "90vh", width: "100%" }}
-      zoom={0}
-      minZoom={-2}
-      maxZoom={2}
-    >
-      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}First_Floor_map.png`} bounds={imageBounds} />
+    <div style={{ position: "relative", width: "100%", height: "90vh" }}>
+      <MapContainer
+        crs={L.CRS.Simple}
+        bounds={imageBounds}
+        style={{ height: "90vh", width: "100%" }}
+        zoom={0}
+        minZoom={-2}
+        maxZoom={2}
+      >
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}First_Floor_map.png`} bounds={imageBounds} />
 
-      {/* Gate markers */}
-      {/* {Object.entries(gatePositions).map(([key, position]) => (
+        {/* Gate markers */}
+        {/* {Object.entries(gatePositions).map(([key, position]) => (
         <Marker
           key={key}
           position={position}
@@ -210,44 +212,58 @@ const FirstFloorMap = ({ sensorData = [] }) => {
         />
       ))} */}
 
-      {/* Sensor markers */}
-       {Array.isArray(sensorData) && sensorData.map((entry) => {
-        const sensor = entry.s_no;
-        const position = sensorPositions[sensor.device_id];
-        if (!position) return null;
+        {/* Sensor markers */}
+        {Array.isArray(sensorData) && sensorData.map((entry) => {
+          const sensor = entry.s_no;
+          const position = sensorPositions[sensor.device_id];
+          if (!position) return null;
 
-        const iconUrl = getIconByStatus(
-          sensor.detector_type,
-          sensor.status,
-          sensor.alarm_status,
-          sensor.detector
-        );
-        const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
+          const iconUrl = getIconByStatus(
+            sensor.detector_type,
+            sensor.status,
+            sensor.alarm_status,
+            sensor.detector
+          );
+          const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
 
-        return (
-          <Marker key={sensor.device_id} position={position} icon={icon}>
-            <Popup>
-              <div>
-                <strong
-                  style={{
-                    color: "blue",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                  }}
-                  onClick={() => handleClick(sensor)}
-                >
-                  {sensor.detector}
-                </strong>
-                <p><strong>Status:</strong> {sensor.status}</p>
-                <p><strong>Zone:</strong> {sensor.zone}</p>
-                <p><strong>Location:</strong> {sensor.location}</p>
-                <p><strong>Device ID:</strong> {sensor.device_id}</p>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </MapContainer>
+          return (
+            <Marker key={sensor.device_id} position={position} icon={icon}>
+              <Popup>
+                <div>
+                  <strong
+                    style={{
+                      color: "blue",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => handleClick(sensor)}
+                  >
+                    {sensor.detector}
+                  </strong>
+                  <p><strong>Status:</strong> {sensor.status}</p>
+                  <p><strong>Zone:</strong> {sensor.zone}</p>
+                  <p><strong>Location:</strong> {sensor.location}</p>
+                  <p><strong>Device ID:</strong> {sensor.device_id}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
+      {/* Top-right corner image overlay */}
+      <img
+        src={compassImg}
+        alt="Overlay"
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          width: "150px",
+          height: "150px",
+          zIndex: 1000,
+        }}
+      />
+    </div >
   );
 };
 

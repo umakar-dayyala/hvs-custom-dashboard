@@ -37,6 +37,36 @@ import NorthUtilityMap from "../components/NorthUtility_map";
 import FloorWiseNotificationPanal from "../components/FloorWiseNotificationPanal";
 import SummaryCards from "../components/SummaryCards";
 
+const dummySensorData = {
+  devices: [
+    {
+      device_id: "device-1",
+      notifications: [
+        {
+          sensor_name: "Temperature",
+          label: "High temperature detected",
+          timestamp: "2025-06-12T10:15:00"
+        },
+        {
+          sensor_name: "Humidity",
+          label: "Low humidity level",
+          timestamp: "2025-06-12T11:00:00"
+        }
+      ]
+    },
+    {
+      device_id: "device-2",
+      notifications: [
+        {
+          sensor_name: "Gas",
+          label: "Gas leak detected",
+          timestamp: "2025-06-12 12:30:00.000"
+        }
+      ]
+    }
+  ]
+};
+
 const FloorWiseDashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();

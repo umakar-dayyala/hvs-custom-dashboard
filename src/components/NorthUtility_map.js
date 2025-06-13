@@ -30,6 +30,7 @@ import alertOxygen from "../assets/rOxygen.svg";
 import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
+import compassImg from "../assets/CompassIcon.png";
 import { routeName } from "../utils/RouteUtils";
 
 const imageBounds = [[0, 0], [775, 825]];
@@ -37,22 +38,22 @@ const imageBounds = [[0, 0], [775, 825]];
 // Sensor positions
 const sensorPositions = {
 
-    //SENSOR NAMES are not updated
-    46: [560, 160],     // AP4C - a >  
-    45: [565, 168],     // AP4C - b >  
-    1165: [565, 180],   // FCAD - c > 
-    1149: [552, 160],      // AP4C - d >  
-    127: [550, 166],   // IBAC - e >  
-    2209: [545, 172],      // AP4C - f >  
-    52: [196, 590],    // MAB - g >  
-    2210: [205, 585],     // AP4C - h >  
-    47: [210, 581],      // AP4C - i
-    1166: [215, 589],  // FCAD - j >  
-    12:[215, 593],   // FCAD - k
-    48: [210, 593],   // IBAC - l 
+  //SENSOR NAMES are not updated
+  46: [560, 162],     // PRM - a >  Done
+  45: [562, 171],     // PRM - b >  Done
+  1165: [565, 179],   // AP4C - c > Done
+  1149: [553, 163],      // AGM - d >  Done
+  127: [548, 166],   // MAB - e > Done
+  2209: [542, 172],      // FCAD - f > Done 
+  52: [205, 585],    // AGM - g >  Done
+  2210: [210, 578],     // FCAD - h > Done 
+  47: [216, 583],      // PRM - i Done
+  1166: [220, 587],  // AP4C - j >  Done
+  12: [220, 592],   // MAB - k Done but not getting data
+  48: [218, 596],   // PRM - l Done
 
 };
-  
+
 
 // Gate label positions
 const gatePositions = {
@@ -190,48 +191,63 @@ const FloorPlanMap = ({ sensorData = [] }) => {
   };
 
   return (
-    <MapContainer
-      crs={L.CRS.Simple}
-      bounds={imageBounds}
-      style={{ height: "90vh", width: "100%" }}
-      zoom={0}
-      minZoom={-2}
-      maxZoom={2}
-    >
-      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}NU_map.png`} bounds={imageBounds} />
-      {/* Sensor markers */}
-       {Array.isArray(sensorData) && sensorData.map((entry) => {
-        const sensor = entry.s_no;
-        const position = sensorPositions[sensor.device_id];
-        if (!position) return null;
+    <div style={{ position: "relative", width: "100%", height: "90vh" }}>
+      <MapContainer
+        crs={L.CRS.Simple}
+        bounds={imageBounds}
+        style={{ height: "90vh", width: "100%" }}
+        zoom={0}
+        minZoom={-2}
+        maxZoom={2}
+      >
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}NU_map.png`} bounds={imageBounds} />
+        {/* Sensor markers */}
+        {Array.isArray(sensorData) && sensorData.map((entry) => {
+          const sensor = entry.s_no;
+          const position = sensorPositions[sensor.device_id];
+          if (!position) return null;
 
-        const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.alarm_status, sensor.detector);
-        const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
+          const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.alarm_status, sensor.detector);
+          const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
 
-        return (
-          <Marker key={sensor.device_id} position={position} icon={icon}>
-            <Popup>
-              <div>
-                <strong
-                  style={{
-                    color: "blue",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                  }}
-                  onClick={() => handleClick(sensor)}
-                >
-                  {sensor.detector}
-                </strong>
-                <p><strong>Status:</strong> {sensor.status}</p>
-                <p><strong>Zone:</strong> {sensor.zone}</p>
-                <p><strong>Location:</strong> {sensor.location}</p>
-                <p><strong>Device ID:</strong> {sensor.device_id}</p>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </MapContainer>
+          return (
+            <Marker key={sensor.device_id} position={position} icon={icon}>
+              <Popup>
+                <div>
+                  <strong
+                    style={{
+                      color: "blue",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => handleClick(sensor)}
+                  >
+                    {sensor.detector}
+                  </strong>
+                  <p><strong>Status:</strong> {sensor.status}</p>
+                  <p><strong>Zone:</strong> {sensor.zone}</p>
+                  <p><strong>Location:</strong> {sensor.location}</p>
+                  <p><strong>Device ID:</strong> {sensor.device_id}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
+      {/* Top-right corner image overlay */}
+      <img
+        src={compassImg}
+        alt="Overlay"
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          width: "150px",
+          height: "150px",
+          zIndex: 1000,
+        }}
+      />
+    </div >
   );
 };
 
