@@ -1,59 +1,76 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { getRedisAlarms, /* getIncidentBySourceId, */ acknowledgeAlarm } from '../service/IncidentService';
+import {
+  subscribeToIncidentData,
+  acknowledgeAlarm
+} from '../service/IncidentService';
+
+const ACK_EXPIRE_MINUTES = 10; 
+
 
 const IncidentAlertPanal = (props) => {
+  console.log("keycloack props-->",props)
   const [alarms, setAlarms] = useState([]);
-  const [acknowledgedDevices, setAcknowledgedDevices] = useState(() => {
-    const stored = localStorage.getItem('acknowledgedAlarms');
+  const [acknowledgedIncidents, setAcknowledgedIncidents] = useState(() => {
+    const stored = localStorage.getItem('acknowledgedIncidents');
     return stored ? JSON.parse(stored) : {};
   });
-  const [incidentIds, setIncidentIds] = useState({});
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success',
   });
 
+  // Cleanup expired acknowledgments every 1 minute
   useEffect(() => {
-    localStorage.setItem('acknowledgedAlarms', JSON.stringify(acknowledgedDevices));
-  }, [acknowledgedDevices]);
+    const interval = setInterval(() => {
+      const now = new Date();
+      const updated = { ...acknowledgedIncidents };
+      let changed = false;
 
-  useEffect(() => {
-    const fetchAlarms = async () => {
-      try {
-        const response = await getRedisAlarms();
-        const data = response?.devices?.devices?.devices || [];
-        setAlarms(data);
-      } catch (error) {
-        console.error('Error fetching alarms:', error);
+      Object.entries(updated).forEach(([incidentId, data]) => {
+        const acknowledgedAt = new Date(data.timestamp);
+        const diff = (now - acknowledgedAt) / 1000 / 60;
+        if (diff > ACK_EXPIRE_MINUTES) {
+          delete updated[incidentId];
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        setAcknowledgedIncidents(updated);
+        localStorage.setItem('acknowledgedIncidents', JSON.stringify(updated));
       }
-    };
+    }, 60000);
 
-    fetchAlarms();
-    const interval = setInterval(fetchAlarms, 3000);
     return () => clearInterval(interval);
+  }, [acknowledgedIncidents]);
+
+  useEffect(() => {
+    localStorage.setItem('acknowledgedIncidents', JSON.stringify(acknowledgedIncidents));
+  }, [acknowledgedIncidents]);
+
+  useEffect(() => {
+    const eventSource = subscribeToIncidentData((data) => {
+      const deviceMap = data?.devices || {};
+      const allIncidents = Object.values(deviceMap).flat();
+      setAlarms(allIncidents);
+    });
+
+    return () => eventSource.close();
   }, []);
 
   const handleAcknowledge = async (deviceId, incidentId) => {
     try {
-      setAcknowledgedDevices((prev) => ({
+      const timestamp = new Date().toISOString();
+      setAcknowledgedIncidents((prev) => ({
         ...prev,
-        [deviceId]: true,
+        [incidentId]: { timestamp },
       }));
 
-      const timestamp = new Date().toISOString();
-
-      // const incidentResponse = await getIncidentBySourceId(incidentId, props?.keycloak?.idToken || '');
-      // const pkIncId = incidentResponse.data.pk_inc_id;
-
-      // setIncidentIds((prev) => ({
-      //   ...prev,
-      //   [deviceId]: pkIncId,
-      // }));
-
       const message = await acknowledgeAlarm(deviceId, timestamp);
+
       setSnackbar({
         open: true,
         message,
@@ -67,10 +84,11 @@ const IncidentAlertPanal = (props) => {
         severity: 'error',
       });
 
-      setAcknowledgedDevices((prev) => ({
-        ...prev,
-        [deviceId]: false,
-      }));
+      setAcknowledgedIncidents((prev) => {
+        const newState = { ...prev };
+        delete newState[incidentId];
+        return newState;
+      });
     }
   };
 
@@ -171,24 +189,6 @@ const IncidentAlertPanal = (props) => {
           animation: none !important;
           cursor: default;
         }
-
-        .incident-link {
-          display: inline-block;
-          margin-top: 10px;
-          padding: 6px 14px;
-          font-size: 14px;
-          font-weight: 500;
-          background-color: #333;
-          color: white;
-          border-radius: 6px;
-          text-decoration: none;
-          transition: all 0.3s ease;
-        }
-
-        .incident-link:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
       `}
       </style>
 
@@ -197,11 +197,13 @@ const IncidentAlertPanal = (props) => {
           alarms.map((incident) => {
             const deviceId = incident.device_id;
             const incidentId = incident.incident_id;
-            const isAcknowledged = acknowledgedDevices[deviceId];
-            // const pkIncId = incidentIds[deviceId];
+            const isAcknowledged = !!acknowledgedIncidents[incidentId];
 
             return (
-              <div key={deviceId} className={`alert-card ${!isAcknowledged ? 'active' : ''}`}>
+              <div
+                key={deviceId + incidentId}
+                className={`alert-card ${!isAcknowledged ? 'active' : ''}`}
+              >
                 <div
                   style={{
                     position: 'absolute',
@@ -221,31 +223,14 @@ const IncidentAlertPanal = (props) => {
                 <p style={{ fontSize: '14px', margin: '8px 0' }}>
                   Sensor Type - {incident.sensor_type}
                 </p>
+                <p style={{ fontSize: '14px', margin: '8px 0' }}>
+                  Sensor Type - {incident.alarm_type}
+                </p>
 
                 {isAcknowledged ? (
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '10px',
-                    }}
-                  >
-                    <button className="acknowledge-btn acknowledged" disabled>
-                      Acknowledged
-                    </button>
-                    {/* {pkIncId && (
-                      <a
-                        className="incident-link"
-                        href={`https://devs.hitachivisualization.com/incidents/${pkIncId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Go to Incident
-                      </a>
-                    )} */}
-                  </div>
+                  <button className="acknowledge-btn acknowledged" disabled>
+                    Acknowledged
+                  </button>
                 ) : (
                   <button
                     onClick={() => handleAcknowledge(deviceId, incidentId)}
@@ -259,7 +244,9 @@ const IncidentAlertPanal = (props) => {
           })
         ) : (
           <div className="no-alarm-card">
-            <h3 style={{ fontSize: '18px', margin: 0, color: '#666' }}>No Active Alarm</h3>
+            <h3 style={{ fontSize: '18px', margin: 0, color: '#666' }}>
+              No Active Alarm
+            </h3>
           </div>
         )}
       </div>
@@ -271,7 +258,11 @@ const IncidentAlertPanal = (props) => {
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         sx={{ zIndex: 1500 }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

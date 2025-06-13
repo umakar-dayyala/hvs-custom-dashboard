@@ -54,3 +54,26 @@ export const getRedisAlarms = async () => {
     throw new Error(`Failed to fetch Redis alarms: ${error.response?.status} ${error.response?.statusText} - ${error.response?.data || error.message}`);
   }
 };
+
+export const subscribeToIncidentData = (onMessage, onError) => {
+  const incidentCardURL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_SSE_STREAM_URL}:${process.env.REACT_APP_SSE_STREAM_PORT}/sse/incidentdata`;
+  const eventSource = new EventSource(incidentCardURL);
+
+  eventSource.onmessage = (event) => {
+    try {
+      const parsed = JSON.parse(event.data);
+      onMessage(parsed);
+    } catch (err) {
+      console.error("Error parsing SSE incidentdata:", err);
+    }
+  };
+
+  eventSource.onerror = (err) => {
+    console.error("SSE incidentdata connection error:", err);
+    if (onError) onError(err);
+    eventSource.close();
+  };
+
+  return eventSource;
+};
+

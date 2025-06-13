@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { keyframes } from "@emotion/react";
-import { getSensorData } from "../service/summaryServices";
+import { subscribeToSummaryCardStats } from "../service/WebSocket";
 
-// Define the scrolling animation
+// Define animations
 const scrollText = keyframes`
-  0% {
-    transform: translateX(100vw);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+  0% { transform: translateX(100vw); }
+  100% { transform: translateX(-100%); }
 `;
 
-// Define the blinking animation for alarms and normal state
 const blinkAnimation = keyframes`
   0% { opacity: 1; }
   30% { opacity: 0.5; }
@@ -24,21 +19,12 @@ const ScrollingText = () => {
   const [hasAlarm, setHasAlarm] = useState(false);
 
   useEffect(() => {
-    let interval;
-
-    const fetchData = async () => {
-      const data = await getSensorData();
-      const alarmExists = data.some(
-        (card) =>
-            card.title === "CBRN Alarms" && Number(card.value) > 0
-      );
+    const eventSource = subscribeToSummaryCardStats((data) => {
+      const alarmExists = Number(data?.cbrn_alarms || 0) > 0;
       setHasAlarm(alarmExists);
-    };
+    });
 
-    fetchData(); // Initial call
-    interval = setInterval(fetchData, 5000); // Fetch every 5 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => eventSource.close();
   }, []);
 
   const fullText = hasAlarm ? "Alarm Detected" : "No Alarm Detected";
@@ -49,16 +35,15 @@ const ScrollingText = () => {
         width: "100%",
         overflow: "hidden",
         whiteSpace: "nowrap",
-        backgroundColor: hasAlarm ? "#E30613" : "#008000", // Red for alarm, Green for no alarm
+        backgroundColor: hasAlarm ? "#E30613" : "#008000",
         padding: "8px",
         position: "relative",
-        height: "48px", 
-        border: hasAlarm ? "2px solid red" : "2px solid green", // Red border for alarm, Green for no alarm
+        height: "48px",
+        border: hasAlarm ? "2px solid red" : "2px solid green",
         borderRadius: "5px",
-        color: "white", // Text is always white
+        color: "white",
         textAlign: "center",
-        animation: hasAlarm ? `${blinkAnimation} 1s infinite` : "none", // Only blink on alarm
-        // marginTop: "10px",
+        animation: hasAlarm ? `${blinkAnimation} 1s infinite` : "none",
       }}
     >
       <Box

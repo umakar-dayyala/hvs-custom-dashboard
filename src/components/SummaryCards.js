@@ -1,34 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Typography, Grid } from "@mui/material";
-import ErrorIcon from "@mui/icons-material/Error";
 import WifiIcon from "@mui/icons-material/Wifi";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
 import WarningIcon from "@mui/icons-material/Warning";
-import { summaryData } from "../service/summaryServices";
+import { subscribeToSummaryCardStats } from "../service/WebSocket"; // adjust path as needed
 
 const SummaryCards = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    let isMounted = true;
+    const eventSource = subscribeToSummaryCardStats(setData, (err) => {
+      console.error("SSE Error:", err);
+    });
 
-    const fetchSummaryData = async () => {
-      try {
-        while (isMounted) {
-          const result = await summaryData();
-          if (isMounted) {
-            setData(result);
-          }
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-      } catch (error) {
-        console.error("Error fetching summary data:", error);
-      }
-    };
-
-    fetchSummaryData();
     return () => {
-      isMounted = false;
+      eventSource.close();
     };
   }, []);
 
@@ -53,7 +39,7 @@ const SummaryCards = () => {
             }}
           >
             <Grid container spacing={1}>
-              {["CBRN Alarms", "Chemical", "Biological", "Radiological"].map(label => (
+              {["CBRN Alarms", "Chemical", "Biological", "Radiological"].map((label) => (
                 <Grid item xs={3} key={label}>
                   <Typography variant="subtitle1" fontWeight="bold" color="#333">
                     {label}
@@ -102,7 +88,7 @@ const SummaryCards = () => {
             }}
           >
             <Grid container spacing={1}>
-              {["Total Sensor", "Chemical", "Biological", "Radiological", "Generic"].map(label => (
+              {["Total Sensor", "Chemical", "Biological", "Radiological", "Generic"].map((label) => (
                 <Grid item xs={2.4} key={label}>
                   <Typography variant="subtitle1" fontWeight="bold" color="#333">
                     {label}
@@ -181,7 +167,9 @@ const SummaryCards = () => {
                 <WarningIcon color="warning" />
               </Grid>
               <Grid item>
-                <Typography fontWeight="bold">Unhealthy: {data.unhealthy_sensors}</Typography>
+                <Typography fontWeight="bold">
+                  Unhealthy: {data.unhealthy_sensors}
+                </Typography>
               </Grid>
             </Grid>
           </Paper>
