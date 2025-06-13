@@ -28,6 +28,7 @@
     "lodash": "^4.17.21",
     "plotly.js": "^3.0.1",
     "plotly.js-basic-dist": "^3.0.1",
+    "plotly.js-dist-min": "^3.0.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.1",
     "react": "^18.3.1",

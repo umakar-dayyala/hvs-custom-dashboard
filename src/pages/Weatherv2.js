@@ -46,19 +46,19 @@ const weatherMetaMap = {
 const Weatherv2 = () => {
 
   const [locationDetails, setUdatedLocationDetails] = useState({
-        floor: 'default',
-        zone: 'default',
-        location: 'default',
-        sensorType: 'default'
-      });
+    floor: 'default',
+    zone: 'default',
+    location: 'default',
+    sensorType: 'default'
+  });
 
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 
   /* ---------- inside component ---------- */
-const deviceId = new URLSearchParams(window.location.search).get("device_id");
+  const deviceId = new URLSearchParams(window.location.search).get("device_id");
 
-/* pick the title based on deviceId */
-const locationName = deviceId === "129" ? "IG 6" : "Tango";
+  /* pick the title based on deviceId */
+  const locationName = deviceId === "129" ? "IG 6" : "Tango";
 
   /* ---------- ALWAYS declare hooks first ---------- */
   const theme = useTheme();                                    // Hook #1
@@ -79,20 +79,20 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
       const pkt = data.parametersData?.[0] ?? {};
       setKpiData(pkt.kpiData ?? {});
       setDirData(pkt["Direction Data"] ?? []);
-      setLastFetchLiveData(pkt.lastfetched.time); 
+      setLastFetchLiveData(pkt.lastfetched.time);
     });
 
     return () => es?.close();
-  }, []);     
-  
-  const setLocationDetails=(floor,zone,location,sensorType) => {
+  }, []);
+
+  const setLocationDetails = (floor, zone, location, sensorType) => {
     setUdatedLocationDetails({
       floor: floor || locationDetails.floor,
       zone: zone || locationDetails.zone,
       location: location || locationDetails.location,
       sensorType: sensorType || locationDetails.sensorType
     });
-    
+
   }// Hook #5
 
   /* ---------- convert kpiData ➜ array ---------- */
@@ -130,20 +130,20 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
     <Box p={2} width="100%">
       {/* ----- IG-6 Weather Card (full-width) ----- */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <BreadCrumbsIndividual locationDetails={locationDetails}/>
+        <BreadCrumbsIndividual locationDetails={locationDetails} />
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Box style={{ whiteSpace: "nowrap" }}>
             {LastFetchLiveData && (
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
             )}
           </Box>
-          
+
         </div>
-        
+
       </div>
       <Box mt={2}>
-            <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
-            </Box>
+        <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
+      </Box>
       <HvGrid container>
         <HvGrid item xs={12}>
           <HvCard
@@ -155,9 +155,9 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
           >
             {/* header */}
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1, p: 1 }}>
-  <img src={locationImg} alt="location" width={40} height={40} />
-  <HvTypography variant="title3">{locationName}</HvTypography>   {/* ← use it here */}
-</Box>
+              <img src={locationImg} alt="location" width={40} height={40} />
+              <HvTypography variant="title3">{locationName}</HvTypography>   {/* ← use it here */}
+            </Box>
 
 
             {/* first row (temp + humidity) */}
@@ -194,14 +194,14 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
                           {s.value}
                         </HvTypography>
                       </Box>
-                      <Box sx={{ width: 180, height: 70 }}>
+                      <Box sx={{ width: 180, height: 90 }}>
                         <GaugeChart
                           id={`g${i}`}
                           nrOfLevels={3}
                           percent={s.numeric / s.max}
                           colors={
                             s.label === "Air Temperature"
-                              ? ["#87CEEB", "#ff9300", "#FF0000"]
+                              ? ["#87CEEB", "#00a6ff", "#FF0000"]
                               : ["#87CEEB", "#00a6ff", "#1b00ff"]
                           }
                           arcWidth={0.3}
@@ -209,6 +209,13 @@ const locationName = deviceId === "129" ? "IG 6" : "Tango";
                           animate
                           formatTextValue={() => ""}
                         />
+                        {/* Show min/max only for Air Temperature */}
+                        {s.label === "Air Temperature" && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "12px", px: 1, mt: "-8px" }}>
+                            <span>0°C</span>
+                            <span>{s.max}°C</span>
+                          </Box>
+                        )}
                       </Box>
                     </Box>
                   </Box>

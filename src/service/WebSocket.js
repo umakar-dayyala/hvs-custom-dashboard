@@ -31,7 +31,7 @@ export const getLiveStreamingDataForSensors = (device_id, callback) => {
     return eventSource; // Return EventSource so the caller can close it when done
 };
 
-// // WebSocket.js or service/WebSocket.js
+// WebSocket.js or service/WebSocket.js
 // export const getLiveStreamingDataForSensors = (deviceId, callback) => {
 //     // simulate an EventSource-like interface
 //     const interval = setInterval(() => {
