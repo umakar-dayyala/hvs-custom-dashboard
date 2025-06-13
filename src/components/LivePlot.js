@@ -110,7 +110,7 @@ const LivePlot = ({ data }) => {
           }}
         />
       ) : (
-        <p>No data to plot ...</p>
+        <p></p>
       )}
     </div>
   );

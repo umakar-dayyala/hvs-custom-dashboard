@@ -6,7 +6,7 @@ import ReactApexChart from "react-apexcharts";
 import { MyContext } from "../context/MyContext";
 import { useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
-import SunburstChart from  "../components/SunburstChart";
+import SunburstChart from "../components/SunburstChart";
 // Icons
 import totalZoneIcon from "../assets/greyDirection.svg";
 import floorIcon from "../assets/rJumpToFloor.svg";
@@ -99,7 +99,7 @@ const FloorCards = ({ floorData }) => {
               enabled: true,
               formatter: (val, { seriesIndex }) => {
                 const sensorCounts = [
-                  floor.activeSensors ||0,
+                  floor.activeSensors || 0,
                   inActiveSensor || 0,
                   floor.unhealthySensors || 0,
                   totalAlarms || 0,
@@ -146,7 +146,7 @@ const FloorCards = ({ floorData }) => {
 
                   <Box
                     // bgcolor={totalAlarms > 0 ? "#E30613" : "#28A745"}
-                    bgcolor={ chartSeries.every(val => !val) ? "RGB(128, 128,128)": totalAlarms > 0 ? "#E30613" : "#28A745"}
+                    bgcolor={chartSeries.every(val => !val) ? "RGB(128, 128,128)" : totalAlarms > 0 ? "#E30613" : "#28A745"}
                     color="white"
                     px={2}
                     py={1}
@@ -173,7 +173,7 @@ const FloorCards = ({ floorData }) => {
                       </HvTypography>
                     ) : (
                       <Box display="flex" justifyContent="center" alignItems="center" width="100%">
-                        <SunburstChart floorBasedData={floor}/>
+                        <SunburstChart floorBasedData={floor} />
                         {/* <ReactApexChart
                           key={chartKey}
                           options={chartOptions}
@@ -183,13 +183,22 @@ const FloorCards = ({ floorData }) => {
                           height={140}
                         />*/}
                         <Box ml={2}>
-                          {["Healthy", "Inactive", "Unhealthy","CBRN Alarms"].map((label, i) => (
+                          {["Healthy", "Inactive", "Unhealthy", "CBRN Alarms"].map((label, i) => (
                             <Box display="flex" alignItems="center" key={label} mb={1}>
-                              <Box width={12} height={12} borderRadius="50%" bgcolor={chartColors[i]} mr={1} />
-                              <HvTypography variant="caption">{label}: {(chartSeries[i] || 0)}</HvTypography>
+                              <Box
+                                width={12}
+                                height={12}
+                                borderRadius="50%"
+                                bgcolor={chartColors[i]}
+                                mr={1}
+                              />
+                              <HvTypography variant="caption">
+                                {label}: <strong>{chartSeries[i] || 0}</strong>
+                              </HvTypography>
                             </Box>
                           ))}
                         </Box>
+
                       </Box>
                     )}
                   </Box>

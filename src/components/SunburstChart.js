@@ -4,7 +4,7 @@ import Sunburst from "sunburst-chart";
 import * as d3 from "d3";
 import "../css/sunburst.css";
 
-// ✅ Safe, local-only transition override
+// ✅ Disable all D3 transitions globally
 let d3TransitionOverridden = false;
 
 if (!d3TransitionOverridden) {
@@ -12,8 +12,13 @@ if (!d3TransitionOverridden) {
 
   const originalTransition = d3.selection.prototype.transition;
   d3.selection.prototype.transition = function (...args) {
-    const t = originalTransition.call(this, ...args);
-    return t.duration(0); // Force instant transitions
+    try {
+      const t = originalTransition.call(this, ...args);
+      return t.duration(0);
+    } catch (err) {
+      console.warn("Transition override failed:", err);
+      return this;
+    }
   };
 }
 
@@ -23,40 +28,42 @@ const SunburstChart = ({ floorBasedData }) => {
 
   const floor = floorBasedData || {};
 
+  const safeValue = (val) => (typeof val === "number" ? val : 0);
+
   const totalValue =
-    (floor.activeSensors || 0) +
-    (floor.inactiveSensors || 0) +
-    (floor.disconnected_sensors || 0) +
-    (floor.unhealthySensors || 0);
+    safeValue(floor.activeSensors) +
+    safeValue(floor.inactiveSensors) +
+    safeValue(floor.disconnected_sensors) +
+    safeValue(floor.unhealthySensors);
 
   const allValuesZero =
-    (floor.activeSensors || 0) === 0 &&
-    ((floor.inactiveSensors || 0) + (floor.disconnected_sensors || 0)) === 0 &&
-    (floor.unhealthySensors || 0) === 0 &&
-    (floor.active_alarms || 0) === 0 &&
-    (floor.unhealthy_alarms || 0) === 0;
+    safeValue(floor.activeSensors) === 0 &&
+    safeValue(floor.inactiveSensors) + safeValue(floor.disconnected_sensors) === 0 &&
+    safeValue(floor.unhealthySensors) === 0 &&
+    safeValue(floor.active_alarms) === 0 &&
+    safeValue(floor.unhealthy_alarms) === 0;
 
   const buildSunburstData = () => ({
-    name: floor.floor || "Unknown Floor",
+    name: floor.floor?.toString() || "Unknown Floor",
     children: [
       {
         name: "Healthy",
-        value: floor.activeSensors || 0,
+        value: safeValue(floor.activeSensors),
         children:
-          floor.active_alarms > 0
-            ? [{ name: "Active Alarms", value: floor.active_alarms }]
+          safeValue(floor.active_alarms) > 0
+            ? [{ name: "Active Alarms", value: safeValue(floor.active_alarms) }]
             : [],
       },
       {
         name: "Inactive",
-        value: (floor.inactiveSensors || 0) + (floor.disconnected_sensors || 0),
+        value: safeValue(floor.inactiveSensors) + safeValue(floor.disconnected_sensors),
       },
       {
         name: "Unhealthy",
-        value: floor.unhealthySensors || 0,
+        value: safeValue(floor.unhealthySensors),
         children:
-          floor.unhealthy_alarms > 0
-            ? [{ name: "Unhealthy Alarms", value: floor.unhealthy_alarms }]
+          safeValue(floor.unhealthy_alarms) > 0
+            ? [{ name: "Unhealthy Alarms", value: safeValue(floor.unhealthy_alarms) }]
             : [],
       },
     ],
@@ -74,15 +81,8 @@ const SunburstChart = ({ floorBasedData }) => {
         .data(data)
         .width(120)
         .height(120)
-        .label((d) => {
-          if (d.name === "Healthy") return ` ${d.value}`;
-          if (d.name === "Inactive") return `${d.value}`;
-          if (d.name === "Unhealthy") return ` ${d.value}`;
-          if (d.name === "Active Alarms") return ` ${d.value}`;
-          if (d.name === "Unhealthy Alarms") return ` ${d.value}`;
-          return "";
-        })
-        .tooltipContent(() => "")
+        .label((d) => ( ""))
+
         .onClick(() => null)
         .onHover((node) => {
           if (centerTextRef.current) {
@@ -107,9 +107,7 @@ const SunburstChart = ({ floorBasedData }) => {
 
     return () => {
       cancelAnimationFrame(frame);
-      if (chartRef.current) {
-        chartRef.current.innerHTML = "";
-      }
+      if (chartRef.current) chartRef.current.innerHTML = "";
     };
   }, [floor]);
 

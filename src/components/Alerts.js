@@ -1,4 +1,3 @@
-// Overview.js
 import React from "react";
 import {
   Box,
@@ -15,25 +14,37 @@ import {
 
 // Utility functions
 const statusColor = (status) => {
-  return status === "Resolved" ? "default" : "primary";
+  return status?.toLowerCase() === "resolved" ? "default" : "primary";
 };
 
 const alertTypeColor = (type) => {
-  return type === "Critical Alert" ? "error" : "default";
+  return type?.toLowerCase()?.includes("critical") ? "error" : "default";
 };
 
 const Alerts = ({ intensityData }) => {
   if (!intensityData || !intensityData.alertData) return null;
 
-  // Transform intensityData into a table-ready format
+  // Dynamically transform data for table display
   const data = Object.entries(intensityData.alertData).map(
-    ([chemicalKey, details]) => ({
-      timestamp: details.timestamp,
-      chemical: chemicalKey.charAt(0).toUpperCase() + chemicalKey.slice(1),
-      alertType: details.critical === "alert" ? "Critical Alert" : "No Alert",
-      value: `${details.value}`,
-      status: details.status,
-    })
+    ([paramKey, details]) => {
+      // Determine alert type dynamically based on any key with value 'alert'
+      const alertTypeKey = Object.entries(details || {}).find(
+        ([key, value]) =>
+          typeof value === "string" &&
+          value.toLowerCase() === "alert" &&
+          !["status", "timestamp"].includes(key.toLowerCase())
+      )?.[0];
+
+      return {
+        timestamp: details.timestamp,
+        chemical: paramKey.charAt(0).toUpperCase() + paramKey.slice(1),
+        alertType: alertTypeKey
+          ? alertTypeKey.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+          : "No Alert",
+        value: `${details.value ?? "-"}`,
+        status: details.status ?? "Unknown",
+      };
+    }
   );
 
   return (
@@ -46,7 +57,7 @@ const Alerts = ({ intensityData }) => {
           <TableHead>
             <TableRow>
               <TableCell><strong>Timestamp</strong></TableCell>
-              <TableCell><strong>Chemical</strong></TableCell>
+              <TableCell><strong>Parameter</strong></TableCell>
               <TableCell><strong>Alert Type</strong></TableCell>
               <TableCell><strong>Value</strong></TableCell>
               <TableCell><strong>Status</strong></TableCell>

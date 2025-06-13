@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -13,22 +13,38 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { HvCard } from "@hitachivantara/uikit-react-core";
 import Alerts from "./Alerts";
 
-
 const IntensityChart = ({ intensityData = {} }) => {
   const { alertData = {}, mostRecentAlert = {} } = intensityData;
   const [selectedChemical, setSelectedChemical] = useState("All Parameters");
-  const [view, setView] = useState("alerts"); // toggle between overview and alerts
+  const [view, setView] = useState("alerts");
 
   const chemicalList = ["All Parameters", ...Object.keys(alertData)];
+
+  // ✅ Dynamically extract alert types (columns)
+  const dynamicAlertTypes = useMemo(() => {
+    const sample = Object.values(alertData)?.[0];
+    if (sample) {
+      return Object.keys(sample).filter(
+        (key) =>
+          typeof sample[key] === "string" &&
+          !["status", "timestamp", "value"].includes(key.toLowerCase())
+      );
+    }
+    return [];
+  }, [alertData]);
 
   const renderAlertCircle = (value, type) => {
     const val = (value || "").toLowerCase().trim();
     let color = "#ccc";
 
     if (val === "alert") {
-      if (type === "concentration") color = "#f9b233";
-      else if (type === "instant") color = "#f9423a";
-      else if (type === "critical") color = "#891c1c";
+      // Assign custom colors if needed
+      if (type.toLowerCase().includes("concentration")) color = "#f9b233";
+      else if (type.toLowerCase().includes("instant")) color = "#f9423a";
+      else if (type.toLowerCase().includes("critical")) color = "#891c1c";
+      else if (type.toLowerCase().includes("final")) color = "#e91e63";
+      else if (type.toLowerCase().includes("preliminary")) color = "#3f51b5";
+      else color = "#f442c8";
     }
 
     return (
@@ -61,10 +77,10 @@ const IntensityChart = ({ intensityData = {} }) => {
         <Typography sx={{ width: "30%", textTransform: "capitalize" }}>
           {chemical}
         </Typography>
-        {["concentration", "instant", "critical"].map((type, idx) => (
+        {dynamicAlertTypes.map((type, idx) => (
           <Box
             key={idx}
-            sx={{ width: "22%", display: "flex", justifyContent: "center" }}
+            sx={{ width: `${70 / dynamicAlertTypes.length}%`, display: "flex", justifyContent: "center" }}
           >
             {renderAlertCircle(alerts?.[type], type)}
           </Box>
@@ -102,65 +118,22 @@ const IntensityChart = ({ intensityData = {} }) => {
             }}
           >
             {view === "alerts" ? (
-              <Alerts intensityData={intensityData}/>
+              <Alerts intensityData={intensityData} />
             ) : Object.keys(intensityData).length > 0 ? (
               <>
-                {/* Summary Cards */}
-                <Box paddingTop={2}>
-                  <Box display="flex" gap={2} flexWrap="wrap" m={2}>
-                    <Box
-                      flex={1}
-                      bgcolor="#fff3cd"
-                      p={2}
-                      borderRadius={2}
-                      minWidth={250}
-                    >
-                      <Typography fontWeight="bold">Concentration Alert</Typography>
-                      <Typography fontSize="0.875rem" mb={1}>
-                        concentration exceeds normal levels
-                      </Typography>
-                    </Box>
-
-                    <Box
-                      flex={1}
-                      bgcolor="#f8d7da"
-                      p={2}
-                      borderRadius={2}
-                      minWidth={250}
-                    >
-                      <Typography fontWeight="bold">Instant Alert</Typography>
-                      <Typography fontSize="0.875rem" mb={1}>
-                        concentration requires immediate attention
-                      </Typography>
-                    </Box>
-
-                    <Box
-                      flex={1}
-                      bgcolor="#f5c6cb"
-                      p={2}
-                      borderRadius={2}
-                      minWidth={250}
-                    >
-                      <Typography fontWeight="bold">Critical Alert</Typography>
-                      <Typography fontSize="0.875rem" mb={1}>
-                        Dangerous level reached, evacuation may be necessary
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-
                 {/* Most Recent Alert */}
-                {mostRecentAlert?.type?.toLowerCase() !== "no alert" && (
-                  <Box m={2}>
-                    <Typography variant="body2" fontWeight="bold">
-                      Most Recent Alert:
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>{mostRecentAlert.type}</strong> for{" "}
-                      {mostRecentAlert.parameter} at {mostRecentAlert.time}
-                    </Typography>
-                  </Box>
-                )}
+                {mostRecentAlert?.type?.toLowerCase() !== "no alert" &&
+                  mostRecentAlert?.type?.toLowerCase() !== "no warning triggered" && (
+                    <Box m={2}>
+                      <Typography variant="body2" fontWeight="bold">
+                        Most Recent Alert:
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>{mostRecentAlert.type}</strong> for{" "}
+                        {mostRecentAlert.parameter} at {mostRecentAlert.time}
+                      </Typography>
+                    </Box>
+                  )}
 
                 <Divider sx={{ my: 3 }} />
 
@@ -173,9 +146,7 @@ const IntensityChart = ({ intensityData = {} }) => {
                   <ToggleButtonGroup
                     value={selectedChemical}
                     exclusive
-                    onChange={(e, newVal) =>
-                      newVal && setSelectedChemical(newVal)
-                    }
+                    onChange={(e, newVal) => newVal && setSelectedChemical(newVal)}
                     size="small"
                     sx={{ mb: 2, flexWrap: "wrap" }}
                   >
@@ -196,36 +167,19 @@ const IntensityChart = ({ intensityData = {} }) => {
                     <Typography sx={{ width: "30%", fontWeight: "bold" }}>
                       Parameters
                     </Typography>
-                    <Typography
-                      sx={{
-                        width: "22%",
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        color: "#f9b233",
-                      }}
-                    >
-                      Concentration
-                    </Typography>
-                    <Typography
-                      sx={{
-                        width: "22%",
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        color: "#f9423a",
-                      }}
-                    >
-                      Instant
-                    </Typography>
-                    <Typography
-                      sx={{
-                        width: "22%",
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        color: "#891c1c",
-                      }}
-                    >
-                      Critical
-                    </Typography>
+                    {dynamicAlertTypes.map((type, i) => (
+                      <Typography
+                        key={i}
+                        sx={{
+                          width: `${70 / dynamicAlertTypes.length}%`,
+                          textAlign: "center",
+                          fontWeight: "bold",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {type.replace(/_/g, " ")}
+                      </Typography>
+                    ))}
                   </Box>
 
                   {renderAlertMatrix()}

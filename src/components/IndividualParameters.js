@@ -67,9 +67,9 @@ const excludedFromPlot = [
   "555 Mode",
   "DET 02 BG High",
   "DET 02 BG Low",
-  "DET 02 Alarm", 
+  "DET 02 Alarm",
   "DET 01 BG High",
-  "DET 01 BG Low", 
+  "DET 01 BG Low",
   "DET 01 Alarm",
   "Instrument Type",
   "Filter Change Count",
@@ -230,7 +230,7 @@ const IndividualParameters = memo(
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(auto-fill, minmax(12rem, 1fr))",
-                  gap: "1rem 1.5rem",
+                  gap: "1rem 4rem",
                 }}
               >
                 {Object.keys(subParams).map((k) => {
@@ -403,10 +403,10 @@ const IndividualParameters = memo(
                           component={Paper}
                           elevation={0}
                           style={{
-                           width: "100%",
-    maxHeight: "300px", // Limit vertical height
-    overflow: "auto",   // Add both vertical and horizontal scroll if needed
-    marginBottom: "16px",
+                            width: "100%",
+                            maxHeight: "600px", // Limit vertical height
+                            overflow: "auto",   // Add both vertical and horizontal scroll if needed
+                            marginBottom: "16px",
                           }}
                         >
                           <Table
@@ -416,9 +416,9 @@ const IndividualParameters = memo(
                             <TableBody>
                               {Object.entries(parameters)
                                 .filter(([k]) => !["HV (High Voltage)", "Exhaust Pressure", "O2 AL1 Set Point",
-                                   "CO2 AL1 Set Point", "CO AL1 Set Point", "O2 AL2 Set Point", 
-                                   "CO2 AL2 Set Point", "Input Voltage", "Internal Temperature",
-                                    "Laser Current"].includes(k)) // exclude plotted values
+                                  "CO2 AL1 Set Point", "CO AL1 Set Point", "O2 AL2 Set Point",
+                                  "CO2 AL2 Set Point", "Input Voltage", "Internal Temperature",
+                                  "Laser Current"].includes(k)) // exclude plotted values
                                 .map(([k, v]) => (
                                   <StyledTableRow key={k}>
                                     <StyledTableCell
@@ -564,7 +564,7 @@ const IndividualParameters = memo(
                                     style={{
                                       ...style,
                                       display: 'flex',
-                                      alignItems: 'flex-start', 
+                                      alignItems: 'flex-start',
                                     }}
                                   >
                                     <StyledTableCell
