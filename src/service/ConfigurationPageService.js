@@ -34,3 +34,37 @@ export const fetchDetectorParameters = async (device_id, sensor_name) => {
     throw err;
   }
 };
+
+export const fetchSensorStatusData = async () => {
+  try {
+    const url = `${API_BASE_URL}/config/getAllSensors`;
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sensor status data:", error);
+    throw error;
+  }
+};
+
+// ConfigurationPageService.js
+
+export const toggleSensorStatus = async (deviceId, action) => {
+  try {
+    const url = `${API_BASE_URL}/config/toggleSensorStatus`;
+    const payload = { device_id: deviceId, action };
+    console.log("Toggling sensor status:", payload);
+    
+    const response = await axios.post(url, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling sensor status:", error);
+    throw error;
+  }
+};
+
+

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, ToggleButton, ToggleButtonGroup, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { isEqual } from "lodash";
-
+ 
 import { floorList, summaryData, getFloorSummary } from "../service/summaryServices";
 import HorizontalDivider from "../components/HorizontalDivider";
 import Loader from "../components/Loader";
@@ -11,7 +11,7 @@ import IncidentMapView from "../components/IncidentMapView";
 import IncidentSatelliteView from "../components/IncidentSatelliteView";
 import IncidentAlertPanal from "../components/IncidentAlertPanal";
 import Breadcrumbs from "../components/Breadcrumbs";
-
+ 
 const IncidentDashboard = (props) => {
   const [floorData, setFloorData] = useState([]);
   const [sensorSummaryData, setSensorSummaryData] = useState([]);
@@ -19,12 +19,12 @@ const IncidentDashboard = (props) => {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState("satellite");
   const navigate = useNavigate();
-
+ 
   useEffect(() => {
     let isMounted = true;
     let timeout;
     let isFirstLoad = true;
-
+ 
     const defaultParams = {
       param_floor: "ALL",
       param_zone: "ALL",
@@ -33,25 +33,25 @@ const IncidentDashboard = (props) => {
       param_sensor_name: "ALL",
       param_sensor_status: "ALL",
     };
-
+ 
     const fetchData = async () => {
       if (isFirstLoad) setLoading(true);
-
+ 
       try {
         // Fetch floor list
         const floorResponse = await floorList();
         const isFloorChanged = !isEqual(floorResponse, floorData);
         if (isFloorChanged) setFloorData(floorResponse);
-
+ 
         // Fetch summary data
         const summaryResponse = await summaryData();
         const isSummaryChanged = !isEqual(summaryResponse, sensorSummaryData);
         if (isSummaryChanged) setSensorSummaryData(summaryResponse);
-
+ 
         // Fetch incident data with default parameters
         const incidentResponse = await getFloorSummary(defaultParams);
         const isIncidentChanged = !isEqual(incidentResponse, incidentData);
-
+ 
         if (isIncidentChanged) setIncidentData(incidentResponse);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -65,29 +65,29 @@ const IncidentDashboard = (props) => {
         }
       }
     };
-
+ 
     fetchData();
-
+ 
     return () => {
       isMounted = false;
       clearTimeout(timeout);
     };
   }, []);
-
+ 
   const handleTabClick = (floorName) => {
     navigate(`floorwise?floor=${floorName}`);
   };
-
+ 
   const handleViewChange = (event, newView) => {
     if (newView !== null) {
       setView(newView);
     }
   };
-
+ 
   const handleSensorsStatusClick = () => {
     navigate("/sensorStatus");
   };
-
+ 
   return (
     <>
       {loading && <Loader />}
@@ -120,9 +120,11 @@ const IncidentDashboard = (props) => {
           <Button
             onClick={handleSensorsStatusClick}
             sx={{
+              alignSelf: "flex-start", // ensures vertical alignment if inside a flex container
+              marginLeft: "auto",
               minWidth: 150,
               height: 54,
-              alignSelf: "center",
+              // alignSelf: "center",
               border: "1px solid #1976d2",
               color: "#1976d2",
               backgroundColor: "transparent",
@@ -156,5 +158,5 @@ const IncidentDashboard = (props) => {
     </>
   );
 };
-
+ 
 export default IncidentDashboard;

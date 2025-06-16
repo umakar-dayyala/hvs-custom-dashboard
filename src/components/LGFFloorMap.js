@@ -126,10 +126,12 @@ const createPinIcon = (imgUrl, status, alarm_status) => {
     }
   }
 
+  const pinClass = alarm_status === "Alarm" ? "pin-wrapper alarm-blink" : "pin-wrapper";
+
   return L.divIcon({
     className: "custom-icon",
     html: `
-      <div class="pin-wrapper">
+      <div class="${pinClass}">
         <div class="pin-body" style="background-color: ${backgroundColor};">
           ${imgUrl ? `<img src="${imgUrl}" class="pin-img" style="filter: brightness(0) invert(1);" />` : ""}
         </div>

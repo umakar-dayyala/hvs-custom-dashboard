@@ -2,35 +2,41 @@ import React, { useEffect, useRef, useState } from 'react';
 import IndividualKPI from '../components/IndividualKPI';
 import IndividualParameters from '../components/IndividualParameters';
 import { HvStack } from '@hitachivantara/uikit-react-core';
-
+import bioicon from "../assets/rOxygen.svg";
+import gbioicon from "../assets/gOxygen.svg";
+import rbell from "../assets/rbell.svg";
+import amberBell from "../assets/amberBell.svg";
+import greenBell from "../assets/greenBell.svg";
+import aicon from "../assets/aOxygen.svg";
+import greyBio from "../assets/gyOxygen.svg";
+ 
 import { Alert, Box } from '@mui/material';
-
+ 
 import Alertbar from '../components/Alertbar';
-
+ 
 import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
-
-
+ 
 const OxygenMonitor = () => {
-
+ 
   const [kpiData, setKpiData] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [param, setParam] = useState([]);
-const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
-  
-
+  const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
+ 
+ 
   const [locationDetails, setUdatedLocationDetails] = useState({
       floor: 'default',
       zone: 'default',
       location: 'default',
       sensorType: 'default'
     });
-
+ 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const deviceId = queryParams.get("device_id");
-  
+ 
     const eventSource = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
         console.error("Error receiving data:", err);
@@ -38,10 +44,10 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
         setKpiData(data.kpiData);
         setParam(data.parametersData);
         setNotifications(data.Notifications);    
-        setLastFetchLiveData(data.lastfetched.time); 
+        setLastFetchLiveData(data.lastfetched.time);
       }
     });
-  
+ 
     return () => {
       if (eventSource) {
         eventSource.close();
@@ -50,7 +56,6 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
     };
   }, []);
   
-
   const setLocationDetails=(floor,zone,location,sensorType) => {
     setUdatedLocationDetails({
       floor: floor || locationDetails.floor,
@@ -58,9 +63,9 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
       location: location || locationDetails.location,
       sensorType: sensorType || locationDetails.sensorType
     });
-    
+   
   }
-
+ 
   return (
     <Box>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -72,8 +77,8 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
     <span>Last Live Data fetched time: {LastFetchLiveData}</span>
   )}
 </Box>
-
-          
+ 
+         
          
         </div>
       </div>
@@ -83,7 +88,21 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
       <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <Box style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <HvStack direction="column" divider spacing="sm">
-           
+          <IndividualKPI
+                kpiData={kpiData}
+                ricon={bioicon}
+                gicon={gbioicon}
+                rbell={rbell}
+                amberBell={amberBell}
+                greenBell={greenBell}
+                aicon={aicon}
+                greyIcon={greyBio}
+                dummyKpiData={[
+                  { title: "Biological Alarms", value: "No Data" },
+                  { title: "Detector Health Faults", value: "No Data" },
+                  { title: "Analytics Alert", value: "No Data" }
+                ]}
+              />
             {/* <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} /> */}
           </HvStack>
           {/* <Box mt={2} style={{ display: "flex", flexDirection: "row" ,justifyContent:"flex-end"}}>
@@ -94,18 +113,18 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 <Box mt={2}>
           <IndividualParameters paramsData={param} />
           </Box>
-          
+         
         </Box>
-
+ 
        
-
+ 
        
-      
-
+     
+ 
       </Box>
-      
+     
     </Box>
   );
 }
-
-export default OxygenMonitor
+ 
+export default OxygenMonitor;

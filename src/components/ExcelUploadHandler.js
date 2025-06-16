@@ -37,7 +37,7 @@ const ExcelUploadHandler = ({ setLoading, handleShowNotification, getInventoryDa
           const requiredColumns = [
             'Asset_Type',
             'Asset_type_unique_id',
-            'Asset_Location',
+            // 'Asset_Location',
             'Asset_Status'
           ];
           console.log('Excel headers:', jsonData[0]);
@@ -57,7 +57,7 @@ const ExcelUploadHandler = ({ setLoading, handleShowNotification, getInventoryDa
             const requiredFields = {
               'Asset Type': row['Asset_Type'],
               'Asset Type Unique ID': row['Asset_type_unique_id'],
-              'Asset Location': row['Asset_Location'],
+              // 'Asset Location': row['Asset_Location'],
               'Asset Status': row['Asset_Status'],
             };
             for (const [fieldName, value] of Object.entries(requiredFields)) {
@@ -74,7 +74,7 @@ const ExcelUploadHandler = ({ setLoading, handleShowNotification, getInventoryDa
               asset_name: row['Asset_Name'] || '',
               asset_manufacterer: row['Asset_Manufacterer'] || '',
               asset_serial_number: row['Asset_Serial_Number'] || '',
-              asset_location: row['Asset_Location'] || '',
+              asset_location: row['Asset_Location'] || 'Storeroom',
               asset_status: row['Asset_Status'] || '',
               installation_date: row['installation_date'] || null,
               camc_period: row['camc_period'] || '',

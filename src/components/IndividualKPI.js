@@ -5,12 +5,12 @@ import {
   HvCardHeader,
   HvTypography,
 } from "@hitachivantara/uikit-react-core";
-
-
-
+ 
+ 
+ 
 const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
   if (!kpiData) return null;
-
+ 
   // Determine bell icon based on value and title
   const bellIcon =
     kpiData.value === "No Data"
@@ -20,7 +20,9 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
       : ["Detector Health Faults", "Analytics Alert"].includes(kpiData.title)
       ? amberBell
       : rbell;
-
+ 
+ 
+ 
   // Determine status color based on value and title
   const statusColor =
     kpiData.value === "No Data"
@@ -30,7 +32,9 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
       : ["Detector Health Faults", "Analytics Alert"].includes(kpiData.title)
       ? "#FF9933"
       : "red";
-
+ 
+ 
+ 
   return (
     <HvCard
       style={{
@@ -84,23 +88,24 @@ const IndividualKPI = ({ kpiData, rbell, amberBell, greenBell }) => {
     </HvCard>
   );
 };
-
+ 
 const KPIContainer = ({ ricon, gicon, alertIcon, kpiData, rbell, amberBell, greenBell, aicon, greyIcon, dummyKpiData }) => {
   const noData = !kpiData || kpiData.length === 0;
-
+ 
   if (noData) {
     kpiData = dummyKpiData || [];
   }
-
+ 
   // Condition checks for icon selection
   const allGreaterThanZero = kpiData.length > 0 && kpiData.every(kpi => parseInt(kpi.value) > 0);
-  const hasRiconCategory = kpiData.some(kpi => 
+  const hasRiconCategory = kpiData.some(kpi =>
     ["Chemical Alarms", "Biological Alarms", "Radiological Alarms","Chemical Alarm", "Biological Alarm", "Radiological Alarm"].includes(kpi.title) && parseInt(kpi.value) > 0
   );
-  const hasAiconCategory = kpiData.some(kpi => 
-    ["Detector Health Faults", "Analytics Alert"].includes(kpi.title) && parseInt(kpi.value) > 0
+  const hasAiconCategory = kpiData.some(kpi =>
+    // ["Detector Health Faults", "Analytics Alert"].includes(kpi.title) && parseInt(kpi.value) > 0
+    ["Detector Health Faults"].includes(kpi.title) && parseInt(kpi.value) > 0
   );
-
+ 
   // Determine the appropriate icon to display
   const iconToShow = noData
     ? greyIcon
@@ -111,7 +116,7 @@ const KPIContainer = ({ ricon, gicon, alertIcon, kpiData, rbell, amberBell, gree
     : hasAiconCategory
     ? aicon
     : gicon;
-
+ 
   return (
     <div
       style={{
@@ -135,5 +140,5 @@ const KPIContainer = ({ ricon, gicon, alertIcon, kpiData, rbell, amberBell, gree
     </div>
   );
 };
-
+ 
 export default KPIContainer;

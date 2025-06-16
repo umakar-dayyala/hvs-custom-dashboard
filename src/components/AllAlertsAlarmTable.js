@@ -242,7 +242,9 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
             filterContentProps={{ adornment: <Filters />, placeholder: null }}
           />
           <HvButton onClick={() => setSortOrder(o => (o === "asc" ? "desc" : "asc"))} variant="secondaryGhost" className={classes.sortButton}>
-            Sort ({sortOrder})
+            {/* Sort ({sortOrder}) */}
+            Sort ({sortOrder === "asc" ? "desc" : "asc"})
+
           </HvButton>
         </>
       }
@@ -290,20 +292,39 @@ const AllAlertsAlarmTable = ({ floorWiseAlertsData, onDetectorClick }) => {
             ))}
           </HvTableHead>
           <HvTableBody {...getTableBodyProps()}>
-            {[...Array(pageSize ?? 0).keys()].map(i => {
-              const row = sorted[i];
-              if (!row) return <HvTableRow key={i}><HvTableCell colSpan={columns.length} /></HvTableRow>;
-              prepareRow(row);
-              return (
-                <HvTableRow {...row.getRowProps()} key={row.getRowProps().key}>
-                  {row.cells.map(cell => (
-                    <HvTableCell {...cell.getCellProps()} key={cell.getCellProps().key}>
-                      {cell.render("Cell")}
-                    </HvTableCell>
-                  ))}
-                </HvTableRow>
-              );
-            })}
+            {page.length === 0 ? (
+              <HvTableRow>
+                <HvTableCell colSpan={columns.length} align="center">
+                  <HvTypography
+                    variant="label"
+                    style={{
+                      fontWeight: "bold",
+                      marginTop: "20px",
+                      marginBottom: "20px",
+                      display: "inline-block",
+                    }}
+                  >
+                    No Active alram and alerts found ✅.
+                  </HvTypography>
+                </HvTableCell>
+              </HvTableRow>
+            ) : (
+              [...Array(pageSize ?? 0).keys()].map(i => {
+                const row = sorted[i];
+                if (!row)
+                  return <HvTableRow key={i}><HvTableCell colSpan={columns.length} /></HvTableRow>;
+                prepareRow(row);
+                return (
+                  <HvTableRow {...row.getRowProps()} key={row.getRowProps().key}>
+                    {row.cells.map(cell => (
+                      <HvTableCell {...cell.getCellProps()} key={cell.getCellProps().key}>
+                        {cell.render("Cell")}
+                      </HvTableCell>
+                    ))}
+                  </HvTableRow>
+                );
+              })
+            )}
           </HvTableBody>
         </HvTable>
       </HvTableContainer>

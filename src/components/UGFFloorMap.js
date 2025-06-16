@@ -32,7 +32,7 @@ const imageBounds = [[0, 0], [775, 825]];
 
 // Sensor positions
 const sensorPositions = {
- 1159: [378, 103], //1 Done
+  1159: [378, 103], //1 Done
   49: [382, 113], //2  Done
   15: [514, 154], //3 Done
   3: [569, 476], //4 Done
@@ -160,10 +160,12 @@ const createPinIcon = (imgUrl, status, alarm_status) => {
     }
   }
 
+  const pinClass = alarm_status === "Alarm" ? "pin-wrapper alarm-blink" : "pin-wrapper";
+
   return L.divIcon({
     className: "custom-icon",
     html: `
-      <div class="pin-wrapper">
+      <div class="${pinClass}">
         <div class="pin-body" style="background-color: ${backgroundColor};">
           ${imgUrl ? `<img src="${imgUrl}" class="pin-img" style="filter: brightness(0) invert(1);" />` : ""}
         </div>
@@ -202,19 +204,19 @@ const UGFFloorMap = ({ sensorData = [] }) => {
   };
 
   return (
-  <div style={{ position: "relative", width: "100%", height: "90vh" }}>
-    <MapContainer
-      crs={L.CRS.Simple}
-      bounds={imageBounds}
-      style={{ height: "90vh", width: "100%" }}
-      zoom={0}
-      minZoom={-2}
-      maxZoom={2}
-    >
-      <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}UGF_map.png`} bounds={imageBounds} />
+    <div style={{ position: "relative", width: "100%", height: "90vh" }}>
+      <MapContainer
+        crs={L.CRS.Simple}
+        bounds={imageBounds}
+        style={{ height: "90vh", width: "100%" }}
+        zoom={0}
+        minZoom={-2}
+        maxZoom={2}
+      >
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}UGF_map.png`} bounds={imageBounds} />
 
-      {/* Gate markers */}
-      {/* {Object.entries(gatePositions).map(([key, position]) => (
+        {/* Gate markers */}
+        {/* {Object.entries(gatePositions).map(([key, position]) => (
         <Marker
           key={key}
           position={position}
@@ -223,67 +225,67 @@ const UGFFloorMap = ({ sensorData = [] }) => {
         />
       ))} */}
 
-      {/* Sensor markers */}
-      {Array.isArray(sensorData) &&
-        sensorData.map((entry) => {
-          const sensor = entry.s_no;
-          const position = sensorPositions[sensor.device_id];
-          if (!position) return null;
+        {/* Sensor markers */}
+        {Array.isArray(sensorData) &&
+          sensorData.map((entry) => {
+            const sensor = entry.s_no;
+            const position = sensorPositions[sensor.device_id];
+            if (!position) return null;
 
-          const iconUrl = getIconByStatus(
-            sensor.detector_type,
-            sensor.status,
-            sensor.alarm_status,
-            sensor.detector
-          );
-          const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
+            const iconUrl = getIconByStatus(
+              sensor.detector_type,
+              sensor.status,
+              sensor.alarm_status,
+              sensor.detector
+            );
+            const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
 
-          return (
-            <Marker key={sensor.device_id} position={position} icon={icon}>
-              <Popup>
-                <div>
-                  <strong
-                    style={{
-                      color: "blue",
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                    }}
-                    onClick={() => handleClick(sensor)}
-                  >
-                    {sensor.detector}
-                  </strong>
-                  <p>
-                    <strong>Status:</strong> {sensor.status}
-                  </p>
-                  <p>
-                    <strong>Device id:</strong> {sensor.device_id}
-                  </p>
-                  <p>
-                    <strong>Zone:</strong> {sensor.zone}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {sensor.location}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
-    </MapContainer>
-    {/* Top-right corner image overlay */ }
-  <img
-   src={compassImg}
-    alt="Overlay"
-    style={{
-      position: "absolute",
-      top: "10px",
-      right: "10px",
-      width: "150px", 
-      height: "150px", 
-      zIndex: 1000,
-    }}
-  />
-</div >
+            return (
+              <Marker key={sensor.device_id} position={position} icon={icon}>
+                <Popup>
+                  <div>
+                    <strong
+                      style={{
+                        color: "blue",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                      }}
+                      onClick={() => handleClick(sensor)}
+                    >
+                      {sensor.detector}
+                    </strong>
+                    <p>
+                      <strong>Status:</strong> {sensor.status}
+                    </p>
+                    <p>
+                      <strong>Device id:</strong> {sensor.device_id}
+                    </p>
+                    <p>
+                      <strong>Zone:</strong> {sensor.zone}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {sensor.location}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+      </MapContainer>
+      {/* Top-right corner image overlay */}
+      <img
+        src={compassImg}
+        alt="Overlay"
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          width: "150px",
+          height: "150px",
+          zIndex: 1000,
+        }}
+      />
+    </div >
   );
 };
 

@@ -24,3 +24,22 @@
     height: 18px;
   }
   
+  @keyframes blinkZoom {
+    0% {
+      transform: scale(1) translate(-20px, -60px);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.5) translate(-20px, -60px);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(1) translate(-20px, -60px);
+      opacity: 1;
+    }
+  }
+  
+  .alarm-blink {
+    animation: blinkZoom 2s infinite ease-in-out;
+  }
+  
