@@ -9,6 +9,7 @@ import {
 import '../css/IncidentAlertPanal.css';
 
 const IncidentAlertPanal = (props) => {
+  console.log('IncidentAlertPanal props:', props?.props?.keycloak?.token);
   const [alarms, setAlarms] = useState([]);
   const [ssedata, setsseData] = useState([]);
   const [acknowledgedIncidents, setAcknowledgedIncidents] = useState({});
@@ -46,7 +47,7 @@ const IncidentAlertPanal = (props) => {
       const timestamp = new Date().toISOString();
       const incidentResponse = await getIncidentBySourceId(
         incidentId,
-        props?.keycloak?.token || ''
+        props?.props?.keycloak?.token || ''
       );
 
       const pkIncId = incidentResponse?.data?.pk_inc_id;
