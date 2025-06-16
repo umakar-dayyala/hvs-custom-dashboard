@@ -1,0 +1,110 @@
+ @keyframes blinkAlert {
+          0% { background-color: white; }
+          50% { background-color: red; color: white; }
+          100% { background-color: white; }
+        }
+
+        @keyframes blinkButton {
+          0% { background-color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+          50% { background-color: #333; box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4), 0 0 20px rgba(211, 47, 47, 0.3); }
+          100% { background-color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        }
+
+        .alert-card {
+          border-radius: 12px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          padding: 16px;
+          position: relative;
+          width: 100%;
+          border: 2px solid #ffcdd2;
+          text-align: center;
+        }
+
+        .alert-card.active {
+          animation: blinkAlert 2s infinite;
+        }
+
+        .no-alarm-card {
+          border-radius: 12px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          padding: 16px;
+          position: relative;
+          width: 100%;
+          border: 2px solid green;
+          text-align: center;
+          min-height: 150px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .alert-scroll {
+          max-height: 85vh;
+          overflow-y: auto;
+          padding-right: 8px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .alert-scroll.no-alarm {
+          justify-content: center;
+          align-items: center;
+          min-height: 85vh;
+        }
+
+        .alert-scroll::-webkit-scrollbar {
+          display: none;
+        }
+
+        .acknowledge-btn {
+          animation: blinkButton 2s infinite;
+          transition: all 0.3s ease;
+          padding: 8px 16px;
+          background-color: #333;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: 500;
+          font-size: 16px;
+        }
+
+        .acknowledge-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(211, 47, 47, 0.5), 0 0 25px rgba(211, 47, 47, 0.4) !important;
+        }
+
+        .acknowledge-btn:active {
+          transform: translateY(0);
+        }
+
+        .acknowledged {
+          background-color: gray !important;
+          animation: none !important;
+          cursor: default;
+        }
+
+        .button-row {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 12px;
+        }
+
+        .go-btn {
+          padding: 8px 16px;
+          background-color: #1976d2;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-weight: 500;
+          font-size: 16px;
+          cursor: pointer;
+        }
+
+        .go-btn:hover {
+          background-color: #1565c0;
+        }

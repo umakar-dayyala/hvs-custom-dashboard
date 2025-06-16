@@ -3,12 +3,11 @@ import axios from 'axios';
 const API_BASE_URL = `${process.env.REACT_APP_API_PROTOCOL}://${process.env.REACT_APP_API_IP}:${process.env.REACT_APP_API_PORT}/api/floor`;
 const INCIDENT_API_URL = 'https://haproxy.hitachivisualization.com:6443/api/Incidents';
 
-export const acknowledgeAlarm = async (deviceId, timestamp, accessToken) => {
+
+export const acknowledgeAlarm = async (payload) => {
+  console.log('Acknowledging alarm with payload:', payload);
   try {
-    const response = await axios.post(`${API_BASE_URL}/postAcknowledgeAlarm`, {
-      device_id: deviceId,
-      timestamp: timestamp || new Date().toISOString(),
-    }, {
+    const response = await axios.post(`${API_BASE_URL}/storeRedisAlarm`, payload, {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -22,9 +21,9 @@ export const acknowledgeAlarm = async (deviceId, timestamp, accessToken) => {
   }
 };
 
-export const getIncidentBySourceId = async (sourceId, token) => {
+export const getIncidentBySourceId = async (incidentId, token) => {
   try {
-    const response = await axios.get(`${INCIDENT_API_URL}/getbycorrelatedentitysourceid?sourceId=${sourceId}`, {
+    const response = await axios.get(`${INCIDENT_API_URL}/getbycorrelatedentitysourceid?sourceId=${incidentId}`, {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
