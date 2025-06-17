@@ -154,6 +154,7 @@ const FloorCards = ({ floorData }) => {
                     display="flex"
                     alignItems="center"
                     justifyContent="space-between"
+                    fontSize={18}
                     gap={1}
                     mt={2}
                     mx={-2} // cancel horizontal padding
@@ -246,6 +247,8 @@ const FloorCards = ({ floorData }) => {
                         border: "1px solid #146BD2",
                         color: "#fff",
                         textTransform: "none",
+                        fontSize: "14px",
+                        // fontWeight: "bold",
                       }}
                       onClick={() => goToFloor(floor.floor)}
                     >

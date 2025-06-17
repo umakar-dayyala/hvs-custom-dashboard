@@ -84,9 +84,15 @@ const IncidentDashboard = (props) => {
     }
   };
  
+  // const handleSensorsStatusClick = () => {
+  //   navigate("/sensorStatus");
+  // };
   const handleSensorsStatusClick = () => {
-    navigate("/sensorStatus");
+    navigate("/sensorStatus", {
+      state: { from: "incident" }, 
+    });
   };
+  
  
   return (
     <>

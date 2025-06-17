@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   FormControl,
@@ -16,6 +17,7 @@ import {
 } from "@mui/material";
 import DeviceBox from "./DeviceBox";
 import { fetchAlarmSummary } from "../service/AlarmSummaryService";
+import { getMABDeviceId } from "../service/summaryServices";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link } from "react-router-dom";
 
@@ -97,7 +99,14 @@ const DeviceFilter = () => {
     return uniqueValues.map((value) => ({ value, label: value }));
   };
 
-  const getDevicePath = (device) => {
+  const navigate = useNavigate();
+
+  const handleDeviceClick = async (device) => {
+    const path = await getDevicePath(device);
+    navigate(path);
+  };
+
+  const getDevicePath = async (device) => {
     const { type2, device_id } = device;
     switch (type2) {
       case "Oxygen":
@@ -106,6 +115,16 @@ const DeviceFilter = () => {
         return `/${type2}?device_id=${device_id}`;
       case "AP4C-F":
         return `/ap4cIndividual?device_id=${device_id}`;
+      case "ASM": {
+        console.log("ASM Device ID:", device_id);
+        const mabDeviceId = await getMABDeviceId(device_id);
+        if (mabDeviceId) {
+          return `/MABIndividual?device_id=${mabDeviceId}`;
+        } else {
+          console.warn("No MAB Device ID found for ASM device:", device_id);
+          return null; //  no navigation if device_id is not found
+        }
+      }
       default:
         return `/${type2}Individual?device_id=${device_id}`;
     }
@@ -119,7 +138,7 @@ const DeviceFilter = () => {
         <Paper elevation={3} sx={{ p: 3, position: "sticky", top: 0, zIndex: 1 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6">Device Filters</Typography>
-            
+
           </Box>
 
           <Grid container spacing={2}>
@@ -195,14 +214,16 @@ const DeviceFilter = () => {
         <Grid container spacing={2} sx={{ px: 2 }}>
           {filteredDevices.map((device, index) => (
             <Grid item xs={12} sm={6} md={4} lg={2} xl={2} key={index}>
-              <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
+              {/* <Link to={getDevicePath(device)} style={{ textDecoration: "none" }}>
+                <DeviceBox device={device} /> */}
+              <Box onClick={() => handleDeviceClick(device)} sx={{ cursor: "pointer" }}>
                 <DeviceBox device={device} />
-              </Link>
+              </Box>
             </Grid>
           ))}
         </Grid>
       </Box>
-    </Box>
+    </Box >
   );
 };
 

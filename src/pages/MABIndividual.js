@@ -47,11 +47,11 @@ export const MABIndividual = React.memo(() => {
   });
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
 
-  // State to hold ASU data (replacing dummy AsmData)
+  // State to hold ASU data (replacing dummy AsmData) just changes fan_status to "Fan Status"
   const [asmData, setAsmData] = useState({
-    fan_status: "OK",
-    pump_status: "OK",
-    cyclone_fluid: "OK",
+    "Fan Status": "OK",
+    "Pump Status": "OK",
+    "Cyclone Fluid": "OK",
   });
 
   // Time range states initialized as null
@@ -130,10 +130,10 @@ export const MABIndividual = React.memo(() => {
         if (isMounted && response?.data && response.data.length > 0) {
           const asu = response.data[0];
           setAsmData({
-            fan_status: asu.fan_status ?? "N/A",
-            pump_status: asu.pump_status ?? "N/A",
-            cyclone_fluid: asu.cyclone_fluid ?? "N/A",
-          });
+            "Fan status": asu.fan_status ?? "N/A",
+            "Pump status": asu.pump_status ?? "N/A",
+            "Cyclone fluid": asu.cyclone_fluid ?? "N/A",
+          });          
         }
       } catch (error) {
         console.error("Error fetching ASU data:", error);

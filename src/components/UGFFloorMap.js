@@ -62,7 +62,7 @@ const sensorPositions = {
   3183: [188, 202], //t Done
   68: [573, 253], //u Done
   3186: [600, 250],
-  3185: [110, 257],
+  3185: [110, 257], // ASM is missing here 1171
 };
 
 // Gate label positions

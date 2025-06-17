@@ -172,6 +172,24 @@ export const getDeviceNotifications = async (deviceIds) => {
   }
 };
 
+// Fetch MAB Device ID based on ASM device ID
+export const getMABDeviceId = async (param_device_id) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/floor/getMAB`, {
+      param_device_id: param_device_id,
+    });
+
+    if (response.data && response.data.length > 0) {
+      return response.data[0].device_id;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch MAB device ID:", error);
+    return null;
+  }
+};
+
 export const getDeviceNotifications_1 = async (deviceIds) => {
   // Fake the deviceIds check if needed
   const hardcodedResponse = {

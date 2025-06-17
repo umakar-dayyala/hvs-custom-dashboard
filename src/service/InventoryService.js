@@ -192,50 +192,21 @@ export const uploadAssetsBulk = async (payload) => {
   }
 };
 
-
-/*
-// Retained but commented out unused functions for reference
-let assets = [
-  {
-    id: "1",
-    Asset_Name: "Asset-001",
-    Asset_Type: "Sensor",
-    Asset_Manufacturer: "Hitachi",
-    Asset_Serial_Number: "SN12345",
-    Asset_Location: "Storeroom",
-    Asset_Status: "Active",
-    Logged_By: "User1",
-    Logged_Date: "2024-12-20",
-    Comments: "All good",
-    Attachments: null,
-  },
-  // ... other assets
-];
-
-export const getAssets = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: 1,
-          Asset_Code: "AST-001",
-          Asset_Type: "PPE",
-          Asset_Name: "Helmet",
-          // ... other fields
-        },
-        // ... other assets
-      ]);
-    }, 500);
-  });
+export const getAssetTypes = () => {
+  return fetch(`${API_BASE_URL}/getAssetTypeSelector`)
+    .then(response => {
+      if (!response.ok) throw new Error("Failed to fetch asset types");
+      return response.json();
+    })
+    .then(data => data.data || []);
 };
 
-export const uploadAssets = (file) => {
-  console.log("Simulating upload for file:", file.name);
+export const getAssetLocations = () => {
+  return fetch(`${API_BASE_URL}//getAssetLocSelector`)
+    .then(response => {
+      if (!response.ok) throw new Error("Failed to fetch asset locations");
+      return response.json();
+    })
+    .then(data => data.data || []);
 };
-
-export const downloadAssets = () => {
-  const csv = assets.map((a) => Object.values(a).join(",")).join("\n");
-  console.log("Simulated CSV Download:\n", csv);
-};
-*/
 

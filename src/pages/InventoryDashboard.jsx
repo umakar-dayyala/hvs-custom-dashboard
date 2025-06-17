@@ -15,7 +15,7 @@ import { saveAs } from "file-saver";
 import InventoryTable from "../components/InventoryTable";
 import AssetDialog from "../components/AssetDialog";
 import ExcelUploadHandler from "../components/ExcelUploadHandler";
-import { getInventoryData, addAsset, editAsset, removeAsset, uploadAssetsBulk } from "../service/InventoryService";
+import { getInventoryData, addAsset, editAsset, removeAsset, uploadAssetsBulk, getAssetTypes, getAssetLocations } from "../service/InventoryService";
 import Loader from "../components/Loader";
 
 const InventoryDashboard = () => {
@@ -24,6 +24,8 @@ const InventoryDashboard = () => {
   const [dialog, setDialog] = useState({ type: "", open: false });
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [assetTypes, setAssetTypes] = useState([]);
+  const [assetLocations, setAssetLocations] = useState([]);
   const [formData, setFormData] = useState({
     asset_type_unique_id: "",
     asset_unique_id: "",
@@ -47,20 +49,6 @@ const InventoryDashboard = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  const assetTypes = [
-    "VRM", "WRM", "PRM", "AGM", "AP4CF", "IBAC", "MAB", "WM", "FCAD", "AAM",
-    "FTIR", "APC", "DO", "PCAD", "GCMS", "RCM", "LRGS", "LDGS", "OM", "ASU",
-    "BAT", "FIS", "ANCM", "ATR", "Area Gamma Monitor", "FPD based CWA Detector", "OTH", "Sensor"
-  ];
-
-  const assetLocations = [
-    "Storeroom",
-    "Upper Ground",
-    "Lower Ground",
-    "Terrace",
-    "Iron Gate",
-    "Other",
-  ];
   const assetStatuses = ["Active", "Inactive", "Removed"];
 
   const [filters, setFilters] = useState({
@@ -87,13 +75,19 @@ const InventoryDashboard = () => {
     (async () => {
       setLoading(true);
       try {
-        const data = await getInventoryData();
-        console.log('Initial inventory data:', data);
-        setAllRows(data);
+        const [inventoryData, typesData, locationsData] = await Promise.all([
+          getInventoryData(),
+          getAssetTypes(),
+          getAssetLocations(),
+        ]);
+        console.log('Initial inventory data:', inventoryData);
+        setAllRows(inventoryData);
+        setAssetTypes(typesData);
+        setAssetLocations(locationsData.map(loc => loc.floor));
       } catch (error) {
         setNotification({
           open: true,
-          message: "Failed to fetch inventory data",
+          message: `Error: ${error.message}`,
           severity: "error",
         });
       } finally {
@@ -111,19 +105,19 @@ const InventoryDashboard = () => {
       const allIds = allRows.map((p) => p.uniqueAssetTypeCode);
       const newSelectedIds = selectedIds.length === allIds.length ? [] : allIds;
       setSelectedIds(newSelectedIds);
-      if (newSelectedIds.length > 0) {
-        handleDialogOpen("remove_types", { type: "all", assetTypes: newSelectedIds });
-      }
+      // if (newSelectedIds.length > 0) {
+      //   handleDialogOpen("remove_types", { type: "all", assetTypes: newSelectedIds });
+      // }
     } else {
       setSelectedIds((prev) =>
         prev.includes(idsOrId)
           ? prev.filter((x) => x !== idsOrId)
           : [...prev, idsOrId]
       );
-      if (!selectedIds.includes(idsOrId)) {
-        const asset = allRows.find((p) => p.uniqueAssetTypeCode === idsOrId);
-        handleDialogOpen("remove_types", { type: "single", assetType: asset });
-      }
+      // if (!selectedIds.includes(idsOrId)) {
+      //   const asset = allRows.find((p) => p.uniqueAssetTypeCode === idsOrId);
+      //   handleDialogOpen("remove_types", { type: "single", assetType: asset });
+      // }
     }
   };
 
@@ -134,9 +128,10 @@ const InventoryDashboard = () => {
     setDialog({ type, open: true });
     setSelectedAsset(asset);
     if (type === 'add') {
+      const selectedType = asset ? assetTypes.find(t => t.unique_asset_type === asset.assetType) : null;
       setFormData({
-        asset_type_unique_id: '',
-        // asset_unique_id: '',
+        asset_type_unique_id: selectedType ? selectedType.unique_asset_type_code : '',
+        asset_unique_id: '',
         Asset_Type: asset?.assetType || '',
         Asset_Name: '',
         Asset_Manufacturer: '',
@@ -147,8 +142,7 @@ const InventoryDashboard = () => {
         camc_period: '',
         warranty_start_date: '',
         warranty_end_date: '',
-        Comments: '',
-        // Attachments: null,
+        Comments: selectedType ? selectedType.description : '',
       });
     } else if (type === "edit") {
       console.log('Editing asset:', asset);
@@ -209,9 +203,23 @@ const InventoryDashboard = () => {
       warranty_start_date: "",
       warranty_end_date: "",
       Comments: "",
-      // Attachments: null,
     });
     setSelectedIds([]);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "Asset_Type") {
+      const selectedType = assetTypes.find((type) => type.unique_asset_type === value);
+      setFormData((prev) => ({
+        ...prev,
+        Asset_Type: value,
+        asset_type_unique_id: selectedType ? selectedType.unique_asset_type_code : "",
+        Comments: selectedType ? selectedType.description : prev.Comments,
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: files ? files[0] : value }));
+    }
   };
 
   const handleDialogSubmit = async (data) => {
@@ -272,19 +280,19 @@ const InventoryDashboard = () => {
           await removeAsset(payload);
         }
         handleShowNotification('Asset(s) removed successfully');
-      } else if (dialog.type === 'remove_types') {
-        for (const typeId of data) {
-          const asset = allRows.find((p) => p.uniqueAssetTypeCode === typeId);
-          if (asset) {
-            const payload = {
-              asset_type_unique_id: asset.uniqueAssetTypeCode,
-              asset_unique_id: '',
-            };
-            console.log('Submitting remove_types payload:', JSON.stringify(payload, null, 2));
-            await removeAsset(payload);
-          }
-        }
-        handleShowNotification('Asset type(s) removed successfully');
+      // } else if (dialog.type === 'remove_types') {
+      //   for (const typeId of data) {
+      //     const asset = allRows.find((p) => p.uniqueAssetTypeCode === typeId);
+      //     if (asset) {
+      //       const payload = {
+      //         asset_type_unique_id: asset.uniqueAssetTypeCode,
+      //         asset_unique_id: '',
+      //       };
+      //       console.log('Submitting remove_types payload:', JSON.stringify(payload, null, 2));
+      //       await removeAsset(payload);
+      //     }
+      //   }
+      //   handleShowNotification('Asset type(s) removed successfully');
       } else if (dialog.type === 'edit') {
         // Validate required fields
         const requiredFields = {
@@ -343,11 +351,6 @@ const InventoryDashboard = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData((f) => ({ ...f, [name]: files ? files[0] : value }));
-  };
-
   // const handleFilterChange = (e) => {
   //   const { name, value } = e.target;
   //   setFilters((f) => ({ ...f, [name]: value }));
@@ -371,7 +374,7 @@ const InventoryDashboard = () => {
       'Comments'
     ];
     const csvRows = [
-      headers.join(','), // Header row
+      headers.join(','),
       ...allAssets.map(asset => [
         asset.asset_type_unique_id || '',
         asset.uniqueAssetID || '',
@@ -395,8 +398,9 @@ const InventoryDashboard = () => {
 
   const handleSelectChildForEdit = (child) => {
     setSelectedAsset(child);
+    const selectedType = assetTypes.find((type) => type.unique_asset_type === child.assetType);
     setFormData({
-      asset_type_unique_id: child.asset_type_unique_id || "",
+      asset_type_unique_id: child.asset_type_unique_id || (selectedType ? selectedType.unique_asset_type_code : ""),
       asset_unique_id: child.uniqueAssetID || "",
       Asset_Type: child.assetType || "",
       Asset_Name: child.asset_name || "",
@@ -408,8 +412,7 @@ const InventoryDashboard = () => {
       camc_period: child.camc_period || "",
       warranty_start_date: child.warranty_start_date || "",
       warranty_end_date: child.warranty_end_date || "",
-      Comments: child.comments || "",
-      // Attachments: null,
+      Comments: child.comments || (selectedType ? selectedType.description : ""),
     });
   };
 
@@ -528,7 +531,7 @@ const InventoryDashboard = () => {
           formData={formData}
           onChange={handleChange}
           selectedAsset={selectedAsset}
-          assetTypes={assetTypes}
+          assetTypes={assetTypes.map(type => type.unique_asset_type)}
           assetLocations={assetLocations}
           assetStatuses={assetStatuses}
           onSelectChildForEdit={handleSelectChildForEdit}

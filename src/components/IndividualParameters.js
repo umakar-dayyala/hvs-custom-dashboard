@@ -523,6 +523,39 @@ const IndividualParameters = memo(
               );
             })}
 
+            {/* ------- Optional ASM section ------- added before notification card */}
+            {AsmData && (
+              <HvCard
+                className="parameter-card"
+                elevation={0}
+                statusColor="red"
+                style={cardStyle}
+              >
+                <HvCardContent className="parameter-content">
+                  <HvTypography variant="title2" className="section-title">
+                    Air Sampler (ASM) Data
+                  </HvTypography>
+                  <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    style={{ width: "100%", overflowX: "auto" }}
+                  >
+                    <Table sx={{ minWidth: "100%" }} aria-label="asm-table">
+                      <TableBody>
+                        {Object.entries(AsmData).map(([k, v]) => (
+                          <StyledTableRow key={k}>
+                            <StyledTableCell component="th" scope="row">
+                              {k}
+                            </StyledTableCell>
+                            <StyledTableCell align="right">{v}</StyledTableCell>
+                          </StyledTableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </HvCardContent>
+              </HvCard>
+            )}
 
             {/* ------- Notifications card ------- */}
             <HvCard
@@ -611,38 +644,7 @@ const IndividualParameters = memo(
               </HvCardContent>
             </HvCard>
             {/* ------- optional ASM section ------- */}
-            {AsmData && (
-              <HvCard
-                className="parameter-card"
-                elevation={0}
-                statusColor="red"
-                style={cardStyle}
-              >
-                <HvCardContent className="parameter-content">
-                  <HvTypography variant="title2" className="section-title">
-                    ASM Data
-                  </HvTypography>
-                  <TableContainer
-                    component={Paper}
-                    elevation={0}
-                    style={{ width: "100%", overflowX: "auto" }}
-                  >
-                    <Table sx={{ minWidth: "100%" }} aria-label="asm-table">
-                      <TableBody>
-                        {Object.entries(AsmData).map(([k, v]) => (
-                          <StyledTableRow key={k}>
-                            <StyledTableCell component="th" scope="row">
-                              {k}
-                            </StyledTableCell>
-                            <StyledTableCell align="right">{v}</StyledTableCell>
-                          </StyledTableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </HvCardContent>
-              </HvCard>
-            )}
+
           </>
         )}
       </div>

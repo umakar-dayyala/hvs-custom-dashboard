@@ -92,17 +92,17 @@ const AssetDialog = ({
     onClose();
   };
 
-  const handleConfirmRemoveTypes = () => {
-    if (selectedAsset.type === "all") {
-      console.log("Removing asset types:", selectedAsset.assetTypes);
-      onSubmit(selectedAsset.assetTypes);
-    } else {
-      const typeId = selectedAsset.assetType?.uniqueAssetTypeCode;
-      console.log("Removing asset type:", typeId);
-      onSubmit([typeId].filter(Boolean));
-    }
-    onClose();
-  };
+  // const handleConfirmRemoveTypes = () => {
+  //   if (selectedAsset.type === "all") {
+  //     console.log("Removing asset types:", selectedAsset.assetTypes);
+  //     onSubmit(selectedAsset.assetTypes);
+  //   } else {
+  //     const typeId = selectedAsset.assetType?.uniqueAssetTypeCode;
+  //     console.log("Removing asset type:", typeId);
+  //     onSubmit([typeId].filter(Boolean));
+  //   }
+  //   onClose();
+  // };
 
   // Modified onChange handler to format date-time fields
   const handleChange = (e) => {
@@ -225,52 +225,52 @@ const AssetDialog = ({
       );
     }
 
-    if (type === "remove_types" && !showConfirm) {
-      return (
-        <>
-          <Typography variant="subtitle1" color="error.main">
-            Confirm remove the following asset types?
-          </Typography>
-          {selectedAsset.type === "all" ? (
-            selectedAsset.assetTypes.map((typeId) => {
-              const row = (allRows || []).find((r) => r.uniqueAssetTypeCode === typeId);
-              return (
-                <div
-                  key={typeId}
-                  style={{
-                    marginTop: 12,
-                    padding: "8px 12px",
-                    background: "#f9f9f9",
-                    borderRadius: 6,
-                  }}
-                >
-                  <strong>Asset Type:</strong> {row?.assetType || typeId}
-                  <br />
-                  <strong>Quantity:</strong> {row?.quantity || "N/A"}
-                </div>
-              );
-            })
-          ) : (
-            <div
-              style={{
-                marginTop: 12,
-                padding: "8px 12px",
-                background: "#f9f9f9",
-                borderRadius: 6,
-              }}
-            >
-              <strong>Asset Type:</strong>{" "}
-              {selectedAsset.assetType?.assetType ||
-                selectedAsset.assetType?.uniqueAssetTypeCode ||
-                "N/A"}
-              <br />
-              <strong>Quantity:</strong>{" "}
-              {selectedAsset.assetType?.quantity || "N/A"}
-            </div>
-          )}
-        </>
-      );
-    }
+    // if (type === "remove_types" && !showConfirm) {
+    //   return (
+    //     <>
+    //       <Typography variant="subtitle1" color="error.main">
+    //         Confirm remove the following asset types?
+    //       </Typography>
+    //       {selectedAsset.type === "all" ? (
+    //         selectedAsset.assetTypes.map((typeId) => {
+    //           const row = (allRows || []).find((r) => r.uniqueAssetTypeCode === typeId);
+    //           return (
+    //             <div
+    //               key={typeId}
+    //               style={{
+    //                 marginTop: 12,
+    //                 padding: "8px 12px",
+    //                 background: "#f9f9f9",
+    //                 borderRadius: 6,
+    //               }}
+    //             >
+    //               <strong>Asset Type:</strong> {row?.assetType || typeId}
+    //               <br />
+    //               <strong>Quantity:</strong> {row?.quantity || "N/A"}
+    //             </div>
+    //           );
+    //         })
+    //       ) : (
+    //         <div
+    //           style={{
+    //             marginTop: 12,
+    //             padding: "8px 12px",
+    //             background: "#f9f9f9",
+    //             borderRadius: 6,
+    //           }}
+    //         >
+    //           <strong>Asset Type:</strong>{" "}
+    //           {selectedAsset.assetType?.assetType ||
+    //             selectedAsset.assetType?.uniqueAssetTypeCode ||
+    //             "N/A"}
+    //           <br />
+    //           <strong>Quantity:</strong>{" "}
+    //           {selectedAsset.assetType?.quantity || "N/A"}
+    //         </div>
+    //       )}
+    //     </>
+    //   );
+    // }
 
     if (type === "edit" && editStep === "select") {
       const children = selectedAsset?.children?.filter((c) => c && c.uniqueAssetID) || [];
@@ -533,16 +533,16 @@ const AssetDialog = ({
         </>
       );
     }
-    if (type === "remove_types") {
-      return (
-        <>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button color="error" onClick={handleConfirmRemoveTypes}>
-            Confirm
-          </Button>
-        </>
-      );
-    }
+    // if (type === "remove_types") {
+    //   return (
+    //     <>
+    //       <Button onClick={onClose}>Cancel</Button>
+    //       <Button color="error" onClick={handleConfirmRemoveTypes}>
+    //         Confirm
+    //       </Button>
+    //     </>
+    //   );
+    // }
     if (type === "edit" && editStep === "select") {
       return (
         <>

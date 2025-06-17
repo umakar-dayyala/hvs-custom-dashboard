@@ -374,7 +374,9 @@ const FloorWiseDashboard = () => {
         <>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Breadcrumbs />
-            <div style={{ display: "flex", gap: "10px" }}></div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <SensorLegend />
+            </div>
           </div>
           <Divider style={{ border: "1px solid #E8E8E8", margin: "8px 0" }} />
           <div>

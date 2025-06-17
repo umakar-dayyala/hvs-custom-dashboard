@@ -31,7 +31,7 @@ import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
 import compassImg from "../assets/CompassIcon.png";
-
+import { getMABDeviceId } from "../service/summaryServices";
 import { routeName } from "../utils/RouteUtils";
 
 const imageBounds = [[0, 0], [775, 825]];
@@ -200,10 +200,20 @@ const FloorPlanMap = ({ sensorData = [] }) => {
   console.log("Terrace Opened:");
   const navigate = useNavigate();
 
-  const handleClick = (sensor) => {
-    const route = routeName(sensor.detector);
-    if (route) {
-      navigate(`/${route}?device_id=${sensor.device_id}`);
+  const handleClick = async (sensor) => {
+    if (sensor.detector === "ASM") {
+      const mabDeviceId = await getMABDeviceId(sensor.device_id);
+      if (mabDeviceId) {
+        navigate(`/MABIndividual?device_id=${mabDeviceId}`);
+      } else {
+        console.warn("No MAB found for ASM device:", sensor.device_id);
+        // Optional: Show a toast/snackbar to user
+      }
+    } else {
+      const route = routeName(sensor.detector);
+      if (route) {
+        navigate(`/${route}?device_id=${sensor.device_id}`);
+      }
     }
   };
 

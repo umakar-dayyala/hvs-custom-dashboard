@@ -22,6 +22,7 @@ import alertOxygen from "../assets/rOxygen.svg";
 import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
+import { getMABDeviceId } from "../service/summaryServices";
 import { routeName } from "../utils/RouteUtils";
 
 /* ---------- helpers ---------- */
@@ -92,9 +93,25 @@ const getSensorIcon = (type, status, alarmStatus, detector) => {
 const Cell = ({ sensors }) => {
   const navigate = useNavigate();
 
-  const handleClick = (sensor) => {
-    const route = routeName(sensor.detector);
-    if (route) navigate(`/${route}?device_id=${sensor.device_id}`);
+  // const handleClick = (sensor) => {
+  //   const route = routeName(sensor.detector);
+  //   if (route) navigate(`/${route}?device_id=${sensor.device_id}`);
+  // };
+  const handleClick = async (sensor) => {
+    if (sensor.detector === "ASM") {
+      const mabDeviceId = await getMABDeviceId(sensor.device_id);
+      if (mabDeviceId) {
+        navigate(`/MABIndividual?device_id=${mabDeviceId}`);
+      } else {
+        console.warn("No MAB found for ASM device:", sensor.device_id);
+        // Optional: Show a toast/snackbar to user
+      }
+    } else {
+      const route = routeName(sensor.detector);
+      if (route) {
+        navigate(`/${route}?device_id=${sensor.device_id}`);
+      }
+    }
   };
 
   const statusColor = (status, alarm_status) => {
@@ -133,7 +150,7 @@ const Cell = ({ sensors }) => {
           width="100%"
           px={0.5}
           py={0.25}
-          bgcolor={statusColor(s.status,s.alarm_status)}
+          bgcolor={statusColor(s.status, s.alarm_status)}
           sx={{ cursor: "pointer" }}
           onClick={() => handleClick(s)}
         >
