@@ -162,7 +162,7 @@ export const getFloorAlartList = async () => {
 export const getDeviceNotifications = async (deviceIds) => {
   try {
     const idsParam = deviceIds.join(',');
-    const response = await axios.get(`${API_BASE_URL}/floor/getRedisCache`, {
+    const response = await axios.get(`${API_BASE_URL}/floor/getRedisCacheForFloor`, {
       params: { device_ids: idsParam },
     });
     return response.data;

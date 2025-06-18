@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -12,15 +12,21 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { HvCard } from "@hitachivantara/uikit-react-core";
 import Alerts from "./Alerts";
-
+ 
 const IntensityChart = ({ intensityData = {} }) => {
   const { alertData = {}, mostRecentAlert = {} } = intensityData;
   const [selectedChemical, setSelectedChemical] = useState("All Parameters");
   const [view, setView] = useState("alerts");
-
+ 
+  const isEmpty = Object.keys(intensityData).length === 0;
+  const [expanded, setExpanded] = useState(!isEmpty);
+ 
+  useEffect(() => {
+    setExpanded(!isEmpty);
+  }, [isEmpty]);
+ 
   const chemicalList = ["All Parameters", ...Object.keys(alertData)];
-
-  // ✅ Dynamically extract alert types (columns)
+ 
   const dynamicAlertTypes = useMemo(() => {
     const sample = Object.values(alertData)?.[0];
     if (sample) {
@@ -32,13 +38,12 @@ const IntensityChart = ({ intensityData = {} }) => {
     }
     return [];
   }, [alertData]);
-
+ 
   const renderAlertCircle = (value, type) => {
     const val = (value || "").toLowerCase().trim();
     let color = "#ccc";
-
+ 
     if (val === "alert") {
-      // Assign custom colors if needed
       if (type.toLowerCase().includes("concentration")) color = "#f9b233";
       else if (type.toLowerCase().includes("instant")) color = "#f9423a";
       else if (type.toLowerCase().includes("critical")) color = "#891c1c";
@@ -46,7 +51,7 @@ const IntensityChart = ({ intensityData = {} }) => {
       else if (type.toLowerCase().includes("preliminary")) color = "#3f51b5";
       else color = "#f442c8";
     }
-
+ 
     return (
       <div
         style={{
@@ -59,13 +64,13 @@ const IntensityChart = ({ intensityData = {} }) => {
       />
     );
   };
-
+ 
   const renderAlertMatrix = () => {
     const filteredData =
       selectedChemical === "All Parameters"
         ? alertData
         : { [selectedChemical]: alertData[selectedChemical] };
-
+ 
     return Object.entries(filteredData).map(([chemical, alerts]) => (
       <Box
         key={chemical}
@@ -80,7 +85,11 @@ const IntensityChart = ({ intensityData = {} }) => {
         {dynamicAlertTypes.map((type, idx) => (
           <Box
             key={idx}
-            sx={{ width: `${70 / dynamicAlertTypes.length}%`, display: "flex", justifyContent: "center" }}
+            sx={{
+              width: `${70 / dynamicAlertTypes.length}%`,
+              display: "flex",
+              justifyContent: "center",
+            }}
           >
             {renderAlertCircle(alerts?.[type], type)}
           </Box>
@@ -88,9 +97,9 @@ const IntensityChart = ({ intensityData = {} }) => {
       </Box>
     ));
   };
-
+ 
   return (
-    <Accordion defaultExpanded>
+    <Accordion expanded={expanded} onChange={() => setExpanded((prev) => !prev)}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h6" fontWeight="bold">
           Intensity Estimation
@@ -98,7 +107,6 @@ const IntensityChart = ({ intensityData = {} }) => {
       </AccordionSummary>
       <AccordionDetails>
         <Box sx={{ width: "100%" }}>
-          {/* View Toggle */}
           <ToggleButtonGroup
             value={view}
             exclusive
@@ -108,7 +116,7 @@ const IntensityChart = ({ intensityData = {} }) => {
             <ToggleButton value="overview">Overview</ToggleButton>
             <ToggleButton value="alerts">Alerts</ToggleButton>
           </ToggleButtonGroup>
-
+ 
           <HvCard
             style={{
               height: "100%",
@@ -119,9 +127,8 @@ const IntensityChart = ({ intensityData = {} }) => {
           >
             {view === "alerts" ? (
               <Alerts intensityData={intensityData} />
-            ) : Object.keys(intensityData).length > 0 ? (
+            ) : !isEmpty ? (
               <>
-                {/* Most Recent Alert */}
                 {mostRecentAlert?.type?.toLowerCase() !== "no alert" &&
                   mostRecentAlert?.type?.toLowerCase() !== "no warning triggered" && (
                     <Box m={2}>
@@ -134,15 +141,14 @@ const IntensityChart = ({ intensityData = {} }) => {
                       </Typography>
                     </Box>
                   )}
-
+ 
                 <Divider sx={{ my: 3 }} />
-
-                {/* Alert Matrix */}
+ 
                 <Box m={2}>
                   <Typography variant="h6" gutterBottom>
                     Alert Matrix
                   </Typography>
-
+ 
                   <ToggleButtonGroup
                     value={selectedChemical}
                     exclusive
@@ -156,8 +162,7 @@ const IntensityChart = ({ intensityData = {} }) => {
                       </ToggleButton>
                     ))}
                   </ToggleButtonGroup>
-
-                  {/* Table Header */}
+ 
                   <Box
                     display="flex"
                     justifyContent="space-between"
@@ -181,7 +186,7 @@ const IntensityChart = ({ intensityData = {} }) => {
                       </Typography>
                     ))}
                   </Box>
-
+ 
                   {renderAlertMatrix()}
                 </Box>
               </>
@@ -198,5 +203,5 @@ const IntensityChart = ({ intensityData = {} }) => {
     </Accordion>
   );
 };
-
+ 
 export default IntensityChart;
