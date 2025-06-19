@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Chip from '@mui/material/Chip';
 import {
   subscribeToIncidentData,
   acknowledgeAlarm,
@@ -9,11 +10,10 @@ import {
 import '../css/IncidentAlertPanal.css';
 
 const IncidentAlertPanal = (props) => {
-  console.log('IncidentAlertPanal props:', props?.props?.keycloak?.token);
   const [alarms, setAlarms] = useState([]);
-  const [ssedata, setsseData] = useState([]);
   const [acknowledgedIncidents, setAcknowledgedIncidents] = useState({});
   const [incidentPkMap, setIncidentPkMap] = useState({});
+  const [pollingIntervals, setPollingIntervals] = useState({});
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -22,7 +22,6 @@ const IncidentAlertPanal = (props) => {
 
   useEffect(() => {
     const eventSource = subscribeToIncidentData((data) => {
-      setsseData(data);
       const deviceMap = data?.devices || {};
       const newIncidents = Object.values(deviceMap).flat();
       setAlarms((prevAlarms) => {
@@ -41,6 +40,12 @@ const IncidentAlertPanal = (props) => {
 
     return () => eventSource.close();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      Object.values(pollingIntervals).forEach(clearInterval);
+    };
+  }, [pollingIntervals]);
 
   const handleAcknowledge = async (deviceId, incidentId, alarm_type) => {
     try {
@@ -69,7 +74,6 @@ const IncidentAlertPanal = (props) => {
       const message = await acknowledgeAlarm(payload);
       setSnackbar({ open: true, message, severity: 'success' });
 
-      // Save acknowledged status and pkIncId
       setAcknowledgedIncidents((prev) => ({
         ...prev,
         [incidentId]: true,
@@ -79,6 +83,56 @@ const IncidentAlertPanal = (props) => {
         ...prev,
         [incidentId]: pkIncId,
       }));
+
+      if (!pollingIntervals[incidentId]) {
+        const intervalId = setInterval(async () => {
+          try {
+            // console.log(`Polling for incident ${incidentId}...`);
+            const res = await getIncidentBySourceId(
+              incidentId,
+              props?.props?.keycloak?.token || ''
+            );
+            const latestStatusId = res?.data?.fk_inc_status_id;
+
+            if (latestStatusId && latestStatusId !== fk_inc_status_id) {
+              const updatedPayload = {
+                device_id: deviceId || '',
+                incident_id: incidentId || '',
+                alarm_type: alarm_type || '',
+                pkIncId: pkIncId,
+                fk_inc_status_id: latestStatusId,
+                timestamp: new Date().toISOString(),
+              };
+
+              const updateMessage = await acknowledgeAlarm(updatedPayload);
+              setSnackbar({
+                open: true,
+                message: updateMessage,
+                severity: 'info',
+              });
+
+              clearInterval(pollingIntervals[incidentId]);
+              setPollingIntervals((prev) => {
+                const updated = { ...prev };
+                delete updated[incidentId];
+                return updated;
+              });
+
+              setAcknowledgedIncidents((prev) => ({
+                ...prev,
+                [incidentId]: true,
+              }));
+            }
+          } catch (err) {
+            console.error(`Polling error for ${incidentId}:`, err.message);
+          }
+        }, 60000);
+
+        setPollingIntervals((prev) => ({
+          ...prev,
+          [incidentId]: intervalId,
+        }));
+      }
     } catch (error) {
       console.error('Acknowledgment error:', error.message);
       setSnackbar({
@@ -95,7 +149,7 @@ const IncidentAlertPanal = (props) => {
 
   return (
     <>
-      <div className={`alert-scroll ${alarms.length === 0 ? 'no-alarm' : ''}`}>
+      <div className={`alert-scroll ${alarms.length === 0 ? 'no-alarm' : ''}`} style={{ padding: '16px' }}>
         {alarms.length > 0 ? (
           alarms.map((incident) => {
             const {
@@ -107,10 +161,8 @@ const IncidentAlertPanal = (props) => {
               location,
               ack_status,
               pk_inc_id,
-              fk_inc_status_id
+              incident_status,
             } = incident;
-
-           console.log(`pk_inc_id for incident ${incident_id}:`, pk_inc_id);
 
             const isAcknowledged =
               acknowledgedIncidents[incident_id] || ack_status === '1';
@@ -118,47 +170,82 @@ const IncidentAlertPanal = (props) => {
             return (
               <div
                 key={device_id + incident_id}
-                className={`alert-card ${!isAcknowledged ? 'active' : ''}`}
+                className="alert-card"
+                style={{
+                  background: '#fdfdfd',
+                  borderRadius: '12px',
+                  padding: '20px',
+                  marginBottom: '16px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                  borderLeft:  '6px solid #f44336',
+                  position: 'relative',
+                }}
               >
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: '-12px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '26px',
-                    height: '14px',
-                    backgroundColor: '#ffcdd2',
-                    clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-                    zIndex: 1,
-                  }}
-                />
-                <h3 style={{ fontSize: '18px', margin: 0 }}>
-                  {sensor_name} Alarm - {location || 'Unknown Location'}
+                <h3 style={{ fontSize: '20px', marginBottom: '8px', color: '#333' }}>
+                  🚨 {sensor_name} - {location || 'Unknown Location'}
                 </h3>
-                <p style={{ fontSize: '14px', margin: '8px 0' }}>
-                  Sensor Type - {sensor_type}
+                <p style={{ fontSize: '14px', margin: '4px 0', color: '#555' }}>
+                  <strong>Sensor Type:</strong> {sensor_type}
                 </p>
-                <p style={{ fontSize: '14px', margin: '8px 0' }}>
-                  Alarm Type - {alarm_type || 'Unknown'}
+                <p style={{ fontSize: '14px', margin: '4px 0', color: '#555' }}>
+                  <strong>Alarm Type:</strong> {alarm_type || 'Unknown'}
                 </p>
 
-                <div className="button-row">
+                <Chip
+  label={`Incident Status: ${incident_status || 'N/A'}`}
+  color={
+    (() => {
+      const status = (incident_status || '').toLowerCase();
+      if (status === 'new incident') return 'error';
+      if (status === 'open') return 'warning';
+      if (status === 'closed') return 'success';
+      if (status === 'withdrawn') return 'default';
+      return 'default';
+    })()
+  }
+  variant="outlined"
+  size="small"
+  sx={{ marginTop: '8px', textTransform: 'capitalize' }}
+/>
+
+
+                <div className="button-row" style={{ marginTop: '16px', display: 'flex', gap: '10px' }}>
                   {isAcknowledged ? (
                     <>
-                      <button className="acknowledge-btn acknowledged" disabled>
-                        Acknowledged
+                      <button
+                        className="acknowledge-btn acknowledged"
+                        disabled
+                        style={{
+                          backgroundColor: '#c8e6c9',
+                          border: 'none',
+                          color: 'white',
+                          padding: '8px 16px',
+                          borderRadius: '4px',
+                          fontWeight: 'bold',
+                          pointerEvents: 'none',
+                        }}
+                      >
+                        ✅ Acknowledged
                       </button>
                       <button
                         className="go-btn"
                         onClick={() =>
                           window.open(
-                            `https://devs.hitachivisualization.com/incidents/${incident.pk_inc_id|| ''}`,
+                            `https://devs.hitachivisualization.com/incidents/${pk_inc_id || ''}`,
                             '_blank'
                           )
                         }
+                        style={{
+                          backgroundColor: '#1976d2',
+                          color: '#fff',
+                          border: 'none',
+                          padding: '8px 16px',
+                          borderRadius: '4px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                        }}
                       >
-                        Go to Incident
+                        🔗 Go to Incident
                       </button>
                     </>
                   ) : (
@@ -167,6 +254,15 @@ const IncidentAlertPanal = (props) => {
                         handleAcknowledge(device_id, incident_id, alarm_type)
                       }
                       className="acknowledge-btn"
+                      style={{
+                        backgroundColor: '#f44336',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                      }}
                     >
                       Acknowledge Alarm
                     </button>
@@ -178,7 +274,7 @@ const IncidentAlertPanal = (props) => {
         ) : (
           <div className="no-alarm-card">
             <h3 style={{ fontSize: '18px', margin: 0, color: '#666' }}>
-              No Active Alarm
+              ✅ No Active Alarm
             </h3>
           </div>
         )}
