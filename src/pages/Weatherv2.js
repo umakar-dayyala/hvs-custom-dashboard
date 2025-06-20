@@ -18,10 +18,11 @@ import { getLiveStreamingDataForSensors } from "../service/WebSocket";
 import GaugeChart from "react-gauge-chart";
 import BreadCrumbsIndividual from "../components/BreadCrumbsIndividual";
 import Alertbar from "../components/Alertbar";
+import MemoGauge from "./MemoGauge";
 
 /* ---------- static meta for each KPI ---------- */
 const weatherMetaMap = {
-  "Air Temperature": {
+  "Air Temperature (C)": {
     icon: <ThermostatIcon sx={{ color: "red", fontSize: 60 }} />,
     max: 50,
   },
@@ -33,70 +34,90 @@ const weatherMetaMap = {
     icon: <OpacityIcon sx={{ color: "skyblue", fontSize: 60 }} />,
     max: 100,
   },
-  Pressure: {
+  "Pressure (hPa)": {
     icon: <CompressIcon sx={{ color: "skyblue", fontSize: 60 }} />,
     max: 1100,
   },
-  "Solar radiation": {
+  "Solar radiation (wt per sqm)": {
     icon: <WbSunnyIcon color="warning" sx={{ fontSize: 60 }} />,
     max: 1000,
   },
 };
 
 const Weatherv2 = () => {
-
-  const [locationDetails, setUdatedLocationDetails] = useState({
-    floor: 'default',
-    zone: 'default',
-    location: 'default',
-    sensorType: 'default'
+  const [locationDetails, setUpdatedLocationDetails] = useState({
+    floor: "default",
+    zone: "default",
+    location: "default",
+    sensorType: "default",
   });
 
   const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"));
 
-  /* ---------- inside component ---------- */
-  const deviceId = new URLSearchParams(window.location.search).get("device_id");
+  const [kpiData, setKpiData] = useState({});
+  const [dirData, setDirData] = useState([]);
+  const [dataBuffer, setDataBuffer] = useState({});
 
-  /* pick the title based on deviceId */
+  const deviceId = useMemo(
+    () => new URLSearchParams(window.location.search).get("device_id"),
+    []
+  );
+
   const locationName = deviceId === "129" ? "IG 6" : "Tango";
 
-  /* ---------- ALWAYS declare hooks first ---------- */
-  const theme = useTheme();                                    // Hook #1
-  const isXs = useMediaQuery(theme.breakpoints.down("sm"));   // Hook #2
-
-  const [kpiData, setKpiData] = useState({});                 // Hook #3
-  const [dirData, setDirData] = useState([]);                 // Hook #4
-
-  /* ---------- SSE subscription ---------- */
   useEffect(() => {
-    const deviceId = new URLSearchParams(window.location.search).get("device_id");
+    const smoothValue = (key, newValue, bufferSize = 5) => {
+      const prev = dataBuffer[key] || [];
+      const updated = [...prev, parseFloat(newValue)].slice(-bufferSize);
+      const avg = updated.reduce((a, b) => a + b, 0) / updated.length;
+      return [avg.toFixed(2), updated];
+    };
 
     const es = getLiveStreamingDataForSensors(deviceId, (err, data) => {
       if (err) {
         console.error("Live-weather error:", err);
         return;
       }
+
       const pkt = data.parametersData?.[0] ?? {};
-      setKpiData(pkt.kpiData ?? {});
+      const rawKpiData = pkt.kpiData ?? {};
+      const smoothedKpi = {};
+      const newBuffer = { ...dataBuffer };
+
+      for (const key in rawKpiData) {
+        const val = rawKpiData[key];
+        if (!isNaN(val) && val !== "") {
+          const [avg, buffer] = smoothValue(key, val);
+          smoothedKpi[key] = avg;
+          newBuffer[key] = buffer;
+        } else {
+          smoothedKpi[key] = val;
+        }
+      }
+
+      setDataBuffer(newBuffer);
+      setKpiData(smoothedKpi);
       setDirData(pkt["Direction Data"] ?? []);
-      setLastFetchLiveData(pkt.lastfetched.time);
+      if (data.lastfetched?.time) {
+        setLastFetchLiveData(data.lastfetched.time);
+      }
     });
 
     return () => es?.close();
-  }, []);
+  }, [deviceId, dataBuffer]);
 
   const setLocationDetails = (floor, zone, location, sensorType) => {
-    setUdatedLocationDetails({
+    setUpdatedLocationDetails({
       floor: floor || locationDetails.floor,
       zone: zone || locationDetails.zone,
       location: location || locationDetails.location,
-      sensorType: sensorType || locationDetails.sensorType
+      sensorType: sensorType || locationDetails.sensorType,
     });
+  };
 
-  }// Hook #5
-
-  /* ---------- convert kpiData ➜ array ---------- */
-  const stats = useMemo(                                       // Hook #6
+  const stats = useMemo(
     () =>
       Object.entries(kpiData).map(([label, value]) => {
         const meta = weatherMetaMap[label] || {};
@@ -112,7 +133,6 @@ const Weatherv2 = () => {
     [kpiData]
   );
 
-  /* ---------- EARLY RETURN (after hooks) ---------- */
   if (!stats.length) {
     return (
       <Box p={2}>
@@ -121,14 +141,11 @@ const Weatherv2 = () => {
     );
   }
 
-  /* ---------- split KPI tiles ---------- */
   const firstRow = stats.slice(0, 2);
   const secondRow = stats.slice(2, 5);
 
-  /* ---------- RENDER ---------- */
   return (
     <Box p={2} width="100%">
-      {/* ----- IG-6 Weather Card (full-width) ----- */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <BreadCrumbsIndividual locationDetails={locationDetails} />
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
@@ -137,30 +154,28 @@ const Weatherv2 = () => {
               <span>Last Live Data fetched time: {LastFetchLiveData}</span>
             )}
           </Box>
-
         </div>
-
       </div>
+
       <Box mt={2}>
         <Alertbar setLocationDetailsforbreadcrumb={setLocationDetails} />
       </Box>
+
       <HvGrid container>
         <HvGrid item xs={12}>
           <HvCard
-            style={{
+            sx={{
               width: "100%",
               borderRadius: 0,
               boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
             }}
           >
-            {/* header */}
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1, p: 1 }}>
               <img src={locationImg} alt="location" width={40} height={40} />
-              <HvTypography variant="title3">{locationName}</HvTypography>   {/* ← use it here */}
+              <HvTypography variant="title3">{locationName}</HvTypography>
             </Box>
 
-
-            {/* first row (temp + humidity) */}
+            {/* First Row */}
             <Box
               sx={{
                 display: "flex",
@@ -170,9 +185,9 @@ const Weatherv2 = () => {
                 justifyContent: isXs ? "center" : "space-between",
               }}
             >
-              {firstRow.map((s, i) => (
+              {firstRow.map((s) => (
                 <HvCard
-                  key={i}
+                  key={s.label}
                   bgcolor="white"
                   style={{ flex: "1 1 330px", minWidth: 260 }}
                 >
@@ -195,27 +210,25 @@ const Weatherv2 = () => {
                         </HvTypography>
                       </Box>
                       <Box sx={{ width: 180, height: 90 }}>
-                        <GaugeChart
-                          id={`g${i}`}
-                          nrOfLevels={3}
-                          percent={s.numeric / s.max}
-                          colors={
-                            s.label === "Air Temperature"
-                              ? ["#87CEEB", "#00a6ff", "#FF0000"]
-                              : ["#87CEEB", "#00a6ff", "#1b00ff"]
-                          }
-                          arcWidth={0.3}
-                          textColor="#000"
-                          animate
-                          formatTextValue={() => ""}
-                        />
-                        {/* Show min/max only for Air Temperature */}
-                        {s.label === "Air Temperature" && (
-                          <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "12px", px: 1, mt: "-8px" }}>
-                            <span>0°C</span>
-                            <span>{s.max}°C</span>
-                          </Box>
-                        )}
+                       <MemoGauge
+  id={`gauge-${s.label}`} // must be stable
+  percent={s.numeric && s.max ? s.numeric / s.max : 0}
+  colors={
+    s.label.includes("Temperature")
+      ? ["#87CEEB", "#00a6ff", "#FF0000"]
+      : ["#87CEEB", "#00a6ff", "#1b00ff"]
+  }
+/>
+
+{(s.label.includes("Temperature") || s.label.includes("Humidity")) && (
+  <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "12px", px: 1, mt: "-8px" }}>
+    <span>{s.label.includes("Temperature") ? "0°C" : "0%"}</span>
+    <span>{s.label.includes("Temperature") ? `${s.max}°C` : `${s.max}%`}</span>
+  </Box>
+)}
+
+
+                        
                       </Box>
                     </Box>
                   </Box>
@@ -223,7 +236,7 @@ const Weatherv2 = () => {
               ))}
             </Box>
 
-            {/* second row (rain, pressure, solar) */}
+            {/* Second Row */}
             <Box
               sx={{
                 display: "flex",
@@ -233,9 +246,9 @@ const Weatherv2 = () => {
                 justifyContent: isXs ? "center" : "space-between",
               }}
             >
-              {secondRow.map((s, i) => (
+              {secondRow.map((s) => (
                 <HvCard
-                  key={i}
+                  key={s.label}
                   bgcolor="white"
                   style={{ flex: "1 1 220px", minWidth: 180 }}
                 >
@@ -257,7 +270,7 @@ const Weatherv2 = () => {
         </HvGrid>
       </HvGrid>
 
-      {/* ----- Wind-rose (full-width) ----- */}
+      {/* Wind Rose Chart */}
       <HvGrid container sx={{ mt: 2 }}>
         <HvGrid item xs={12}>
           <WindRoseChart data={dirData} />

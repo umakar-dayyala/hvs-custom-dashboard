@@ -15,12 +15,20 @@ const positionMap = {
   129: [120, 190],
 };
 
-// Center the map
 const CenterMap = () => {
   const map = useMap();
-  map.setView([imageHeight / 2, imageWidth / 2], 0);
+  const didInitialCenter = useRef(false);
+
+  useEffect(() => {
+    if (!didInitialCenter.current) {
+      map.setView([imageHeight / 2, imageWidth / 2], 0);
+      didInitialCenter.current = true;
+    }
+  }, [map]);
+
   return null;
 };
+
 
 // Custom Leaflet Layer for Plotly Wind Rose
 const WindRoseLayer = ({ data = [], position = [150, 190] }) => {
@@ -28,31 +36,23 @@ const WindRoseLayer = ({ data = [], position = [150, 190] }) => {
   const layerRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Base size of the chart at zoom level 0
   const baseSize = 300;
 
   useEffect(() => {
-    // Create a custom Leaflet layer
     layerRef.current = L.Layer.extend({
       onAdd: function (map) {
-        // Create container div for Plotly
         containerRef.current = L.DomUtil.create("div", "wind-rose-container");
         containerRef.current.style.position = "absolute";
         containerRef.current.style.zIndex = 1000;
 
-        // Add to map's overlay pane
         map.getPanes().overlayPane.appendChild(containerRef.current);
-
-        // Initialize Plotly chart
         renderPlotlyChart();
 
-        // Update position and size on map move/zoom
         map.on("moveend zoomend", updatePositionAndSize);
         updatePositionAndSize();
       },
 
       onRemove: function (map) {
-        // Clean up
         map.off("moveend zoomend", updatePositionAndSize);
         if (containerRef.current) {
           L.DomUtil.remove(containerRef.current);
@@ -61,7 +61,6 @@ const WindRoseLayer = ({ data = [], position = [150, 190] }) => {
       },
     });
 
-    // Instantiate and add layer to map
     const layer = new layerRef.current();
     layer.addTo(map);
 
@@ -70,7 +69,6 @@ const WindRoseLayer = ({ data = [], position = [150, 190] }) => {
     };
   }, [map, position, data]);
 
-  // Function to render/update Plotly chart
   const renderPlotlyChart = () => {
     if (!containerRef.current) return;
 
@@ -130,28 +128,22 @@ const WindRoseLayer = ({ data = [], position = [150, 190] }) => {
     );
   };
 
-  // Update chart position and size based on map's LatLng and zoom
   const updatePositionAndSize = () => {
     if (!containerRef.current) return;
 
-    // Calculate scale based on zoom level
     const zoom = map.getZoom();
-    const scale = Math.pow(2, zoom); // Leaflet's zoom is exponential (2^zoom)
+    const scale = Math.pow(2, zoom);
     const scaledSize = baseSize * scale;
 
-    // Update container size
     containerRef.current.style.width = `${scaledSize}px`;
     containerRef.current.style.height = `${scaledSize}px`;
 
-    // Update Plotly chart size
     Plotly.relayout(containerRef.current, {
       width: scaledSize,
       height: scaledSize,
     });
 
-    // Update position
     const point = map.latLngToLayerPoint(L.latLng(position));
-    // Adjust for chart center
     const adjustedPoint = {
       x: point.x - scaledSize / 2,
       y: point.y - scaledSize / 2,
@@ -162,19 +154,33 @@ const WindRoseLayer = ({ data = [], position = [150, 190] }) => {
   return null;
 };
 
-const WindRoseLeaflet = ({ data = [] }) => {
-  // Extract device_id from URL
-  const queryParams = new URLSearchParams(window.location.search);
-  const deviceId = parseInt(queryParams.get("device_id")) || 129; // Default to 117 if not found
+// 🔧 Utility: max speed
+const getMaxSpeed = (windData) => {
+  if (!windData?.length) return "—";
+  return Math.max(...windData.map((d) => parseFloat(d.speed) || 0)).toFixed(2);
+};
 
-  // Get position based on device_id
+// 🔧 Utility: dominant direction
+const getDominantDirection = (windData) => {
+  if (!windData?.length) return "—";
+  const sorted = [...windData].sort(
+    (a, b) => (parseFloat(b.speed) || 0) - (parseFloat(a.speed) || 0)
+  );
+  return sorted[0]?.direction || "—";
+};
+
+const WindRoseLeaflet = ({ data = [] }) => {
+  const queryParams = new URLSearchParams(window.location.search);
+  const deviceId = parseInt(queryParams.get("device_id")) || 129;
+
   const position = useMemo(() => {
-    return positionMap[deviceId] || [150, 190]; // Default position if device_id not in map
+    return positionMap[deviceId] || [150, 190];
   }, [deviceId]);
 
   return (
     <div
       style={{
+        position: "relative",
         height: "95vh",
         width: "100%",
         padding: "20px",
@@ -193,6 +199,25 @@ const WindRoseLeaflet = ({ data = [] }) => {
         <ImageOverlay url={centralvista} bounds={bounds} opacity={0.9} />
         <WindRoseLayer data={data} position={position} />
       </MapContainer>
+
+      {/* Top-right Wind Info Box */}
+      <div
+        style={{
+          position: "absolute",
+          top: 40,
+          right: 40,
+          background: "rgba(255, 255, 255, 0.9)",
+          padding: "10px 15px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+          zIndex: 1000,
+          fontSize: "14px",
+          color: "#000",
+        }}
+      >
+        <div><strong>Wind Speed:</strong> {getMaxSpeed(data)} m/s</div>
+        <div><strong>Direction:</strong> {getDominantDirection(data)}</div>
+      </div>
     </div>
   );
 };

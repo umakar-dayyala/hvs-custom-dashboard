@@ -19,14 +19,12 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange, title, lastFetchTime })
   const [filteredData, setFilteredData] = useState(null);
   const [selectedRange, setSelectedRange] = useState();
 
-  // Check if anomalyChartData is valid
   const isValidData =
     anomalyChartData &&
     Array.isArray(anomalyChartData.datasets) &&
     anomalyChartData.datasets.length > 0 &&
     Array.isArray(anomalyChartData.labels);
 
-  // Accordion expanded state, default expanded if data available
   const [expanded, setExpanded] = useState(isValidData);
 
   useEffect(() => {
@@ -55,32 +53,35 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange, title, lastFetchTime })
   const filterData = ([start, end]) => {
     if (!isValidData) return;
 
-    const filteredLabels = anomalyChartData.labels.filter((label) => {
+    const indices = anomalyChartData.labels.reduce((arr, label, index) => {
       const timestamp = dayjs(label);
-      return timestamp.isAfter(start) && timestamp.isBefore(end);
-    });
+      if (timestamp.isAfter(start) && timestamp.isBefore(end)) arr.push(index);
+      return arr;
+    }, []);
 
-    const filteredDatasets = anomalyChartData.datasets.map((dataset) => {
-      if (!dataset.data || !dataset.anomalyValues) return dataset;
+    const filteredLabels = indices.map((i) => anomalyChartData.labels[i]);
 
-      return {
-        ...dataset,
-        data: dataset.data.filter((_, index) => filteredLabels.includes(anomalyChartData.labels[index])),
-        anomalyValues: dataset.anomalyValues.filter((_, index) =>
-          filteredLabels.includes(anomalyChartData.labels[index])
-        ),
-      };
-    });
+    const filteredDatasets = anomalyChartData.datasets.map((dataset) => ({
+      ...dataset,
+      data: indices.map((i) => dataset.data?.[i] ?? null),
+      anomalyValues: indices.map((i) => dataset.anomalyValues?.[i] ?? 0),
+    }));
 
     setFilteredData({ labels: filteredLabels, datasets: filteredDatasets });
   };
 
   const currentDataset =
-    filteredData?.datasets?.find((d) => d.label === selectedDataset) ||
-    filteredData?.datasets?.[0];
+  filteredData?.datasets?.find((d) => d.label === selectedDataset) ||
+  anomalyChartData?.datasets?.find((d) => d.label === selectedDataset) ||
+  anomalyChartData?.datasets?.[0] ||
+  null;
 
-  const hasData =
-    filteredData && filteredData.datasets?.some((dataset) => dataset.data?.length > 0);
+
+  const chartLabels = filteredData?.labels || anomalyChartData.labels;
+  const chartData = currentDataset?.data || [];
+  const chartAnomalies = currentDataset?.anomalyValues || [];
+
+  const hasData = Array.isArray(chartData) && chartData.length > 0;
 
   return (
     <Accordion expanded={expanded} onChange={() => setExpanded((p) => !p)}>
@@ -143,7 +144,6 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange, title, lastFetchTime })
                   ))}
                 </Select>
               )}
-
               <DateTimeRangePicker onChange={handleDateRangeChange} />
             </div>
           </div>
@@ -155,13 +155,13 @@ const AnomalyChart = ({ anomalyChartData, onRangeChange, title, lastFetchTime })
                   config={{ displayModeBar: false }}
                   data={[
                     {
-                      x: filteredData.labels,
-                      y: currentDataset.data,
+                      x: chartLabels,
+                      y: chartData,
                       mode: "lines+markers",
                       name: "Data",
                       marker: {
-                        color: currentDataset.data.map((_, index) =>
-                          currentDataset.anomalyValues[index] === 1 ? "red" : "blue"
+                        color: chartData.map((_, index) =>
+                          chartAnomalies[index] === 1 ? "red" : "blue"
                         ),
                         size: 6,
                       },
