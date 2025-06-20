@@ -32,7 +32,7 @@ import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from "../components/Connectivitydata";
 import { fetchDeviceNotifications } from "../service/notificationService";
 
-export const IbacIndividual = () => {
+ const IbacIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
   const [bioParamChartData, setBioParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -313,3 +313,4 @@ export const IbacIndividual = () => {
     </Box>
   );
 };
+export default IbacIndividual;

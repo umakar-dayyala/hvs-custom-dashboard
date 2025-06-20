@@ -33,7 +33,7 @@ import Imagedata from "../components/Imagedata";
 import { fetchDeviceNotifications } from "../service/notificationService";
 
 
-export const WRMIndividual = () => {
+const WRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
   const [wrmParamChartData, setWrmParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -296,3 +296,4 @@ export const WRMIndividual = () => {
     </Box>
   );
 };
+export default WRMIndividual;

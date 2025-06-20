@@ -39,7 +39,7 @@ const DUMMY_KPI_DATA = [
   { title: "Analytics Alert", value: "No Data" }
 ];
 
-export const FcadIndividual = React.memo(() => {
+const FcadIndividual = React.memo(() => {
   const [paramsData, setParamsData] = useState([]);
   const [ap4cParamChartData, setap4cParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -307,3 +307,5 @@ const setLocationDetails=(floor,zone,location,sensorType) => {
     </Box>
   );
 });
+
+export default FcadIndividual;

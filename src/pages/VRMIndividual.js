@@ -30,7 +30,7 @@ import { fetchDeviceNotifications } from '../service/notificationService';
 
 
 
-export const VRMIndividual = () => {
+const VRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
   const [vrmParamChartData, setVRMParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -291,3 +291,5 @@ export const VRMIndividual = () => {
     </Box>
   );
 };
+
+export default VRMIndividual;

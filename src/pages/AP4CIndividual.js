@@ -36,7 +36,7 @@ const DUMMY_KPI_DATA = [
   { title: "Analytics Alert", value: "No Data" }
 ];
 
-export const AP4CIndividual = React.memo(() => {
+const AP4CIndividual = React.memo(() => {
   const [paramsData, setParamsData] = useState([]);
   const [ap4cParamChartData, setap4cParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -312,3 +312,5 @@ export const AP4CIndividual = React.memo(() => {
     </Box>
   );
 });
+
+export default AP4CIndividual;

@@ -23,7 +23,7 @@ import greenBell from "../assets/greenBell.svg";
 import aicon from "../assets/aRadiological.svg";
 import greyradio from "../assets/greyRadio.svg";
 
-export const AgmIndividual = () => {
+const AgmIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
   const [agmParamChartData, setAgmParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -248,3 +248,4 @@ export const AgmIndividual = () => {
     </Box>
   );
 };
+export default AgmIndividual;

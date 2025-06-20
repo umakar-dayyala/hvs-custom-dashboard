@@ -30,7 +30,7 @@ import { fetchDeviceNotifications } from '../service/notificationService';
 
 
 
-export const PRMIndividual = () => {
+const PRMIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
   const [prmParamChartData, setPRMParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -293,3 +293,4 @@ const [LastFetchLiveData, setLastFetchLiveData] = useState(null);
     </Box>
   );
 };
+export default PRMIndividual;

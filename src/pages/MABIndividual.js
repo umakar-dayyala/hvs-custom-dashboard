@@ -28,7 +28,7 @@ import aicon from "../assets/aBiological.svg";
 import greyBio from "../assets/greyBio.svg";
 import { fetchDeviceNotifications } from '../service/notificationService';
 
-export const MABIndividual = React.memo(() => {
+const MABIndividual = React.memo(() => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [paramsData, setParamsData] = useState([]);
   const [mabParamChartData, setMabParamChartData] = useState({});
@@ -336,3 +336,4 @@ export const MABIndividual = React.memo(() => {
     </Box>
   );
 });
+export default MABIndividual;

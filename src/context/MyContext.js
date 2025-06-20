@@ -13,3 +13,4 @@ export const MyProvider = ({ children }) => {
     </MyContext.Provider>
   );
 };
+export default MyProvider;

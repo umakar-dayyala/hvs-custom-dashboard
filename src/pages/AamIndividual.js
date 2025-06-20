@@ -25,7 +25,7 @@ import greyradio from "../assets/greyRadio.svg";
 import BreadCrumbsIndividual from '../components/BreadCrumbsIndividual';
 import Connectivitydata from '../components/Connectivitydata';
 
-export const AamIndividual = () => {
+const AamIndividual = () => {
   const [paramsData, setParamsData] = useState([]);
   const [agmParamChartData, setAgmParamChartData] = useState({});
   const [kpiData, setKpiData] = useState([]);
@@ -257,3 +257,5 @@ export const AamIndividual = () => {
     </Box>
   );
 };
+
+export default AamIndividual;
