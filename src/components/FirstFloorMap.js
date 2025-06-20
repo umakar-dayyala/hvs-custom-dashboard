@@ -39,20 +39,20 @@ const imageBounds = [[0, 0], [775, 825]];
 // Sensor positions
 const sensorPositions = {
 
-  2193: [511, 147],     // FCAD - 1 > Done
-  2194: [410, 159],      // FCAD - 2 > Done
-  2196: [493, 556],   // FCAD - 3 > Done
-  2197: [239, 565],     // FCAD - 4 > Done
-  2198: [201, 136],   // FCAD - 5 > Done
-  2195: [629, 330],     // FCAD - 6 > Done
-  51: [626, 336],   // AGM - 7 > Done
-  2199: [544, 440],     // FCAD - 8 > Done
-  2200: [193, 409],     // FCAD - 9 > Done
-  2201: [359, 153],   // FCAD - a > Done
-  39: [549, 445],   // PRM - b > Done
-  40: [195, 413],   // PRM - c > Done
-  70: [636, 225],     // AP4C - d >Done
-  71: [136, 177],     // AP4C - e > Done
+  2193: [511, 145],     // FCAD - 39 > Done
+  2194: [400, 154],      // FCAD - 40 > Done
+  2196: [476, 579],   // FCAD - 43 > Done
+  2197: [256, 603],     // FCAD - 44 > Done
+  2198: [280, 127],   // FCAD - 45 > Done
+  2195: [609, 362],     // FCAD - 41 > Done
+  51: [602, 373],   // AGM - 42 > Done
+  2199: [540, 438],     // FCAD - 46 > Done
+  2200: [185, 415],     // FCAD - 49 > Done
+  2201: [359, 147],   // FCAD - 50 > Done
+  39: [534, 434],   // PRM - 48 > Done
+  40: [187, 407],   // PRM - 52 > Done
+  70: [598, 180],     // AP4C - 47 >Done
+  71: [163, 145],     // AP4C - 51 > Done
 };
 
 
@@ -212,7 +212,7 @@ const FirstFloorMap = ({ sensorData = [] }) => {
         minZoom={-2}
         maxZoom={2}
       >
-        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}First_Floor_map.png`} bounds={imageBounds} />
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}new_FFMap.png`} bounds={imageBounds} />
 
         {/* Gate markers */}
         {/* {Object.entries(gatePositions).map(([key, position]) => (

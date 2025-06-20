@@ -32,37 +32,42 @@ const imageBounds = [[0, 0], [775, 825]];
 
 // Sensor positions
 const sensorPositions = {
-  1159: [378, 103], //1 Done
-  49: [382, 113], //2  Done
-  15: [514, 154], //3 Done
-  3: [569, 476], //4 Done
-  146: [567, 472], //5 Done
-  65: [563, 467], //6 Done
-  2187: [561, 463], //7 Done
-  2186: [586, 356], //8 Done
-  33: [561, 489], //a Done
-  34: [337, 734], //b Done
-  53: [343, 724], //c Done
-  113: [335, 724], //d Done
-  145: [549, 486], //e Done
-  35: [324, 734], //f Done
-  66: [328, 724], //g Done
-  2188: [320, 724], //h Done
-  2189: [240, 544],  //i Done
-  36: [142, 447], //j Done
-  2190: [143, 453], //k Done
-  90: [149, 457], //l Done
-  67: [157, 451], //m Done
-  37: [141, 441], //n Done
-  50: [144, 435],//o Done
-  2191: [130, 329], //p Done
-  38: [367, 108], //q Done
-  2192: [239, 134], //r Done
-  69: [182, 196], //s Done
-  3183: [188, 202], //t Done
-  68: [573, 253], //u Done
-  3186: [600, 250],
-  3185: [110, 257], // ASM is missing here 1171
+  1159: [388, 155], //5 Done
+  49: [384, 169], //4  Done
+  15: [489, 198], //6 Done
+  3: [567, 474], //4 Done
+  146: [573, 470], //12 Done
+  65: [563, 467], //11 Done
+  2187: [557, 464], //13 Done
+  33: [561, 483], //14 Done
+  34: [337, 692], //16 Done
+  53: [343, 692], //17 Done
+  113: [343, 688], //18 Done
+  145: [549, 482], //15 Done
+  35: [329, 690], //20 Done
+  66: [320, 690], //22 Done
+  2188: [325, 690], //21 Done
+  2189: [240, 530],  //23 Done
+  36: [134, 461], //24 Done
+  2190: [143, 453], //25 Done
+  90: [149, 457], //26 Done
+  67: [150, 449], //27 Done
+  37: [137, 448], //28 Done
+  50: [144, 446],//29 Done
+  2191: [130, 359], //30 Done
+  38: [372, 154], //32 Done
+  2192: [239, 179], //31 Done
+  69: [160, 227], //38 Done
+  3183: [172, 222], //36 Done
+  68: [577, 253], //35 Done
+  3186: [170, 229], //37 Done
+  3185: [570, 250], // 34 Done
+  // // new devices
+  81: [606, 365], // 8 Done
+  16: [617, 352], // 7 Done
+  1171: [338, 688], // 19 Done
+  2186: [585, 385], //9 Done
+  3184: [570, 237], //33 Done
 };
 
 // Gate label positions
@@ -213,7 +218,7 @@ const UGFFloorMap = ({ sensorData = [] }) => {
         minZoom={-2}
         maxZoom={2}
       >
-        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}UGF_map.png`} bounds={imageBounds} />
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}new_UGFMap.jpg`} bounds={imageBounds} />
 
         {/* Gate markers */}
         {/* {Object.entries(gatePositions).map(([key, position]) => (

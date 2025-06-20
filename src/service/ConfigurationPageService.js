@@ -68,3 +68,29 @@ export const toggleSensorStatus = async (deviceId, action) => {
 };
 
 
+export const getStopLedParams = async (sensor_name, device_id) => {
+  const response = await fetch(`${API_BASE_URL}/config/getStopLedParams`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ sensor_name, device_id }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch LED/Buzzer parameters");
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+export const fetchStopLedAckData = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/config/getAckAlarmData`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching acknowledged alarm data:", error?.response?.data || error.message);
+    throw new Error("Failed to fetch acknowledged alarm data");
+  }
+};

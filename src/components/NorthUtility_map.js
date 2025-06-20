@@ -40,19 +40,22 @@ const imageBounds = [[0, 0], [775, 825]];
 const sensorPositions = {
 
   //SENSOR NAMES are not updated
-  46: [560, 162],     // PRM - a >  Done
-  45: [562, 171],     // PRM - b >  Done
-  1165: [565, 179],   // AP4C - c > Done
-  1149: [553, 163],      // AGM - d >  Done
-  127: [548, 166],   // MAB - e > Done
-  2209: [542, 172],      // FCAD - f > Done 
-  52: [205, 585],    // AGM - g >  Done
-  2210: [210, 578],     // FCAD - h > Done 
-  47: [216, 583],      // PRM - i Done
-  1166: [220, 587],  // AP4C - j >  Done
-  12: [220, 592],   // MAB - k Done but not getting data
-  48: [218, 596],   // PRM - l Done
-
+  46: [556, 212],     // PRM -  103 Done
+  45: [562, 213],     // PRM - 102 Done
+  1165: [551, 216],   // AP4C - 98 Done
+  1149: [545, 205],      // AGM - 101 Done
+  127: [542, 215],   // MAB - > 99 Done
+  2209: [548, 209],      // FCAD - 97 Done
+  52: [217, 582],    // AGM - 108 Done
+  2210: [221, 581],     // FCAD - 104 Done
+  47: [232, 583],      // PRM - 109 Done
+  1166: [241, 585],  // AP4C - 105 Done
+  // 12: [220, 592],   // MAB - k Done but not get not ther
+  48: [226, 589],   // PRM - 110 Done
+  // new device id's
+  1179: [538, 212], // ASM 100 Done
+  128: [244, 589], // MAB 106 Done
+  1189: [243, 592], // ASM 107 not recieving data
 };
 
 
@@ -201,7 +204,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         navigate(`/${route}?device_id=${sensor.device_id}`);
       }
     }
-  };  
+  };
 
   return (
     <div style={{ position: "relative", width: "100%", height: "90vh" }}>
@@ -213,7 +216,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         minZoom={-2}
         maxZoom={2}
       >
-        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}NU_map.png`} bounds={imageBounds} />
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}new_NUMap.png`} bounds={imageBounds} />
         {/* Sensor markers */}
         {Array.isArray(sensorData) && sensorData.map((entry) => {
           const sensor = entry.s_no;

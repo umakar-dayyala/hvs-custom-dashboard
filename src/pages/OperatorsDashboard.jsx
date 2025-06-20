@@ -106,7 +106,7 @@ const OperatorDashboard = () => {
   };
 
 
-  // console.log(floorData);
+  console.log("Floor data is",floorData);
   return (
     <>
       {loading && <Loader />}

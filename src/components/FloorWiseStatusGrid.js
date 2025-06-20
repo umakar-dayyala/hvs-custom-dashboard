@@ -191,10 +191,20 @@ const FloorWiseStatusGrid = ({ sensorData }) => {
   const zones = useMemo(() => Object.keys(sensorMatrix).sort(), [sensorMatrix]);
 
   const locations = useMemo(() => {
-    const set = new Set();
-    zones.forEach((z) => Object.keys(sensorMatrix[z]).forEach((l) => set.add(l)));
-    return [...set].sort();
-  }, [zones, sensorMatrix]);
+    const seen = new Set();
+    const ordered = [];
+  
+    zones.forEach((zone) => {
+      Object.keys(sensorMatrix[zone]).forEach((loc) => {
+        if (!seen.has(loc)) {
+          seen.add(loc);
+          ordered.push(loc);
+        }
+      });
+    });
+  
+    return ordered;
+  }, [zones, sensorMatrix]);  
 
   return (
     <Box overflow="auto">

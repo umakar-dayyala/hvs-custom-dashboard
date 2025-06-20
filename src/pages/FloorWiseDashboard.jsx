@@ -34,6 +34,7 @@ import TerraceMap from "../components/TerraceMap";
 import FirstFloorMap from "../components/FirstFloorMap";
 import SouthUtilityMap from "../components/SouthUtility_map";
 import NorthUtilityMap from "../components/NorthUtility_map";
+import UtilityBlockMap from "../components/utilityBlcokMap";
 import FloorWiseNotificationPanal from "../components/FloorWiseNotificationPanal";
 import SummaryCards from "../components/SummaryCards";
 
@@ -420,6 +421,9 @@ const FloorWiseDashboard = () => {
                   <ToggleButton value="south" aria-label="South View">
                     South
                   </ToggleButton>
+                  <ToggleButton value="utilityBlock" aria-label="Utility Block View">
+                    Utility Block
+                  </ToggleButton>
                 </ToggleButtonGroup>
               )}
             </Box>
@@ -438,9 +442,11 @@ const FloorWiseDashboard = () => {
                   floor === "Utility Blocks" ? (
                     utilityView === "north" ? (
                       <NorthUtilityMap sensorData={floorSummaryData} />
-                    ) : (
+                    ) : utilityView === "south" ? (
                       <SouthUtilityMap sensorData={floorSummaryData} />
-                    )
+                    ) : utilityView === "utilityBlock" ? (
+                      <UtilityBlockMap sensorData={floorSummaryData} />
+                    ) : null
                   ) : floor === "Upper Ground Floor" ? (
                     <UGFFloorMap sensorData={floorSummaryData} />
                   ) : floor === "Lower Ground Floor" ? (
@@ -476,7 +482,7 @@ const FloorWiseDashboard = () => {
                 <Box bg="white" p={1} borderRadius="lg" boxShadow="lg" borderColor="#E8E8E8">
                   {/* <FloorWiseNotificationPanal sensorData={floorSummaryData} /> */}
                   {/* {floor === "Upper Ground Floor" ? ( */}
-                    <FloorWiseNotificationPanal sensorData={floorNotificationData} />
+                  <FloorWiseNotificationPanal sensorData={floorNotificationData} />
                   {/* // ) : null} */}
                 </Box>
               </Box>

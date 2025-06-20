@@ -1,141 +1,142 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { SearchableTable } from '../components/TableComponentConfig';
-import { fetchConfigurationData, fetchSensorStatusData } from '../service/ConfigurationPageService';
-
-const stop_led_title = "Stop LED/Buzzer";
-const Configuration_title = "Configure Sensor";
-const active_dective_title = "Activate/Deactivate Sensor";
-const predective_title = "Enable/Disable Predictive Analytics";
+import {
+  fetchConfigurationData,
+  fetchSensorStatusData,
+  fetchStopLedAckData
+} from '../service/ConfigurationPageService';
 
 const ConfigurationPage = () => {
-  const [tableData, setTableData] = useState({
-    general: [],
-    stopLed: [],
-    sensorStatus: []
-  });
-  const [loadingStates, setLoadingStates] = useState({
-    stopLed: true,
+  const [generalData, setGeneralData] = useState([]);
+  const [stopLedData, setStopLedData] = useState([]);
+  const [sensorStatusData, setSensorStatusData] = useState([]);
+
+  const [loading, setLoading] = useState({
     general: true,
+    stopLed: true,
     sensorStatus: true,
     predictive: true
   });
 
-  const fetchData = async (tableKey) => {
-    setLoadingStates(prev => ({ ...prev, [tableKey]: true }));
+  // ✅ Fetch for Configure Sensor and Predictive
+  const loadGeneralData = async () => {
+    setLoading(prev => ({ ...prev, general: true, predictive: true }));
+    try {
+      const res = await fetchConfigurationData();
+      const formatted = res.data.map(item => ({
+        staticPort: item.staticPort,
+        static_type_flag: item.static_type_flag,
+        staticIp: item.staticIp,
+        device_id: item.device_id,
+        floor: item.floor,
+        zone: item.zone,
+        location: item.location,
+        type: item.sensor_type,
+        sensor: item.sensor,
+        action: item.action
+      }));
+      setGeneralData(formatted);
+    } catch (err) {
+      console.error("Error loading general config:", err);
+    } finally {
+      setLoading(prev => ({ ...prev, general: false, predictive: false }));
+    }
+  };
 
-    if (tableKey === 'stopLed' || tableKey === 'general' || tableKey === 'predictive') {
-      try {
-        const configRes = await fetchConfigurationData();
-        const processedGeneralData = configRes.data.map(item => ({
-          staticPort: item.staticPort,
-          static_type_flag: item.static_type_flag,
-          staticIp: item.staticIp,
-          device_id: item.device_id,
-          floor: item.floor,
-          zone: item.zone,
-          location: item.location,
-          type: item.sensor_type,
-          sensor: item.sensor,
-          action: item.action
-        }));
+  // ✅ Fetch for Stop LED/Buzzer
+  const loadStopLedData = async () => {
+    setLoading(prev => ({ ...prev, stopLed: true }));
+    try {
+      const res = await fetchStopLedAckData();
+      const formatted = res.data.map(item => {
+        const d = item.device_id;
+        return {
+          device_id: d.device_id,
+          floor: d.floor,
+          zone: d.zone,
+          location: d.location,
+          type: d.sensor_type,
+          sensor: d.sensor,
+          staticIp: d.static_ip,
+          staticPort: d.static_port,
+          alarm_status: d.alarm_staus || "N/A",
+          alarm_start: d.alarm_start,
+          ack_at: d.ack_at,
+          action: d.action,
+        };
+      });
+      setStopLedData(formatted);
+    } catch (err) {
+      console.error("Error loading stop LED data:", err);
+    } finally {
+      setLoading(prev => ({ ...prev, stopLed: false }));
+    }
+  };
 
-        const stopLedData = configRes.data
-          .filter(item => item.action === 1)
-          .map(item => ({
-            device_id: item.device_id,
-            floor: item.floor,
-            zone: item.zone,
-            location: item.location,
-            type: item.sensor_type,
-            sensor: item.sensor,
-            staticIp: item.staticIp,
-            staticPort: item.staticPort,
-            alarm_status: item.alarm_status || "N/A",
-            action: item.action
-          }));
-
-        setTableData(prev => ({
-          ...prev,
-          general: tableKey === 'general' || tableKey === 'predictive' ? processedGeneralData : prev.general,
-          stopLed: tableKey === 'stopLed' ? stopLedData : prev.stopLed
-        }));
-      } catch (err) {
-        console.error("Error fetching configuration data:", err);
-      } finally {
-        setLoadingStates(prev => ({ ...prev, [tableKey]: false }));
-      }
-    } else if (tableKey === 'sensorStatus') {
-      try {
-        const sensorStatusRes = await fetchSensorStatusData();
-        const predictiveData = sensorStatusRes.data.map(item => ({
-          device_id: item.device_id,
-          floor: item.floor,
-          zone: item.zone,
-          location: item.location,
-          type: item.sensor_type,
-          sensor: item.sensor_name,
-          sensor_status: item.sensor_status
-        }));
-
-        setTableData(prev => ({
-          ...prev,
-          sensorStatus: predictiveData
-        }));
-      } catch (err) {
-        console.error("Error fetching sensor status data:", err);
-      } finally {
-        setLoadingStates(prev => ({ ...prev, sensorStatus: false }));
-      }
+  // ✅ Fetch for Activate/Deactivate
+  const loadSensorStatusData = async () => {
+    setLoading(prev => ({ ...prev, sensorStatus: true }));
+    try {
+      const res = await fetchSensorStatusData();
+      const formatted = res.data.map(item => ({
+        device_id: item.device_id,
+        floor: item.floor,
+        zone: item.zone,
+        location: item.location,
+        type: item.sensor_type,
+        sensor: item.sensor_name,
+        sensor_status: item.sensor_status
+      }));
+      setSensorStatusData(formatted);
+    } catch (err) {
+      console.error("Error loading sensor status:", err);
+    } finally {
+      setLoading(prev => ({ ...prev, sensorStatus: false }));
     }
   };
 
   useEffect(() => {
-    fetchData('stopLed');
-    fetchData('general');
-    fetchData('sensorStatus');
-    fetchData('predictive');
+    loadStopLedData();
+    loadGeneralData();
+    loadSensorStatusData();
   }, []);
 
   return (
     <div>
-      {/* Stop LED/Buzzer Table */}
       <Box mt={2} mb={2}>
         <SearchableTable
-          tableData={tableData.stopLed}
-          title={stop_led_title}
-          refreshData={() => fetchData('stopLed')}
-          loading={loadingStates.stopLed}
+          tableData={stopLedData}
+          title="Stop LED/Buzzer"
+          refreshData={loadStopLedData}
+          loading={loading.stopLed}
         />
       </Box>
 
-      {/* Configure Sensor Table */}
       <Box mt={2} mb={2}>
         <SearchableTable
-          tableData={tableData.general}
-          title={Configuration_title}
-          refreshData={() => fetchData('general')}
-          loading={loadingStates.general}
+          tableData={generalData}
+          title="Configure Sensor"
+          refreshData={loadGeneralData}
+          loading={loading.general}
         />
       </Box>
 
-      {/* Activate/Deactivate Sensor Table */}
       <Box mt={2} mb={2}>
         <SearchableTable
-          tableData={tableData.sensorStatus}
-          title={active_dective_title}
-          refreshData={() => fetchData('sensorStatus')}
-          loading={loadingStates.sensorStatus}
+          tableData={sensorStatusData}
+          title="Activate/Deactivate Sensor"
+          refreshData={loadSensorStatusData}
+          loading={loading.sensorStatus}
         />
       </Box>
 
-      {/* Enable/Disable Predictive Analytics Table */}
       <Box mt={2} mb={2}>
         <SearchableTable
-          tableData={tableData.general}
-          title={predective_title}
-          refreshData={() => fetchData('predictive')}
-          loading={loadingStates.predictive}
+          tableData={generalData}
+          title="Enable/Disable Predictive Analytics"
+          refreshData={loadGeneralData}
+          loading={loading.predictive}
         />
       </Box>
     </div>

@@ -16,13 +16,27 @@ import rChemicalIcon from "../assets/rChemical.svg";
 import activeSensorsIcon from "../assets/onlineWifi.svg";
 import inactiveSensorsIcon from "../assets/greyWifi.svg";
 import WarningIcon from "@mui/icons-material/Warning";
+import gWeather from "../assets/gWeather.svg";
+import rWeather from "../assets/rWeather.svg";
+import gOxygen from "../assets/gOxygen.svg";
+import rOxygen from "../assets/rOxygen.svg";
 
 // Sensor type to icon mapping
-const getSensorIcon = (type, count) => {
+const getSensorIcon = (type, count, floorName = "") => {
+  const lowerName = floorName.toLowerCase();
   const icons = {
     radiological: count > 0 ? rRadiologicalIcon : gRadiologicalIcon,
     biological: count > 0 ? rBiologicalIcon : gBiologicalIcon,
     chemical: count > 0 ? rChemicalIcon : gChemicalIcon,
+    generic: (() => {
+      if (lowerName.includes("iron gate")) {
+        return count > 0 ? rWeather : gWeather;
+      } else if (lowerName.includes("upper ground")) {
+        return count > 0 ? rOxygen : gOxygen;
+      } else {
+        return count > 0 ? rWeather : gWeather;
+      }
+    })(),
   };
   return icons[type] || null
 };
@@ -102,6 +116,24 @@ const FloorSummary = ({ data = [], sensorCounts = {} }) => {
               </HvTypography>
               <VerticalDivider />
             </Box>
+            {["iron gate", "upper ground"].some(name =>
+              floor.floor.toLowerCase().includes(name)
+            ) && (
+                <Box display="flex" alignItems="center" gap={0.5} ml={1}>
+                  <img
+                    src={getSensorIcon("generic", floor.generic_alarms, floor.floor)}
+                    alt="Generic Icon"
+                    width={30}
+                    height={30}
+                  />
+                  <HvTypography variant="title3">
+                    <span style={{ color: getSensorTextColor(floor.generic_alarms) }}>
+                      Generic {floor.generic_alarms}
+                    </span>/{floor.total_generic || 0}
+                  </HvTypography>
+                  <VerticalDivider />
+                </Box>
+              )}
 
             {/* Total Zones */}
             <Box display="flex" alignItems="center" gap={0.5} ml={1}>

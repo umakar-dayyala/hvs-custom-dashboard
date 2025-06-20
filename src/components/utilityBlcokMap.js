@@ -31,43 +31,46 @@ import alertWeather from "../assets/rWeather.svg";
 import greyOxygen from "../assets/gyOxygen.svg";
 import greyWeather from "../assets/gyWeather.svg";
 import compassImg from "../assets/CompassIcon.png";
-import { getMABDeviceId } from "../service/summaryServices";
 import { routeName } from "../utils/RouteUtils";
+import { getMABDeviceId } from "../service/summaryServices";
 
 const imageBounds = [[0, 0], [775, 825]];
 
 // Sensor positions
 const sensorPositions = {
 
-  72: [510, 124],     // AP4C - 53 Done
-  73: [635, 346],     // AP4C - 55 Done
-  2202: [642, 344],   // FCAD - 54 Done
-  74: [475, 597],     // AP4C - 56 Done
-  1148: [468, 603],   // IBAC - 57 Done
-  75: [241, 587],      // AP4C - 59 Done
-  122: [239, 580],    // MAB - 60 Done
-  76: [108, 309],     // AP4C - 63 Done
-  77: [266, 107],      // AP4C - 65 Done 66 SL number in Iccc documnet missing device id
-  2203: [242, 584],  // FCAD - 58 Done
-  2204: [269, 107],   // FCAD - 64 Done
-  7: [406, 226],   // IBAC - 71 Done
-  78: [408, 245],     // AP4C - 68 Done
-  79: [407, 217],      // AP4C - 69 Done
-  123: [411, 261],    // MAB 72 - Done
-  1147: [411, 253],   // IBAC - 70 Done
-  2205: [413, 258],  // FCAD - 67 Done
-  2206: [319, 247],   // FCAD - 75 Done
-  1160: [342, 247],   // AP4C - 77 Done
-  1145: [324, 252],  // IBAC - 78 Done
-  124: [310, 243],   // MAB - 80 done
-  1146: [340, 250],   // IBAC - 79 Done
+  41: [69, 172],     // PRM - 88 Done 
+  1161: [75, 171],    // AP4C - 84 Done 
+  2207: [62, 180],   // FCAD - 83 Done
+  42: [63, 184],     // PRM - 89 Done
+  57: [64, 188],   // AGM - 87 Done
+  125: [76, 175],      // MAB - 85 Done
+  43: [228, 604],    // PRM - 95 Done
+  1164: [222, 611],     // AP4C -  91 Done
+  5: [220, 604],      // AGM 94 Done
+  2208: [221, 597],  // FCAD -  90 Done
+  126: [230, 595],   // MAB 92 Done
+  44: [226, 593],   // PRM 96 Done
+  // new device
+  1177: [77, 178], // ASM 86 Done
+  1178:[233, 598], // ASM 93 Done
 
-  1170: [355, 153],   // AAM (81) - 82 Done
-  1169: [412, 237],   // AAM (85) - 74 Done
-  1172: [236, 587],   // ASB - 61 Done Serial Number, 62 SL number in Iccc documnet missing device id(Not live)
-  1175: [409, 250],   // ASB - 73 Done
-  1176: [314, 239],   // ASB - 81 Done 
-  80: [312, 248],      // AP4C - 76 Done
+  46: [663, 209],     // PRM -  103 Done
+  45: [668, 211],     // PRM - 102 Done
+  1165: [663, 214],   // AP4C - 98 Done
+  1149: [659, 205],      // AGM - 101 Done
+  127: [657, 213],   // MAB - > 99 Done
+  2209: [660, 207],      // FCAD - 97 Done
+  52: [480, 601],    // AGM - 108 Done
+  2210: [484, 600],     // FCAD - 104 Done
+  47: [489, 600],      // PRM - 109 Done
+  1166: [495, 602],  // AP4C - 105 Done
+  48: [487, 607],   // PRM - 110 Done
+  // new device id's
+  1179: [656, 211], // ASM 100 Done
+  128: [496, 608], // MAB 106 Done
+  1189: [496, 611], // ASM 107 not recieving data
+  
 };
 
 
@@ -197,8 +200,8 @@ const createGateIcon = (label) =>
     iconAnchor: [30, 10],
   });
 
-const FloorPlanMap = ({ sensorData = [] }) => {
-  console.log("Terrace Opened:");
+const UtilityBlockMap = ({ sensorData = [] }) => {
+  console.log("SOUTH UTILITY Opened:");
   const navigate = useNavigate();
 
   const handleClick = async (sensor) => {
@@ -216,7 +219,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         navigate(`/${route}?device_id=${sensor.device_id}`);
       }
     }
-  };
+  };  
 
   return (
     <div style={{ position: "relative", width: "100%", height: "90vh" }}>
@@ -228,7 +231,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         minZoom={-2}
         maxZoom={2}
       >
-        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}new_TerraceMap.png`} bounds={imageBounds} />
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}new_UtilityMap.png`} bounds={imageBounds} />
 
         {/* Sensor markers */}
         {Array.isArray(sensorData) && sensorData.map((entry) => {
@@ -236,8 +239,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
           const position = sensorPositions[sensor.device_id];
           if (!position) return null;
 
-          const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.alarm_status,
-            sensor.detector);
+          const iconUrl = getIconByStatus(sensor.detector_type, sensor.status, sensor.alarm_status, sensor.detector);
           const icon = createPinIcon(iconUrl, sensor.status, sensor.alarm_status);
 
           return (
@@ -270,7 +272,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         alt="Overlay"
         style={{
           position: "absolute",
-          top: "10px",
+          bottom: "10px",
           right: "10px",
           width: "150px",
           height: "150px",
@@ -281,4 +283,4 @@ const FloorPlanMap = ({ sensorData = [] }) => {
   );
 };
 
-export default FloorPlanMap;
+export default UtilityBlockMap;

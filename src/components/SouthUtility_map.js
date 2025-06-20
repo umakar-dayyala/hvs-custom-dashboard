@@ -40,18 +40,21 @@ const imageBounds = [[0, 0], [775, 825]];
 const sensorPositions = {
 
   //SENSOR NAMES are not updated
-  41: [179, 175],     // PRM - 1 > Done  
-  1161: [190, 176],    // AP4C - 2 > Done
-  2207: [164, 180],   // FCAD - 3 >  Done
-  42: [171, 187],     // PRM - 4 >  Done 
-  57: [176, 193],   // AGM - 5 >   Done
-  125: [195, 183],      // MAB - 6 > Done 
-  43: [549, 612],    // PRM - 7 > Done 
-  1164: [532, 617],     // AP4C - 8 >  Done 
-  5: [527, 612],      // AGM - 9 Done
-  2208: [528, 605],  // FCAD - x > Done  
-  126: [555, 602],   // MAB - y Done
-  44: [540, 602],   // PRM - z (IBAC-IBAC), pseudo device_id Done
+  41: [185, 174],     // PRM - 88 Done
+  1161: [195, 174],    // AP4C - 84 Done
+  2207: [168, 182],   // FCAD - 83 Done
+  42: [172, 186],     // PRM - 89 Done
+  57: [174, 190],   // AGM - 87 Done
+  125: [198, 178],      // MAB - 85 Done
+  43: [510, 586],    // PRM - 95 Done
+  1164: [492, 592],     // AP4C -  91 Done
+  5: [490, 586],      // AGM 94 Done
+  2208: [494, 580],  // FCAD -  90 Done
+  126: [515, 576],   // MAB 92 Done
+  44: [502, 576],   // PRM 96 Done
+  // new device
+  1177: [200, 181], // ASM 86 Done
+  1178:[517, 580], // ASM 93 Done
 
 };
 
@@ -213,7 +216,7 @@ const FloorPlanMap = ({ sensorData = [] }) => {
         minZoom={-2}
         maxZoom={2}
       >
-        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}SU_map.png`} bounds={imageBounds} />
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}new_SUMap.png`} bounds={imageBounds} />
 
         {/* Sensor markers */}
         {Array.isArray(sensorData) && sensorData.map((entry) => {

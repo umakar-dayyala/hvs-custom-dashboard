@@ -38,7 +38,7 @@ const imageBounds = [[0, 0], [775, 825]];
 
 // Sensor positions
 const sensorPositions = {
-  1168: [712, 231],     // AAM - 1
+  1168: [683, 253],     // AAM - 1 Done
 };
 
 
@@ -192,7 +192,7 @@ const LGFFloorMap = ({ sensorData = [] }) => {
         minZoom={-2}
         maxZoom={2}
       >
-        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}LGF_PNG.png`} bounds={imageBounds} />
+        <ImageOverlay url={`${process.env.REACT_APP_IMAGE_URL}new_LGFMap.png`} bounds={imageBounds} />
 
         {/* Gate markers */}
         {/* {Object.entries(gatePositions).map(([key, position]) => (

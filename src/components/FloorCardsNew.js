@@ -78,17 +78,20 @@ const FloorCards = ({ floorData }) => {
                 inActiveSensor > 0 || floor.activeSensors === 0 || floor.totalSensors === 0
                   ? "RGB(128, 128,128)" : "#29991d";
 
-          const bioIcon = floor.totalSensors === 0 ? greyBio :
-            floor.biological_alarms > 0 ? alertBiological :
-              inActiveSensor > 0 || floor.activeSensors === 0 ? greyBio : gBiological;
+          // const bioIcon = floor.totalSensors === 0 ? greyBio :
+          //   floor.biological_alarms > 0 ? alertBiological :
+          //     inActiveSensor > 0 || floor.activeSensors === 0 ? greyBio : gBiological;
+          // const chemicalIcon = floor.totalSensors === 0 ? greyChemical :
+          //   floor.chemical_alarms > 0 ? alertChemical :
+          //     inActiveSensor > 0 || floor.activeSensors === 0 ? greyChemical : gChemical;
+          // const radioIcon = floor.totalSensors === 0 ? greyRadio :
+          //   floor.radiological_alarms > 0 ? alertRadiation :
+          //     inActiveSensor > 0 || floor.activeSensors === 0 ? greyRadio : gRadiation;
+          
+          const bioIcon = floor.biological_alarms > 0 ? alertBiological : greyBio;
+          const chemicalIcon = floor.chemical_alarms > 0 ? alertChemical : greyChemical;
+          const radioIcon = floor.radiological_alarms > 0 ? alertRadiation : greyRadio;
 
-          const chemicalIcon = floor.totalSensors === 0 ? greyChemical :
-            floor.chemical_alarms > 0 ? alertChemical :
-              inActiveSensor > 0 || floor.activeSensors === 0 ? greyChemical : gChemical;
-
-          const radioIcon = floor.totalSensors === 0 ? greyRadio :
-            floor.radiological_alarms > 0 ? alertRadiation :
-              inActiveSensor > 0 || floor.activeSensors === 0 ? greyRadio : gRadiation;
 
           const chartOptions = {
             chart: { type: "donut", toolbar: { show: false }, animations: { enabled: true } },

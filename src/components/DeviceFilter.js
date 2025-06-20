@@ -87,6 +87,18 @@ const DeviceFilter = () => {
     }));
   };
 
+  // const getOptions = (key) => {
+  //   const filteredBase = deviceData.filter((device) =>
+  //     Object.entries(filters).every(([k, v]) => {
+  //       if (k === key) return true;
+  //       return !v.length || v.includes(String(device[k]));
+  //     })
+  //   );
+
+  //   const uniqueValues = [...new Set(filteredBase.map((d) => d[key]))];
+  //   return uniqueValues.map((value) => ({ value, label: value }));
+  // };
+
   const getOptions = (key) => {
     const filteredBase = deviceData.filter((device) =>
       Object.entries(filters).every(([k, v]) => {
@@ -94,10 +106,25 @@ const DeviceFilter = () => {
         return !v.length || v.includes(String(device[k]));
       })
     );
-
-    const uniqueValues = [...new Set(filteredBase.map((d) => d[key]))];
+  
+    let uniqueValues = [...new Set(filteredBase.map((d) => d[key]))];
+  
+    // Custom sorting logic
+    if (key === "zone" || key === "location") {
+      uniqueValues = uniqueValues.sort((a, b) => {
+        // Try numeric sort if all values are numbers or contain numeric suffixes like "Zone 1", "Zone 2"
+        const aNum = parseInt(a.match(/\d+/));
+        const bNum = parseInt(b.match(/\d+/));
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return aNum - bNum;
+        }
+        // Fallback to alphabetical sort
+        return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: "base" });
+      });
+    }
+  
     return uniqueValues.map((value) => ({ value, label: value }));
-  };
+  };  
 
   const navigate = useNavigate();
 

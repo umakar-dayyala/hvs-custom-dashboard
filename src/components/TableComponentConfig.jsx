@@ -27,7 +27,8 @@ import {
 } from "@hitachivantara/uikit-react-core";
 import { Add, Close, Filters } from "@hitachivantara/uikit-react-icons";
 import WriteConfigurationModal from "./ConfigModal";
-import { toggleSensorStatus } from "../service/ConfigurationPageService";
+import { toggleSensorStatus, getStopLedParams } from "../service/ConfigurationPageService";
+import { sendStopLedCommand } from "../components/StopLedCommand";
 import "../css/configurationPage.css";
 
 const slide = keyframes({
@@ -198,6 +199,11 @@ export const SearchableTable = ({ tableData = [], loading = false, title, refres
         filter: "includesSome",
       },
       {
+        Header: "Device ID",
+        accessor: "device_id",
+        filter: "includesSome",
+      },
+      {
         Header: "Type",
         accessor: "type",
         filter: "includesSome",
@@ -243,8 +249,32 @@ export const SearchableTable = ({ tableData = [], loading = false, title, refres
             <HvButton
               variant="primaryGhost"
               className={classes.actionButton}
-              onClick={() => {
-                console.log("Stop LED/Buzzer clicked for:", row.original.device_id);
+              // disabled={row.original.ack_at !== null}
+              onClick={async () => {
+                const sensorName = row.original.sensor;
+                const deviceId = row.original.device_id;
+                const ip = row.original.staticIp;
+                const port = row.original.staticPort;
+
+                try {
+                  // Optional: fetch parameter names for user feedback
+                  const res = await getStopLedParams(sensorName, deviceId);
+                  const paramNames = res?.data?.map(p => p.parameter_name).join(", ");
+
+                  // Call centralized command logic (this builds + sends the payload)
+                  await sendStopLedCommand({ device_id: deviceId, ip, port, sensor_name: sensorName });
+
+                  setSnackbarMessage(
+                    paramNames
+                      ? `Stop LED/Buzzer command sent. Params: ${paramNames}`
+                      : "Command sent. No param names received."
+                  );
+                } catch (error) {
+                  console.error("Stop LED command failed:", error);
+                  setSnackbarMessage("Failed to send Stop LED/Buzzer command");
+                } finally {
+                  setSnackbarOpen(true);
+                }
               }}
             >
               Stop LED/Buzzer

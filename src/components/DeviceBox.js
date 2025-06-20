@@ -5,6 +5,8 @@ import chemicon from "../assets/blackChemical.svg";
 import radioicon from "../assets/blackRadio.svg";
 import weathericon from "../assets/bWeather.svg";
 import oxygenicon from "../assets/bOxygen.svg";
+import { Tooltip } from "@mui/material";
+
 
 const DeviceBox = ({ device }) => {
   const getBackgroundColor = () => {
@@ -31,83 +33,104 @@ const DeviceBox = ({ device }) => {
   };
 
   return (
-    
-    <Button
-      variant="contained"
-      fullWidth
-      sx={{
-        p: 1.5,
-        height: "100%",
-        
-        fontWeight: "bold",
-        backgroundColor: getBackgroundColor(),
-        color: "white",
-        "&:hover": {
-          backgroundColor: getHoverBackgroundColor(),
+    <Tooltip
+      title={`${device.category} - ${device.type2}`}
+      placement="top"
+      arrow
+      componentsProps={{
+        tooltip: {
+          sx: {
+            bgcolor: "white",
+            color: "black",
+            fontWeight: "bold",
+            fontSize: "0.85rem",
+            border: "1px solid #ccc",
+            boxShadow: 3,
+          },
         },
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        textAlign: "left",
-        gap: 2,
-        transition: "background-color 0.3s ease",
+        arrow: {
+          sx: {
+            color: "white",
+          },
+        },
       }}
     >
-      {getIcon() && (
-        <Box
-          component="img"
-          src={getIcon()}
-          alt="icon"
-          sx={{
-            width: 40,
-            height: 40,
-            filter: "invert(100%)",
-            flexShrink: 0,
-          }}
-        />
-      )}
+      <Button
+        variant="contained"
+        fullWidth
+        sx={{
+          p: 1.5,
+          height: "100%",
+          fontWeight: "bold",
+          backgroundColor: getBackgroundColor(),
+          color: "white",
+          "&:hover": {
+            backgroundColor: getHoverBackgroundColor(),
+          },
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          textAlign: "left",
+          gap: 2,
+          transition: "background-color 0.3s ease",
+        }}
+      >
+        {getIcon() && (
+          <Box
+            component="img"
+            src={getIcon()}
+            alt="icon"
+            sx={{
+              width: 40,
+              height: 40,
+              filter: "invert(100%)",
+              flexShrink: 0,
+            }}
+          />
+        )}
 
-      <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <Typography
-          variant="subtitle2"
-          title={device.name}
-          sx={{
-            fontSize: { xs: "0.85rem", sm: "0.95rem" },
-            fontWeight: "bold",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {device.name}
-        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <Typography
+            variant="subtitle2"
+            title={device.name}
+            sx={{
+              fontSize: { xs: "0.85rem", sm: "0.95rem" },
+              fontWeight: "bold",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {device.name}
+          </Typography>
 
-        <Typography
-          variant="body1"
-          title={device.sensorName}
-          sx={{
-            fontSize: "1rem",
-            fontWeight: "bold",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {device.sensorName}
-        </Typography>
+          <Typography
+            variant="body1"
+            title={device.sensorName}
+            sx={{
+              fontSize: "1rem",
+              fontWeight: "bold",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {device.sensorName}
+          </Typography>
 
-        <Typography
-          variant="caption"
-          sx={{
-            fontSize: "0.9rem",
-            fontWeight: "bold",
-          }}
-        >
-          {device.status}
-        </Typography>
-      </Box>
-    </Button>
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "0.9rem",
+              fontWeight: "bold",
+            }}
+          >
+            {device.status}
+          </Typography>
+        </Box>
+      </Button>
+    </Tooltip>
   );
 };
 
